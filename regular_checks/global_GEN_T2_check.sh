@@ -4,7 +4,7 @@ current_week=`date +"%Y%m%d"`
 six_months_ago=`date -d '6 months ago' +"%Y%m%d"`
 
 # set dirs
-SRC=/afs/cern.ch/user/m/mtaze/scripts/regular_checks
+SRC=/afs/cern.ch/user/m/mtaze/TransferTeam/regular_checks
 OUT=/afs/cern.ch/user/m/mtaze/work/OUTPUT/RegularCheckResults/GEN_check/$current_week
 mkdir -p $OUT
 

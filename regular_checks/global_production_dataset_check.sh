@@ -4,7 +4,7 @@ current_week=`date   +"%Y%m%d"`
 five_weeks_ago=`date -d '5 week ago' +"%Y%m%d"`
 
 # set dirs
-SRC=/afs/cern.ch/user/m/mtaze/scripts/regular_checks
+SRC=/afs/cern.ch/user/m/mtaze/TransferTeam/regular_checks
 OUT=/afs/cern.ch/user/m/mtaze/work/OUTPUT/RegularCheckResults/production_check/$current_week
 mkdir -p $OUT
 

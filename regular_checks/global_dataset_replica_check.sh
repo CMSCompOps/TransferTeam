@@ -3,7 +3,7 @@ echo "global dataset replica check  at `date`"
 current_week=`date +"%Y%m%d"`
 
 # set dirs
-SRC=/afs/cern.ch/user/m/mtaze/scripts/regular_checks
+SRC=/afs/cern.ch/user/m/mtaze/TransferTeam/regular_checks
 OUT=/afs/cern.ch/user/m/mtaze/work/OUTPUT/RegularCheckResults/replica_check/$current_week
 mkdir -p $OUT
 
