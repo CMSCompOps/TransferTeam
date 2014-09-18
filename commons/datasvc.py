@@ -30,7 +30,7 @@ def parseResult(out, path, result, firstEntry=False):
             if attr:
                 newOut = list(out);
                 for key in attr.split(','):
-                    newOut.append(str(subResult[key]))
+                    newOut.append(str(subResult[key]).replace('\n',''))
                 parseResult(newOut,rest,subResult)
             else:
                 parseResult(out, rest, subResult) 

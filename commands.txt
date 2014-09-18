@@ -1,70 +1,3 @@
-LOCAL
-FileDeleteTMDB -db ~/.globus/DBParam:Prod/Meric -list [file] -node [site]
-
-GLOBAL
-FileDeleteTMDB -db ~/.globus/DBParam:Prod/Meric -list [file] -invalidate
-
-~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS3SetFileStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=invalid --recursive=False --files=[files]
-awk '{system("~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS3SetFileStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=invalid --recursive=False --files="$1)}' [file]
-
-BLOCK INVALIDATION
-FileDeleteTMDB -db ~/.globus/DBParam:Prod/Meric -list block:blockname -invalidate
-
-Deletion campaign
-python deletionCampaign.py --node T1_DE_KIT_MSS --dataset /*/*Fall10*/*,/*/*Summer11*/*,/*/*Fall11*/*,/*/*Run2011*/*,/*/*Run2012*/* | tee kit;python deletionCampaign.py --node T1_ES_PIC_MSS --dataset /*/*Fall10*/*,/*/*Summer11*/*,/*/*Fall11*/*,/*/*Run2011*/*,/*/*Run2012*/* | tee pic;python 
-
-Location: 
-awk '{system("python ~/scripts/phedex/checkReplica.py --lfn "$1)}' file.txt
-awk '{system("python ~/scripts/phedex/checkReplica.py --option custodial:y --lfn "$1)}' file.txt
-awk '{system("python ~/scripts/phedex/checkCustodialLocation.py --onlyCustodial --lfn "$1)}' test.txt
-
-PhEDEx datasvc:
-./datasvc.py --service errorlog --options "from=T1_FR_CCIN2P3_Disk&to=T1_DE_KIT_Disk" --path /phedex/link/block/file/name --subpath /phedex/link/block/file/transfer_error/detail_log
-awk '{system("~/scripts/phedex/datasvc.py --service missingfiles --options \"block="$1"\" --path /phedex/block/replica/node")}' escaped_wrongdbsblock.txt
-
-
-BDV inject:
-/afs/cern.ch/user/m/mtaze/TransferTeam/consistency_check/BDV/BlockDownloadVerify-injector.pl --db ~/.globus/DBParam:Prod/Meric --expire 8640000 --node [node] --block % --test size --force 
-awk '{system("/afs/cern.ch/user/m/mtaze/TransferTeam/consistency_check/BDV/BlockDownloadVerify-injector.pl --db ~/.globus/DBParam:Prod/Meric --node T1_US_FNAL_Buffer --block "$1" --test size --force")}'
-
-BDV Parser
-/afs/cern.ch/user/m/mtaze/TransferTeam/consistency_check/BDV/BDVParser.sh --verbose --db ~/.globus/DBParam:Prod/Meric --node NODE --day 20 --round ROUND
-
-
-sqlplus $(~/phedex/PHEDEX-micro/Utilities/OracleConnectId -db ~/.globus/DBParam:Prod/Meric)
-
-
-NEW NODE
-./NodeNew -db ~/.globus/DBParam:Dev/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
-
-
-----------------------------------------------------------------------------------------------
-SCC
-----------------------------------------------------------------------------------------------
-/afs/cern.ch/user/m/mtaze/TransferTeam/consistency_check/SCC/SCCHelper.sh --db ~/.globus/DBParam:Prod/Meric --node NODE --dump DUMP --round ROUND
-
-| egrep "dataset_production" > fake_orphan
-| egrep "not_in_dbs|file_invalid|err: " > true_orphan
-| egrep "file_valid" > file_valid
-
-
-python ~/scripts/consistency_check/SCC/src/SCCUtils.py --node node --list input --output result.out
-
-
-egrep "/store/mc|/store/data|/store/generator|/store/results|/store/hidata|/store/himc|/store/lumi|/store/relval"
-
-
-file_not_in_dbs
-dataset_production
-file_not_have_info
-dataset_invalid_file_invalid
-dataset_invalid_file_valid
-dataset_deleted
-dataset_deprecated
-dataset_valid
-err:
-
-
 Disk Cleaning
 1-2- get dataset with cust loc
 awk '{system("python ~/scripts/phedex/checkReplica.py --option custodial:y --dataset "$1)}'
@@ -78,19 +11,8 @@ awk '{system("python ~/scripts/disk_cleaning/checkWFStat.py --inputdataset "$1)}
 
 
 
-Link Commissioning
-./DDTLinksManage -db ~/.globus/DBParam:Prod/Meric file
-./LinkNew -db ~/.globus/DBParam:Prod/Meric T1_US_FOO_MSS T1_US_FOO_Buffer:R/1
 
 ~/scripts/parallel.sh --command ' ?' --file [file] --output [output]
-awk -v d=1 '{system("./LinkNew -db ~/.globus/DBParam:Prod/Meric "$1"  T3_KR_KISTI:R/"d";./LinkNew -db ~/.globus/DBParam:Debug/Meric "$1"  T3_KR_KISTI:R/"d";./LinkNew -db ~/.globus/DBParam:Dev/Meric "$1"  T3_KR_KISTI:R/"d)}'
-
-
-glite-transfer-submit -s https://lcgfts3.gridpp.rl.ac.uk:8443 -t CMS_T0 -f ./copyjob
-glite-transfer-status --verbose -l -s https://lcgfts3.gridpp.rl.ac.uk:8443 4ff82ff7-2f95-4a2c-b59f-dd1973e3a564
-
-EOS dump
-for f in `/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select ls /eos/cms/store | egrep "mc|data|generator|results|hidata|himc|lumi|relval"`; do /afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select find -f -mtime +30 --ctime --mtime --checksum --size /eos/cms/store/$f; done | gzip -9 > eos_dump_`date +%s`.gz
 
 
 
@@ -101,7 +23,7 @@ Regular Checks
 -noreplica
 grep "/RAW$" dataset_without_replica.out
 awk '{system("python /afs/cern.ch/user/m/mtaze/TransferTeam/commons/checkReplica.py --dataset "$1)}' dataset_without_replica.out | grep -v "sites: $"
-awk '{system("~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS3SetDatasetStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=DELETED --recursive=False -d " $1 " || echo " $1)}' dataset_without_replica.out | tee failed_files
+awk '{system("~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS3SetDatasetStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=DELETED --recursive=False -d " $1 " || echo " $1)}' dataset_without_replica.out | tee no_replica_failed_files
 
 LOADTEST invalidation
 https://twiki.cern.ch/twiki/bin/view/CMS/PhedexOperationsLoadTestCreation#If_you_already_have_a_LoadTest07
@@ -131,32 +53,4 @@ update t_dps_dataset set is_open = 'y' where name = '/PhEDEx_Debug/LoadTest07Sou
 * get dest loadtest files
 /afs/cern.ch/user/m/mtaze/scripts/phedex/datasvc.py --instance=debug --service filereplicas --options "lfn=/store/PhEDEx_LoadTest07/LoadTest07_Debug_US_Va*/*/*/*US_Vandy_F8*" --path /phedex/block/file:name > vandy.out
 
-LINUX COMMANDS
-* find and replace a string in a file
-sed -i 's/find/replace/g' file.txt
--i : inplace
-g  : all
 
-*split file
-split (-l rowcound) (-b maxbyte) (-d numeric suffix) filename
-
-* join two file based on a column
-join -1 1 -2 1 file1 file2
-
-* We specified the dot as the separator. The -k 2,2n syntax has the following meaning. Do a sort by column (-k), start at the beginning of column 2 and go to the end of column 2 (2,2). The n on the end is to indicate that we want to do a numeric sort since we are dealing with numbers. 
-sort -t. -k 2,2n -k 4,4n
-
-* sort on the fly
-comm -23 <(sort 2kit_cust) <(sort 3kitblocktest)
-
-*Use this for dirs:
-ls -d -1 $PWD/**
-this for files:
-ls -d -1 $PWD/*.*
-this for everything:
-ls -d -1 $PWD/**/*
-
-* sec to date
-date -d @1361234760.790
-
-tracepath grid71.phy.ncu.edu.tw

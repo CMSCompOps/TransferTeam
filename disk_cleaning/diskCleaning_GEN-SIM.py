@@ -30,8 +30,9 @@ def geturl(url, request, retries=2):
 
 node = None
 datasetRegex='/*/*/GEN-SIM'
+monthLimit = 6 # in Months
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["node=","dataset="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["node=","dataset=","monthlimit="])
 except getopt.GetoptError:
     print  >> sys.stderr, 'Failed to parse options!'
     sys.exit(2)
@@ -42,7 +43,9 @@ for opt, arg in opts :
         node = arg
     elif opt == "--dataset":
         datasetRegex = arg
-        
+    elif opt == "--monthlimit":
+        monthLimit = int(arg)
+
 if node == None:
     print  >> sys.stderr, 'Please specify a node name with --node'
     sys.exit(2)
@@ -53,8 +56,7 @@ urlCMSWeb = 'cmsweb.cern.ch'
 urlWMstats = '/couchdb/wmstats/_design/WMStats/_view/'
 
 statusOngoingWF = ["assigned","acquired","running","running-open","running-closed","assignment-approved"]
-OUTPUTDATASET_LIMIT = 6 # in Months
-datelimit = int(time.time()) - 6*30*24*60*60
+datelimit = int(time.time()) - monthLimit*30*24*60*60
  
 try:
     url = urlPhedex + 'blockreplicas?create_since=0&show_dataset=y&dataset=%s&node=%s' % (datasetRegex,node)

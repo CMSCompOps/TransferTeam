@@ -38,9 +38,9 @@ done
 [ -z $round ] && { echo >&2 "Please specify round date(e.g. May14) with -r(--round) option!"; exit 1; }
 
 # some safety checks before starting SCC
-[ `grep -cv "^/store/" $dump` -eq 0 ] || {echo "All LFNs in the dump should start with \"/store\""; exit 5;}
-[ `grep -Ecv "/store/mc|/store/data|/store/generator|/store/results|/store/hidata|/store/himc|/store/lumi|/store/relval" $dump` -eq 0 ] || {echo "Storage dump should only contain LFNs under these directories: \n/store/mc\n/store/data\n/store/generator\n/store/results\n/store/hidata\n/store/himc\n/store/lumi\n/store/relval"; exit 5;}
-[ `grep -cv "\." $dump` -eq 0 ] || {echo "Some LFNs have no extension(.root, .tmp), these can be directory. Please remove files without extension from the dump before continue!"; exit 5;}
+[ `grep -cv "^/store/" $dump` -eq 0 ] || { echo "All LFNs in the dump should start with \"/store\""; exit 5; }
+[ `grep -Ecv "/store/mc|/store/data|/store/generator|/store/results|/store/hidata|/store/himc|/store/lumi|/store/relval" $dump` -eq 0 ] || { echo "Storage dump should only contain LFNs under these directories: \n/store/mc\n/store/data\n/store/generator\n/store/results\n/store/hidata\n/store/himc\n/store/lumi\n/store/relval"; exit 5; }
+[ `grep -cv "\." $dump` -eq 0 ] || { echo "Some LFNs have no extension(.root, .tmp), these can be directory. Please remove files without extension from the dump before continue!"; exit 5; }
 
 # create dir for site
 out=$out"/"$round"/"$node"/"

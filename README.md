@@ -5,24 +5,24 @@ TransferTeam
 ###Invalidation
 1) Check replica
 ```
-awk '{system("python .commons/checkReplica.py --lfn "$1)}' file.txt
+awk '{system("python ~/TransferTeam/commons/checkReplica.py --lfn "$1)}' file.txt
 ```
 
 2a) Local invalidation
 ```
-FileDeleteTMDB -db ~/param/DBParam:Prod/Meric -list [file] -node [site]
+~/TransferTeam/phedex/FileDeleteTMDB -db ~/param/DBParam:Prod/Meric -list [file] -node [site]
 ```
 
 2b) Global invalidation
 ```
 -TMDB
-FileDeleteTMDB -db ~/param/DBParam:Prod/Meric -list [file] -invalidate
+~/TransferTeam/phedex/FileDeleteTMDB -db ~/param/DBParam:Prod/Meric -list [file] -invalidate
 
 -DBS
 
-~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS3SetFileStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=invalid --recursive=False --files=[files]
+~/TransferTeam/dbs/DBS3SetFileStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=invalid --recursive=False --files=[files]
 OR
-awk '{system("~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS3SetFileStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=invalid --recursive=False --files="$1)}' [file]
+awk '{system("~/TransferTeam/dbs/DBS3SetFileStatus.py --url=https://cmsweb.cern.ch/dbs/prod/global/DBSWriter --status=invalid --recursive=False --files="$1)}' [file]
 ```
 
 ###PhEDEx Admin - new site
@@ -31,23 +31,23 @@ awk '{system("~/dbs3-client/slc5_amd64_gcc461/cms/dbs3-client/3.1.8/examples/DBS
 
 ```
 (optional: -capacity 200T)
-./NodeNew -db ~/param/DBParam:Dev/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
-./NodeNew -db ~/param/DBParam:Debug/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
-./NodeNew -db ~/param/DBParam:Prod/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
+~/TransferTeam/phedex/NodeNew -db ~/param/DBParam:Dev/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
+~/TransferTeam/phedex/NodeNew -db ~/param/DBParam:Debug/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
+~/TransferTeam/phedex/NodeNew -db ~/param/DBParam:Prod/Meric -name T3_HU_Debrecen -kind Disk -technology DPM -se-name dpm.grid.atomki.hu -capacity 200T
 ```
 
 2) Create PhEDEx links
 
 Link weights: https://twiki.cern.ch/twiki/bin/view/CMSPublic/CompOpsTransferTeamLinkWeights
 ```
-./LinkNew -db ~/param/DBParam:Dev/Meric T1_US_FNAL_Disk T3_KR_KISTI:R/1
-./LinkNew -db ~/param/DBParam:Debug/Meric T1_US_FNAL_Disk T3_KR_KISTI:R/1
-./LinkNew -db ~/param/DBParam:Prod/Meric T1_US_FNAL_Disk T3_KR_KISTI:R/1
+~/TransferTeam/phedex/LinkNew -db ~/param/DBParam:Dev/Meric T1_US_FNAL_Disk T3_KR_KISTI:R/1
+~/TransferTeam/phedex/LinkNew -db ~/param/DBParam:Debug/Meric T1_US_FNAL_Disk T3_KR_KISTI:R/1
+~/TransferTeam/phedex/LinkNew -db ~/param/DBParam:Prod/Meric T1_US_FNAL_Disk T3_KR_KISTI:R/1
 ```
 
 or use awk to create all at once
 ```
-awk '{system("./LinkNew -db ~/param/DBParam:Prod/Meric "$1" "$2":R/"$3";./LinkNew -db ~/param/DBParam:Debug/Meric "$1" "$2":R/"$3";./LinkNew -db ~/param/DBParam:Dev/Meric "$1" "$2":R/"$3)}'
+awk '{system("~/TransferTeam/phedex/LinkNew -db ~/param/DBParam:Prod/Meric "$1" "$2":R/"$3";~/TransferTeam/phedex/LinkNew -db ~/param/DBParam:Debug/Meric "$1" "$2":R/"$3";~/TransferTeam/phedex/LinkNew -db ~/param/DBParam:Dev/Meric "$1" "$2":R/"$3)}'
 
 $cat list.txt
 T1_US_FNAL_Disk T3_KR_KISTI 1
@@ -57,7 +57,7 @@ T1_IT_CNAF_Disk T3_KR_KISTI 1
 
 3) Disable Prod links, they should be commissioned, and enabled automatically
 ```
-./DDTLinksManage -db ~/param/DBParam:Prod/Meric file
+~/TransferTeam/phedex/DDTLinksManage -db ~/param/DBParam:Prod/Meric file
 
 $cat file
 T1_US_FNAL_Disk T3_KR_KISTI disable
@@ -66,18 +66,18 @@ T1_IT_CNAF_Disk T3_KR_KISTI disable
 ###Check Replica
 
 ```
-awk '{system("python .commons/checkReplica.py --lfn "$1)}' file.txt
+awk '{system("python ~/TransferTeam/commons/checkReplica.py --lfn "$1)}' file.txt
 
-awk '{system("python .commons/checkReplica.py --option custodial:y --dataset "$1)}' file.txt
+awk '{system("python ~/TransferTeam/commons/checkReplica.py --option custodial:y --dataset "$1)}' file.txt
 ```
 
 
 ###Parse PhEDEx data service
 
 ```
-./commons/datasvc.py --service errorlog --options "from=T1_FR_CCIN2P3_Disk&to=T1_DE_KIT_Disk" --path /phedex/link/block/file:name/transfer_error:detail_log
+~/TransferTeam/commons/datasvc.py --service errorlog --options "from=T1_FR_CCIN2P3_Disk&to=T1_DE_KIT_Disk" --path /phedex/link/block/file:name/transfer_error:detail_log
 
-awk '{system("./commons/datasvc.py --service missingfiles --options \"block="$1"\" --path /phedex/block/replica:node")}' block_list.txt
+awk '{system("~/TransferTeam/commons/datasvc.py --service missingfiles --options \"block="$1"\" --path /phedex/block/replica:node")}' block_list.txt
 ```
 
 ###Submit transfer to FTS server

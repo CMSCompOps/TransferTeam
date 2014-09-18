@@ -1,0 +1,13 @@
+1) Get Valid datasets in DBS (e.g. for Fall11)
+python deletionCampaign.py --dataset /*/*Fall11*/* | tee Fall11_dbs
+
+2) Get dataset with replica at T1 tapes
+python getT1Datasets.py --dataset /*/*Fall11*/* | tee Fall11_tmdb
+
+3) Get common datasets
+cat Fall11_dbs | cut -d ' ' -f 2 | sort | uniq > ds_dbs
+cat Fall11_tmdb | cut -d ' ' -f 2 | sort | uniq > ds_tmdb
+comm -12 ds_dbs ds_tmdb > common_Fall11
+
+4) join common datasets with ds_dbs list to get other information
+join -o 2.1,2.2,2.3,2.4,2.5,2.6,2.7,2.8 -1 1 -2 2 <(sort common_Fall11) <(sort Fall11_dbs) > Fall11.txt
