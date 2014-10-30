@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta name="author" content="Meric Taze">
+        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet"> 
+        <script src="https://code.jquery.com/jquery-latest.js"></script>
+        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+        <script src="base.js"></script>
+        <!-- Date: '{date}' -->
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="header">
+                <ul class="nav nav-pills pull-right">
+                    <li class="active"><a href="index.html">Lantecy</a></li>
+                    <li><a href="suggestions.html">Suggestions</a></li>
+                    <li><a href="corrupt_files.html">Corrupt Files</a></li>
+                    <li><a href="missing_files.html">Missing Files</a></li>
+                </ul>
+                <h3 class="text-muted">Transfer Team</h3>
+            </div>
+
+	    	<div class="page-header">
+	        	<h2>Disk Subscription Overview</h2>
+	      	</div>
+	      	<div>
+	        	{latency_table_disk}
+	        </div>
+	        
+	    	<div class="page-header">
+	        	<h2>CERN Subscription Overview</h2>
+	      	</div>
+	      	<div>
+	        	{latency_table_cern}
+	        </div>
+
+	        <div class="page-header">
+	        	<h4>Notes:</h4>
+	      	</div>
+
+	      	<div>
+	        	<ul>
+	        	    <li>
+	        	    	Subscription table row colors
+	        	    	<div class="alert-info">
+        					Preprocessing subscriptions
+      					</div>
+      					
+	        	    	<div class="alert-warning">
+        					Other subscriptions
+      					</div>
+      				</li>
+      				<li>
+      					Dataset table Problem column: if there is a number different than 0, that means transfer of that dataset won't be able to complete before solving the problem. Mouseover will show the suggestion to solve the problem.
+      					<p><div class="label label-success" data-original-title="" title="">0</div> No transfer problem</p>
+      					<p><div class="label label-warning" data-original-title="" title="">&gt;0</div> PhEDEx will try to recover the error automatically (though it might fail to recover)</p>
+      					<p><div class="label label-danger" data-original-title="" title="">&lt;0</div> The issue requires some operator intervention</p>
+      				</li>
+    				<li>
+    					If there is a transfer problem, "Estimated Arrival Time" will be set as "NA"
+      				</li>
+	        	</ul>
+	        </div>
+	    </div>
+      	<div>
+      	    <hr>
+    		{date}
+        </div>
+    </body>
+</html>
