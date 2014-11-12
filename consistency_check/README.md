@@ -4,7 +4,7 @@ twiki: https://twiki.cern.ch/twiki/bin/view/CMSPublic/CompOpsTransferTeamConsist
 
 #### StorageConsistencyCheck(SCC)
 ```
-~/TransferTeam/consistency_check/SCC/SCCHelper.sh --db ~/param/DBParam:Prod/Meric --node T2_CH_CERN --dump path/to/dump/file --round Nov14
+~/TransferTeam/consistency_check/SCC/SCCHelper.sh --db ~/param/DBParam:Prod/Meric --node T2_CH_CERN --dump path/to/dump/file --output output_dir
 ```
 #### BlockDownloadVerify(BDV)
 
@@ -16,5 +16,5 @@ twiki: https://twiki.cern.ch/twiki/bin/view/CMSPublic/CompOpsTransferTeamConsist
 
 * parse BDV results
 ```
-~/TransferTeam/consistency_check/BDV/BDVParser.sh --verbose --db ~/param/DBParam:Prod/Meric --node T2_CH_CERN --day 20 --round Nov14
+~/TransferTeam/consistency_check/BDV/BDVParser.sh --verbose --db ~/param/DBParam:Prod/Meric --node T2_CH_CERN --day 20 --output output_dir
 ```
