@@ -74,6 +74,13 @@ def initErrorTable(tableContent):
         errorLink = "https://cmsweb.cern.ch/phedex/%s/Activity::ErrorInfo?fileid=%s;tofilter=%s;fromfilter=%s" % (instance, trText['file_id'], trText['dest'], trText['src'])
         errorCell = createCell("")
         errorCell.append(createLink("errors",errorLink))
+
+        if trText['done'] == 1:
+            errorCell.set("style","background-color:#fcf8e3")
+        else:
+            errorCell.set("style","background-color:#f2dede")
+            
+
         row.append(errorCell)
 
         table.append(row)
@@ -86,13 +93,23 @@ def checkResultForError(result):
         dest = link.get('to','')
         for block in link['block']:
             for file in block['file']:
+
+                # check whether this is an old error and file is already transferred to destination
+                urlReplica ='https://cmsweb.cern.ch/phedex/datasvc/json/%s/filereplicas?lfn=%s' % (instance,file['name'])
+                resultReplica = json.load(urllib.urlopen(urlReplica))['phedex']['block'][0]['file'][0]
+                done = 0
+                for replica in resultReplica['replica']:
+                    if replica['node'] == dest:
+                       done = 1
+                       break
+
                 if errorRegex == None:
-                    tableContent.append({'src':src,'dest':dest,'lfn':file['name'],'file_id':file['id']})
+                    tableContent.append({'src':src,'dest':dest,'lfn':file['name'],'file_id':file['id'],'done':done})
                     return
                 else:
                     for error in file['transfer_error']:
                         if error['detail_log']['$t'] and re.search(r""+errorRegex,error['detail_log']['$t']):
-                            tableContent.append({'src':src,'dest':dest,'lfn':file['name'],'file_id':file['id']})
+                            tableContent.append({'src':src,'dest':dest,'lfn':file['name'],'file_id':file['id'],'done':done})
                             return
                         
 

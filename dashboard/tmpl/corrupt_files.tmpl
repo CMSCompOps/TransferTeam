@@ -3,10 +3,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta name="author" content="Meric Taze">
-        <link href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet"> 
-        <script src="https://code.jquery.com/jquery-latest.js"></script>
-        <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-        <script src="base.js"></script>
+        <link href="res/bootstrap.min.css" rel="stylesheet"> 
+        <script src="res/jquery-latest.js"></script>
+        <script src="res/bootstrap.min.js"></script>
+        <script src="res/base.js"></script>
         <!-- Date: '{date}' -->
     </head>
     <body>
@@ -27,7 +27,24 @@
 	      	<div>
 	        	{error_table}
 	        </div>
-        </div> 
+
+            <div class="page-header">
+                <h4>Notes:</h4>
+            </div>
+
+            <div>
+                <p>
+                    <div style="background-color:#fcf8e3;display: inline-block">errors</div>
+                    File is now at destination site
+                </p>
+                <p>
+                    <div style="background-color:#f2dede;display: inline-block">errors</div>
+                    Transfer of the file is still failing
+                </p>
+            </div>
+
+        </div>
+
       	<div>
       	    <hr>
     		{date}

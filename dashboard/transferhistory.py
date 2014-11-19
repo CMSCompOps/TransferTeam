@@ -3,7 +3,6 @@
 import sys,os,urllib,time, collections
 from xml.etree import ElementTree as ET
 from xml.dom import minidom
-from _sqlite3 import Row
 
 try:
     import json
@@ -30,7 +29,7 @@ suggestionTexts = {
                    "-2":" Transfer of these blocks have been suspended manually, you may want to check subscription page and unsuspend them",
                    "-3": "asdf",
                    "-4": "asdf",
-                   "-5": "No link from source to destination, you may want to commission the missing link",
+                   "-5": "No link from source to destination, you may want to commission the missing link, or agents might be down",
                    "-6": "Following files don't have replica, you may want to crosscheck&invalidate them"
                    }
 suggestionHeaders = {
