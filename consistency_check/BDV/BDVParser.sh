@@ -1,14 +1,13 @@
 #!/bin/bash
 
 src=/afs/cern.ch/user/m/mtaze/TransferTeam/consistency_check/BDV
-out=/afs/cern.ch/user/m/mtaze/work/OUTPUT/BDV_output
 node=""
 db=""
-round=""
 test="size"
 day=10
 check_finished=false
 verbose=false
+out=""
 
 function usage
 {
@@ -17,13 +16,13 @@ function usage
     echo "-t | --test    : Limit report to select only this type of failing blocks (default: size)"
     echo "-l | --day     : Limit report to tests updated so many days ago (default: 10)"
     echo "-c | --check   : If flag is set, it will only check whether BDV completed"
-    echo "-r | --round   : Consistency Check Round label to use in output directory creation (e.g. May14)"
+    echo "-o | --output  : Output directory"
     echo "-v | --verbose : verbose output"
 }
 
 
 # parse the command line arguments
-TEMP=`getopt -o d:n:t:l:r:cvh --long db:,node:,test:,day:,round:,check,verbose,help -n "$FUNCNAME" -- "$@"`
+TEMP=`getopt -o d:n:t:l:o:cvh --long db:,node:,test:,day:,output:,check,verbose,help -n "$FUNCNAME" -- "$@"`
 eval set -- "$TEMP";
 while [ $# -gt 0 ]
 do
@@ -34,7 +33,7 @@ do
         (-l|--day)  day="$2"; shift 2;;
         (-c|--check) check_finished=true; shift ;;
         (-v|--verbose) verbose=true; shift;;
-        (-r|--round) round="$2"; shift 2;;
+        (-o|--output) out="$2"; shift 2;;
         (-h|--help) usage; exit 0;;
         (--) shift; break;;
         (*)  echo >&2 "error!"; exit 1;;
@@ -44,18 +43,17 @@ done
 # check required arguments
 [ -z $db ] && { echo >&2 "Please specify DBParam with -d(--db) option!"; exit 1; }
 [ -z $node ] && { echo >&2 "Please specify node name with -n(--node) option!"; exit 1; }
-[ -z $round ] && { echo >&2 "Please specify round date(e.g. May14) with -r(--round) option!"; exit 1; }
+[ -z $out ] && { out="./"$node; }
 
 # create node directory
-out=$out"/"$round"/"$node"/"
 mkdir -p $out
 
 # create output files
-out_blocklist="$out${node:6}_BDV_block_list.txt"
-out_lfnlist="$out${node:6}_BDV_LFN_list.txt"
-out_local="$out${node:6}_BDV_local_invalidation.txt"
-out_global="$out${node:6}_BDV_global_invalidation.txt"
-out_report="$out${node:6}_BDV_report.txt"
+out_blocklist="$out"/"${node:6}_BDV_block_list.txt"
+out_lfnlist="$out"/"${node:6}_BDV_LFN_list.txt"
+out_local="$out"/"${node:6}_BDV_local_invalidation.txt"
+out_global="$out"/"${node:6}_BDV_global_invalidation.txt"
+out_report="$out"/"${node:6}_BDV_report.txt"
 
 
 # get injection report
@@ -70,6 +68,7 @@ unfinished=`cat $out_report | grep -i $node | egrep -c -v "Fail /|OK /"`
 
 # remove old files before start to append them
 rm -f $out_lfnlist $out_global $out_local
+touch $out_global $out_local
 
 # get failed blocks
 cat $out_report | grep 'Fail /' | grep " $test " | tr -s ' ' | cut -d ' ' -f 13 | sort | uniq | egrep -iv "test|backfill|penguins|bunnies" > $out_blocklist
