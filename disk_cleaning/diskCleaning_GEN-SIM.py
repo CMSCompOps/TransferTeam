@@ -7,6 +7,13 @@ try:
 except ImportError:
     import simplejson as json
 
+pileup = ["/MinBias_TuneZ2_7TeV-pythia6/Summer11Leg-START53_LV4-v1/GEN-SIM","/MinBias_TuneZ2_7TeV-pythia6/Summer11-START311_V2-v2/GEN-SIM","/MinBias_TuneZ2star_8TeV-pythia6/Summer12-START50_V13-v3/GEN-SIM","/MinBias_Tune4C_7TeV_pythia8/Summer12-LowPU2010-START42_V17B-v1/GEN-SIM","/MinBias_TuneA2MB_13TeV-pythia8/Fall13-POSTLS162_V1-v1/GEN-SIM","/MinBias_TuneZ2star_14TeV-pythia6/GEM2019Upg14-DES19_62_V8-v1/GEN-SIM","/MinBias_TuneZ2star_14TeV-pythia6/TTI2023Upg14-DES23_62_V1-v1/GEN-SIM","/MinBias_TuneZ2star_14TeV-pythia6/Muon2023Upg14-DES23_62_V1-v1/GEN-SIM","/MinBias_TuneA2MB_2p76TeV_pythia8/ppSpring2014-STARTHI53_V28_castor-v2/GEN-SIM","/GJet_Pt-20_doubleEMEnriched_TuneZ2_7TeV-pythia6/Summer11Leg-START53_LV4-v1/GEN-SIM","/QCD_Pt-1800_TuneZ2_7TeV_pythia6/Summer11Leg-START53_LV4-v1/GEN-SIM","/W4Jets_TuneZ2_7TeV-madgraph-tauola/Summer11Leg-START53_LV4-v1/GEN-SIM"]
+
+def to_TB(amount):
+    return "%.3fTB" % (amount / float(1000 ** 4))
+
+def to_GB(amount):
+    return "%.3fGB" % (amount / float(1000 ** 3))
 
 # get method to parse given url which requires certificate
 def geturl(url, request, retries=2):
@@ -58,29 +65,36 @@ urlWMstats = '/couchdb/wmstats/_design/WMStats/_view/'
 statusOngoingWF = ["assigned","acquired","running","running-open","running-closed","assignment-approved"]
 datelimit = int(time.time()) - monthLimit*30*24*60*60
  
-try:
-    url = urlPhedex + 'blockreplicas?create_since=0&show_dataset=y&dataset=%s&node=%s' % (datasetRegex,node)
-    result = json.load(urllib.urlopen(url))
-    totalSize = 0
-    for dataset in result['phedex']['dataset']:
+url = urlPhedex + 'blockreplicas?create_since=0&show_dataset=y&dataset=%s&node=%s' % (datasetRegex,node)
+result = json.load(urllib.urlopen(url))
+totalSize = long(0)
+totalSizeAtSite = long(0)
+for dataset in result['phedex']['dataset']:
+    try:
         datasetName = str(dataset['name'])
-    
+
+        # skip pileup samples
+        if datasetName in pileup:
+            continue
+
         # check if custodial replica exists
-        url = urlPhedex + 'blockreplicas?create_since=0&custodial=y&dataset=' + datasetName
+        url = urlPhedex + 'blockreplicas?create_since=0&dataset=' + datasetName
         subResult = json.load(urllib.urlopen(url))
         custReplicaExist = False
+        datasetSizeAtSite = 0
         datasetSize = 0
         for block in subResult['phedex']['block']:
-            datasetSize += int(block['bytes'])
-            if 'replica' in block:
-                custReplicaExist = True
-            else:
-                custReplicaExist = False
-    
+            datasetSize += long(block['bytes'])
+            for replica in block['replica']:
+                if replica['node'] == node:
+                    datasetSizeAtSite += long(replica['bytes'])
+                if replica['custodial'] == "y":
+                    custReplicaExist = True
+
         if not custReplicaExist:
             #print >> sys.stderr, 'no custodial location for '+ datasetName
             continue
-    
+
         # check if it's input dataset of an ongoing WF
         url = urlWMstats + 'requestByInputDataset?include_docs=true&reduce=false&key="%s"' % datasetName
         rows = geturl(urlCMSWeb, url)['rows']
@@ -93,7 +107,7 @@ try:
                 break
         if isInputOfOngoingWF:
             continue
-    
+
         
         # check if it's output dataset of a recently finished WF  
         url = urlWMstats + 'requestByOutputDataset?include_docs=true&reduce=false&key="%s"' % datasetName
@@ -108,8 +122,9 @@ try:
         if isOutputOfRecentWF:
             continue
         
+        totalSizeAtSite += datasetSizeAtSite
         totalSize += datasetSize
-        print 'dataset:',datasetName
+        print 'dataset:',datasetName,'sizeAtSite:',to_GB(datasetSizeAtSite),'total_size:',to_GB(datasetSize)
         print '\tWFs(inputdataset):'
         for wf in inputWFs:
             print '\t\t'+wf
@@ -117,6 +132,7 @@ try:
         for wf in outputWFs:
             print '\t\t'+wf
         print
-    print 'total_size:', "%.3f TB" % (totalSize / float(1000 ** 4))
-except Exception as e:
-    print >> sys.stderr, 'error:',e
+    except Exception as e:
+        continue
+
+print 'total_size_at_site:', to_TB(totalSizeAtSite),'total_size:', to_TB(totalSize)

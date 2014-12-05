@@ -39,7 +39,7 @@ cat $out_prod_datasets | egrep -i 'Test|Backfill|Penguins|PreScaleThingy' | egre
 #cat $DIR/Test_whitelist.txt | sort | uniq > $DIR/out/$current_week/Test_whitelist.txt
 #comm -23 $DIR/out/$current_week/Test_samples_nonwhitelisted.txt  $DIR/out/$current_week/Test_whitelist.txt >$DIR/out/$current_week/Test_samples.txt
 
-[ -s $out_test_dataset ] && /bin/mail -s 'Test and Backfill production datasets older than one month' dmason@fnal.gov,andrew.lahiff@stfc.ac.uk,vincenzo.spinoso@ba.infn.it,ajit@hep.wisc.edu,jbadillo@cern.ch,gutsche@fnal.gov,Dirk.Hufnagel@cern.ch,amlevin@mit.edu,cms-comp-ops-transfer-team@cern.ch < $out_test_dataset
+[ -s $out_test_dataset ] && /bin/mail -s 'Test and Backfill production datasets older than one month' dmason@fnal.gov,andrew.lahiff@stfc.ac.uk,vincenzo.spinoso@ba.infn.it,ajit@hep.wisc.edu,jbadillo@cern.ch,alan.malta@cern.ch,gutsche@fnal.gov,Dirk.Hufnagel@cern.ch,amlevin@mit.edu,cms-comp-ops-transfer-team@cern.ch < $out_test_dataset
 
 #remove the Test* datasets
 comm -23 $out_prod_datasets $out_test_dataset > $tmp

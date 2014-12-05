@@ -8,5 +8,6 @@ $(document).ready(function(){
     $(".basis0").tooltip({title: 'all files in the block are currently routed. FileRouter estimate is used to calculate ETA'})
     $(".basis1").tooltip({title: 'the block is not yet routed because the destination queue is full'})
     $(".basis2").tooltip({title: 'at least one file in the block is currently not routed, because it recently failed to transfer, and is waiting for rerouting'})
+
 });
 

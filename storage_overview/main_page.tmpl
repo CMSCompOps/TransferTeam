@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{title}</title>
+<meta name="author" content="Oliver Gutsche">
+<!-- Date: '{date}' -->
+</head>
+<body>
+<h1>{title_tape}</h1>
+<h2>Current week Overview</h2>
+<a href="total_tape_storage_overview_by_site.png" target="_blank">
+    <img src="total_tape_storage_overview_by_site.png" height="200">
+</a>
+<a href="total_tape_storage_overview_by_type.png" target="_blank">
+    <img src="total_tape_storage_overview_by_type.png" height="200">
+</a>
+<br>
+{summary_tape}
+<h2>Delta between Current and Previous week Overview</h2>
+<a href="delta_tape_storage_overview_by_site.png" target="_blank">
+    <img src="delta_tape_storage_overview_by_site.png" height="200">
+</a>
+<a href="delta_tape_storage_overview_by_type.png" target="_blank">
+    <img src="delta_tape_storage_overview_by_type.png" height="200">
+</a>
+<br>
+{delta_summary_tape}
+<br>
+<a href="custodial_tape_storage_pie.png" target="_blank">
+    <img src="custodial_tape_storage_pie.png" height="250">
+</a>
+<a href="custodial_data_tape_storage_pie.png" target="_blank">
+    <img src="custodial_data_tape_storage_pie.png" height="250">
+</a>
+<a href="custodial_mc_tape_storage_pie.png" target="_blank">
+    <img src="custodial_mc_tape_storage_pie.png" height="250">
+</a>
+<br>
+
+<h2>Tables</h2>
+<table border="1" cellspacing="0" cellpadding="2">
+<tr>
+    <th>Description</th>
+    <th>Tables</th>
+</tr>
+<tr>
+    <td>Tape Storage Overview</td>
+    <td>
+        <a href="tape_storage_overview_current.html">Current week</a>, 
+        <a href="tape_storage_overview_previous.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview per site</td>
+    <td>{column_tape}</td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Detailed View for Data</td>
+    <td><a href="tape_storage_overview_current_data_detailed.html">Current week</a>, <a href="tape_storage_overview_previous_data_detailed.html">Previous week</a>, <a href="tape_storage_overview_delta_data_detailed.html">Delta between Current and Previous week</a></td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era/Tier View for Data</td>
+    <td>
+        <a href="tape_storage_overview_current_data_era_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_data_era_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_data_era_tier.html">Delta between Current and Previous week</a></td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era/Cust./Non-Cust. View for Data</td>
+    <td>
+        <a href="tape_storage_overview_current_data_era_cust.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_data_era_cust.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_data_era_cust.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era View for Data</td>
+    <td>
+        <a href="tape_storage_overview_current_data_era.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_data_era.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_data_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era View for Custodial Data</td>
+    <td>
+        <a href="tape_storage_overview_current_cust_data_era.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_cust_data_era.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_cust_data_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era View for Non-Custodial Data</td>
+    <td>
+        <a href="tape_storage_overview_current_non_cust_data_era.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_non_cust_data_era.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_non_cust_data_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Tier View for Data</td>
+    <td>
+        <a href="tape_storage_overview_current_data_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_data_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_data_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Tier View for Custodial Data</td>
+    <td>
+        <a href="tape_storage_overview_current_cust_data_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_cust_data_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_cust_data_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Tier View for Non-Custodial Data</td>
+    <td>
+        <a href="tape_storage_overview_current_non_cust_data_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_non_cust_data_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_non_cust_data_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Detailed View for MC</td>
+    <td>
+        <a href="tape_storage_overview_current_mc_detailed.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_mc_detailed.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_mc_detailed.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era/Tier View for MC</td>
+    <td>
+        <a href="tape_storage_overview_current_mc_era_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_mc_era_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_mc_era_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era/Cust./Non-Cust. View for MC</td>
+    <td>
+        <a href="tape_storage_overview_current_mc_era_cust.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_mc_era_cust.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_mc_era_cust.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era View for MC</td>
+    <td>
+        <a href="tape_storage_overview_current_mc_era.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_mc_era.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_mc_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era View for Custodial MC</td>
+    <td>
+        <a href="tape_storage_overview_current_cust_mc_era.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_cust_mc_era.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_cust_mc_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Era View for Non-Custodial MC</td>
+    <td>
+        <a href="tape_storage_overview_current_non_cust_mc_era.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_non_cust_mc_era.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_non_cust_mc_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Tier View for MC</td>
+    <td>
+        <a href="tape_storage_overview_current_mc_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_mc_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_mc_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Tier View for Custodial MC</td>
+    <td>
+        <a href="tape_storage_overview_current_cust_mc_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_cust_mc_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_cust_mc_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Tier View for Non-Custodial MC</td>
+    <td>
+        <a href="tape_storage_overview_current_non_cust_mc_tier.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_non_cust_mc_tier.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_non_cust_mc_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Tape Storage Overview: Detailed View for Other data</td>
+    <td>
+        <a href="tape_storage_overview_current_other_detailed.html">Current week</a>, 
+        <a href="tape_storage_overview_previous_other_detailed.html">Previous week</a>, 
+        <a href="tape_storage_overview_delta_other_detailed.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+
+</table>
+
+
+
+<h1>{title_disk}</h1>
+<h2>Current week Overview</h2>
+<a href="total_disk_storage_overview_by_site.png" target="_blank">
+    <img src="total_disk_storage_overview_by_site.png" height="200">
+</a>
+<a href="total_disk_storage_overview_by_type.png" target="_blank">
+    <img src="total_disk_storage_overview_by_type.png" height="200">
+</a>
+<br>
+{summary_disk}
+<h2>Delta between Current and Previous week Overview</h2>
+<a href="delta_disk_storage_overview_by_site.png" target="_blank">
+    <img src="delta_disk_storage_overview_by_site.png" height="200">
+</a>
+<a href="delta_disk_storage_overview_by_type.png" target="_blank">
+    <img src="delta_disk_storage_overview_by_type.png" height="200">
+</a>
+<br>
+{delta_summary_disk}
+<br>
+
+
+<h2>Tables</h2>
+<table border="1" cellspacing="0" cellpadding="2">
+<tr>
+    <th>Description</th>
+    <th>Tables</th>
+</tr>
+<tr>
+    <td>Disk Storage Overview</td>
+    <td>
+        <a href="disk_storage_overview_current.html">Current week</a>, 
+        <a href="disk_storage_overview_previous.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview per site</td>
+    <td>{column_disk}</td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Detailed View for Data</td>
+    <td><a href="disk_storage_overview_current_data_detailed.html">Current week</a>, <a href="disk_storage_overview_previous_data_detailed.html">Previous week</a>, <a href="disk_storage_overview_delta_data_detailed.html">Delta between Current and Previous week</a></td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era/Tier View for Data</td>
+    <td>
+        <a href="disk_storage_overview_current_data_era_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_data_era_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_data_era_tier.html">Delta between Current and Previous week</a></td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era/Cust./Non-Cust. View for Data</td>
+    <td>
+        <a href="disk_storage_overview_current_data_era_cust.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_data_era_cust.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_data_era_cust.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era View for Data</td>
+    <td>
+        <a href="disk_storage_overview_current_data_era.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_data_era.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_data_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era View for Custodial Data</td>
+    <td>
+        <a href="disk_storage_overview_current_cust_data_era.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_cust_data_era.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_cust_data_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era View for Non-Custodial Data</td>
+    <td>
+        <a href="disk_storage_overview_current_non_cust_data_era.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_non_cust_data_era.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_non_cust_data_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Tier View for Data</td>
+    <td>
+        <a href="disk_storage_overview_current_data_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_data_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_data_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Tier View for Custodial Data</td>
+    <td>
+        <a href="disk_storage_overview_current_cust_data_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_cust_data_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_cust_data_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Tier View for Non-Custodial Data</td>
+    <td>
+        <a href="disk_storage_overview_current_non_cust_data_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_non_cust_data_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_non_cust_data_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Detailed View for MC</td>
+    <td>
+        <a href="disk_storage_overview_current_mc_detailed.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_mc_detailed.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_mc_detailed.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era/Tier View for MC</td>
+    <td>
+        <a href="disk_storage_overview_current_mc_era_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_mc_era_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_mc_era_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era/Cust./Non-Cust. View for MC</td>
+    <td>
+        <a href="disk_storage_overview_current_mc_era_cust.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_mc_era_cust.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_mc_era_cust.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era View for MC</td>
+    <td>
+        <a href="disk_storage_overview_current_mc_era.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_mc_era.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_mc_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era View for Custodial MC</td>
+    <td>
+        <a href="disk_storage_overview_current_cust_mc_era.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_cust_mc_era.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_cust_mc_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Era View for Non-Custodial MC</td>
+    <td>
+        <a href="disk_storage_overview_current_non_cust_mc_era.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_non_cust_mc_era.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_non_cust_mc_era.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Tier View for MC</td>
+    <td>
+        <a href="disk_storage_overview_current_mc_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_mc_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_mc_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Tier View for Custodial MC</td>
+    <td>
+        <a href="disk_storage_overview_current_cust_mc_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_cust_mc_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_cust_mc_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Tier View for Non-Custodial MC</td>
+    <td>
+        <a href="disk_storage_overview_current_non_cust_mc_tier.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_non_cust_mc_tier.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_non_cust_mc_tier.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+<tr>
+    <td>Disk Storage Overview: Detailed View for Other data</td>
+    <td>
+        <a href="disk_storage_overview_current_other_detailed.html">Current week</a>, 
+        <a href="disk_storage_overview_previous_other_detailed.html">Previous week</a>, 
+        <a href="disk_storage_overview_delta_other_detailed.html">Delta between Current and Previous week</a>
+    </td>
+</tr>
+
+</table>
+
+
+
+
+<hr>
+{fulldate}
+</body>
+</html>

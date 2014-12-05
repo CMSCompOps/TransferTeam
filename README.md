@@ -168,4 +168,9 @@ ls -d -1 $PWD/**/*
 date -d @1361234760.790
 ```
 
+* find a missing file/executable..
+locate [filename]
+
+* find it comes with which rpm
+rpm -qf [path]
 

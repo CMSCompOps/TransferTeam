@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import sys,getopt
-import traceback
 #DBS-3 imports
 from dbs.apis.dbsClient import *
 

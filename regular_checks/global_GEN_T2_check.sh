@@ -41,6 +41,8 @@ do
     fi
 done
 
-/bin/mail -s '/GEN datasets at the T2s older than 6 months' meric.taze@cern.ch <<< "Hi All, \n\nThe current lists of /GEN datasets older than 6 months at the T2s are now available at: $OUT\nPlease review them and submit PhEDEx Deletion Requests if necessary.\n\nRegards,\nTransferTeam"
+text="Hi All,\n\nThe current lists of /GEN datasets older than 6 months at the T2s are now available at:\n\n$OUT\n\nPlease review them and submit PhEDEx deletion requests if necessary.\n\nRegards,\nTransferTeam\n"
+
+echo -e $text | /bin/mail -s '/GEN datasets at the T2s older than 6 months' meric.taze@cern.ch
 
 echo "end of Check for /GEN datasets older than 6 months at the T2 at `date`"

@@ -56,7 +56,7 @@ def createCell(data, header=False):
 def initErrorTable(tableContent):
     table = ET.Element("table")
     table.set("class", "table table-striped")
-    table.set("id","corrupt_file_table")
+    table.set("id","file_error_table")
 
     # headers 
     row = ET.Element("tr")

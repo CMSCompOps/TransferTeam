@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>{title}</title>
+<meta name="author" content="Oliver Gutsche">
+<!-- Date: '{date}' -->
+</head>
+<body>
+
+<h4> Delta compared to last week and overall storage overview</h4>
+
+<a href="total_tape_storage_overview_by_site.png" target="_blank">
+    <img src="total_tape_storage_overview_by_site.png" height="200">
+</a>
+<a href="delta_tape_storage_overview_by_site.png" target="_blank">
+    <img src="delta_tape_storage_overview_by_site.png" height="200">
+</a>
+<br>
+<br>
+<a href="total_disk_storage_overview_by_site.png" target="_blank">
+    <img src="total_disk_storage_overview_by_site.png" height="200">
+</a>
+<a href="delta_disk_storage_overview_by_site.png" target="_blank">
+    <img src="delta_disk_storage_overview_by_site.png" height="200">
+</a>
+<br>
+<br>
+
+<h4> custodial fractions:</h4>
+<a href="custodial_tape_storage_pie.png" target="_blank">
+    <img src="custodial_tape_storage_pie.png" height="250">
+</a>
+<a href="custodial_data_tape_storage_pie.png" target="_blank">
+    <img src="custodial_data_tape_storage_pie.png" height="250">
+</a>
+<a href="custodial_mc_tape_storage_pie.png" target="_blank">
+    <img src="custodial_mc_tape_storage_pie.png" height="250">
+</a>
+<br>
+
+
+<h4> T1 Tape planning overview:</h4>
+{tape_usage}
+
+<br>
+
+<h4> T1 Disk planning overview:</h4>
+{disk_usage}
+
+<hr>
+{date}
+</body>
+</html>
