@@ -17,8 +17,12 @@ def to_GB(amount):
 
 # get method to parse given url which requires certificate
 def geturl(url, request, retries=2):
-    conn  =  httplib.HTTPSConnection(url, cert_file = os.getenv('X509_USER_PROXY'),
-                                            key_file = os.getenv('X509_USER_PROXY'))
+    proxy = os.getenv('X509_USER_PROXY')
+    if not proxy:
+        proxy = "/tmp/x509up_u%s" % os.geteuid()
+
+    conn  =  httplib.HTTPSConnection(url, cert_file = proxy,
+                                            key_file = proxy)
     r1=conn.request("GET",request)
     r2=conn.getresponse()
     request = json.loads(r2.read())
@@ -38,8 +42,9 @@ def geturl(url, request, retries=2):
 node = None
 datasetRegex='/*/*/GEN-SIM'
 monthLimit = 6 # in Months
+debugMode = False
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "", ["node=","dataset=","monthlimit="])
+    opts, args = getopt.getopt(sys.argv[1:], "", ["node=","dataset=","monthlimit=","debug"])
 except getopt.GetoptError:
     print  >> sys.stderr, 'Failed to parse options!'
     sys.exit(2)
@@ -52,6 +57,8 @@ for opt, arg in opts :
         datasetRegex = arg
     elif opt == "--monthlimit":
         monthLimit = int(arg)
+    elif opt == "--debug":
+        debugMode = True
 
 if node == None:
     print  >> sys.stderr, 'Please specify a node name with --node'
@@ -73,8 +80,11 @@ for dataset in result['phedex']['dataset']:
     try:
         datasetName = str(dataset['name'])
 
+        if debugMode: print >> sys.stderr, 'checking: %s' % datasetName
+
         # skip pileup samples
         if datasetName in pileup:
+            if debugMode: print >> sys.stderr, 'skipping: it is set as pileup dataset in the script'
             continue
 
         # check if custodial replica exists
@@ -92,7 +102,7 @@ for dataset in result['phedex']['dataset']:
                     custReplicaExist = True
 
         if not custReplicaExist:
-            #print >> sys.stderr, 'no custodial location for '+ datasetName
+            if debugMode: print >> sys.stderr, 'skipping: no custodial replica exists'
             continue
 
         # check if it's input dataset of an ongoing WF
@@ -106,6 +116,7 @@ for dataset in result['phedex']['dataset']:
                 isInputOfOngoingWF = True
                 break
         if isInputOfOngoingWF:
+            if debugMode: print >> sys.stderr, 'skipping: used by an ongoing WF'
             continue
 
         
@@ -120,6 +131,7 @@ for dataset in result['phedex']['dataset']:
                 isOutputOfRecentWF = True
                 break
         if isOutputOfRecentWF:
+            if debugMode: print >> sys.stderr, 'skipping: recently produced'
             continue
         
         totalSizeAtSite += datasetSizeAtSite
@@ -133,6 +145,7 @@ for dataset in result['phedex']['dataset']:
             print '\t\t'+wf
         print
     except Exception as e:
+        if debugMode: print >> sys.stderr, 'skipping: unexpected error (please also check whether you have a valid proxy) - %s' % e
         continue
 
 print 'total_size_at_site:', to_TB(totalSizeAtSite),'total_size:', to_TB(totalSize)
