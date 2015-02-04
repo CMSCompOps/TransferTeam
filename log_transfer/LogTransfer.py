@@ -84,7 +84,7 @@ def getAlreadyInjectedDatasets():
 
 
 if __name__ == '__main__':
-    # Get request object for future PhEDEx Calls
+    # Get request object for future PhEDEx calls
     request = Request()
 
     # get list of datasets injected before
