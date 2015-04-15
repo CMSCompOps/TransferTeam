@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use PHEDEX::Core::DB;
+
+my (%args,@h);
+my $MB = 10**6;
+
+&GetOptions ("input=s" => \$args{INPUT},
+             "db=s" => \$args{DBCONFIG},
+             "help|h" => sub { &usage() });
+
+sub usage {
+    print <<"EOF";
+    SetInjectionRate --db file:instance --input file/path
+    file format should be "SourceDataset DestinationDataset Rate(in MB)" per line
+EOF
+}
+
+# check arguments
+if (!$args{DBCONFIG} || !$args{INPUT}) {
+    die "Insuficient parameters, use -h for help.\n";
+}
+
+# check input file exists
+open(my $fh, '<', $args{INPUT}) or die "Could not open '$args{INPUT}' $!\n";
+
+
+
+my $self = { DBCONFIG => $args{DBCONFIG} };
+my $dbh = &connectToDatabase ($self);
+
+
+# query to be used to update the rate
+my $sql = qq{ update
+			      (select lp.rate as rate
+	               from t_loadtest_param lp
+	               join t_dps_dataset ds on ds.id = lp.src_dataset
+	               join t_dps_dataset dd on dd.id = lp.dest_dataset
+	               where ds.name=:src_dataset and dd.name=:dest_dataset) t
+	          set t.rate=:rate };
+
+
+my $count = 0;
+# read input file
+while (my $line = <$fh>) {
+	chomp $line;
+	
+	# get arguments src_dataset, dest_dataset, rate
+	my @fields = split(/\s/, $line);
+	
+	# set read params from the file to the sql query
+	my %params = (":src_dataset" => $fields[0], ":dest_dataset" => $fields[1], ":rate" => $fields[2]*$MB);
+	
+	# execute the query
+	my $q = &dbexec($dbh, $sql, %params);
+	
+	$count ++;
+}
+
+# commit and disconnect
+$dbh->commit();
+&disconnectFromDatabase ($self, $dbh, 1);
+print "Total number of updated rates: $count\n";
