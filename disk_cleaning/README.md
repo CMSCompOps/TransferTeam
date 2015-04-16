@@ -1,11 +1,12 @@
-###Consistency Check
+###Disk Cleaning
 
-twiki: 
+twiki: https://twiki.cern.ch/twiki/bin/view/CMSPublic/CompOpsTransferTeamT1DiskCleaning
 
 #### Get storage overview
 ```
 python ~/TransferTeam/disk_cleaning/getSamples.py --node T1_UK_RAL_Disk
 ```
+
 #### Create GEN-SIM suggestion list
 ```
 python ~/TransferTeam/disk_cleaning/diskCleaning_GEN-SIM.py --node T1_UK_RAL_Disk --monthlimit 6 | tee output.txt

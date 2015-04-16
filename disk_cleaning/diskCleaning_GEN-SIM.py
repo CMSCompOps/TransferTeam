@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 
-import sys,os,getopt,urllib,httplib,time
+import sys,os,getopt,urllib,httplib,time,re
 
 try:
     import json
 except ImportError:
     import simplejson as json
-
-pileup = ["/MinBias_TuneZ2_7TeV-pythia6/Summer11Leg-START53_LV4-v1/GEN-SIM","/MinBias_TuneZ2_7TeV-pythia6/Summer11-START311_V2-v2/GEN-SIM","/MinBias_TuneZ2star_8TeV-pythia6/Summer12-START50_V13-v3/GEN-SIM","/MinBias_Tune4C_7TeV_pythia8/Summer12-LowPU2010-START42_V17B-v1/GEN-SIM","/MinBias_TuneA2MB_13TeV-pythia8/Fall13-POSTLS162_V1-v1/GEN-SIM","/MinBias_TuneZ2star_14TeV-pythia6/GEM2019Upg14-DES19_62_V8-v1/GEN-SIM","/MinBias_TuneZ2star_14TeV-pythia6/TTI2023Upg14-DES23_62_V1-v1/GEN-SIM","/MinBias_TuneZ2star_14TeV-pythia6/Muon2023Upg14-DES23_62_V1-v1/GEN-SIM","/MinBias_TuneA2MB_2p76TeV_pythia8/ppSpring2014-STARTHI53_V28_castor-v2/GEN-SIM","/GJet_Pt-20_doubleEMEnriched_TuneZ2_7TeV-pythia6/Summer11Leg-START53_LV4-v1/GEN-SIM","/QCD_Pt-1800_TuneZ2_7TeV_pythia6/Summer11Leg-START53_LV4-v1/GEN-SIM","/W4Jets_TuneZ2_7TeV-madgraph-tauola/Summer11Leg-START53_LV4-v1/GEN-SIM"]
 
 def to_TB(amount):
     return "%.3fTB" % (amount / float(1000 ** 4))
@@ -67,9 +65,10 @@ if node == None:
 # Constant variables
 urlPhedex = 'https://cmsweb.cern.ch/phedex/datasvc/json/prod/'
 urlCMSWeb = 'cmsweb.cern.ch'
-urlWMstats = '/couchdb/wmstats/_design/WMStats/_view/'
+urlWMstats = '/couchdb/reqmgr_workload_cache/_design/ReqMgr/_view/'
 
-statusOngoingWF = ["assigned","acquired","running","running-open","running-closed","assignment-approved"]
+# added "completed" Status as asked by Andrew - there may be some workflows that require ACDC etc
+StatusOngoingWF = ["assigned","acquired","running","running-open","running-closed","assignment-approved","completed"]
 datelimit = int(time.time()) - monthLimit*30*24*60*60
  
 url = urlPhedex + 'blockreplicas?create_since=0&show_dataset=y&dataset=%s&node=%s' % (datasetRegex,node)
@@ -83,14 +82,15 @@ for dataset in result['phedex']['dataset']:
         if debugMode: print >> sys.stderr, 'checking: %s' % datasetName
 
         # skip pileup samples
-        if datasetName in pileup:
-            if debugMode: print >> sys.stderr, 'skipping: it is set as pileup dataset in the script'
+        if re.match(r'/MinBias*/*/GEN-SIM',datasetName):
+            if debugMode: print >> sys.stderr, 'skipping pileup dataset: %s' % datasetName
             continue
 
         # check if custodial replica exists
         url = urlPhedex + 'blockreplicas?create_since=0&dataset=' + datasetName
         subResult = json.load(urllib.urlopen(url))
         custReplicaExist = False
+        custReplicaComplete = False
         datasetSizeAtSite = 0
         datasetSize = 0
         for block in subResult['phedex']['block']:
@@ -100,19 +100,29 @@ for dataset in result['phedex']['dataset']:
                     datasetSizeAtSite += long(replica['bytes'])
                 if replica['custodial'] == "y":
                     custReplicaExist = True
+                    if replica['complete'] == "y":
+                        custReplicaComplete = True
+
+            # if one of the blocks not have custodial replica or has non complete custodial replica, skip the dataset
+            if not custReplicaExist or not custReplicaComplete:
+                break
 
         if not custReplicaExist:
             if debugMode: print >> sys.stderr, 'skipping: no custodial replica exists'
             continue
 
+        if not custReplicaComplete:
+            if debugMode: print >> sys.stderr, 'skipping: custodial replica is not complete'
+            continue
+
         # check if it's input dataset of an ongoing WF
-        url = urlWMstats + 'requestByInputDataset?include_docs=true&reduce=false&key="%s"' % datasetName
+        url = urlWMstats + 'byinputdataset?include_docs=true&reduce=false&key="%s"' % datasetName
         rows = geturl(urlCMSWeb, url)['rows']
         isInputOfOngoingWF = False
         inputWFs = []
         for row in rows:
-            inputWFs.append("%s %s %s" % (row['id'],row['doc']['request_status'][-1]['status'], time.strftime('%Y-%m-%d', time.gmtime(row['doc']['request_status'][-1]['update_time']))))
-            if row['doc']['request_status'][-1]['status'] in statusOngoingWF:
+            inputWFs.append("%s %s %s" % (row['id'],row['doc']['RequestTransition'][-1]['Status'], time.strftime('%Y-%m-%d', time.gmtime(row['doc']['RequestTransition'][-1]['UpdateTime']))))
+            if row['doc']['RequestTransition'][-1]['Status'] in StatusOngoingWF:
                 isInputOfOngoingWF = True
                 break
         if isInputOfOngoingWF:
@@ -121,13 +131,13 @@ for dataset in result['phedex']['dataset']:
 
         
         # check if it's output dataset of a recently finished WF  
-        url = urlWMstats + 'requestByOutputDataset?include_docs=true&reduce=false&key="%s"' % datasetName
+        url = urlWMstats + 'byoutputdataset?include_docs=true&reduce=false&key="%s"' % datasetName
         rows = geturl(urlCMSWeb, url)['rows']
         isOutputOfRecentWF = False
         outputWFs = []
         for row in rows:
-            outputWFs.append("%s %s %s" % (row['id'],row['doc']['request_status'][-1]['status'], time.strftime('%Y-%m-%d', time.gmtime(row['doc']['request_status'][-1]['update_time']))))
-            if int(row['doc']['request_status'][-1]['update_time']) > datelimit:
+            outputWFs.append("%s %s %s" % (row['id'],row['doc']['RequestTransition'][-1]['Status'], time.strftime('%Y-%m-%d', time.gmtime(row['doc']['RequestTransition'][-1]['UpdateTime']))))
+            if int(row['doc']['RequestTransition'][-1]['UpdateTime']) > datelimit:
                 isOutputOfRecentWF = True
                 break
         if isOutputOfRecentWF:
