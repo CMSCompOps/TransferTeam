@@ -1,5 +1,5 @@
-Run2 Trannsfer Test
-===================
+Run2 Transfer Test
+==================
 
 * twiki     : https://twiki.cern.ch/twiki/bin/view/CMSPublic/CompOpsRun2T0T1TransferTests
 * monitoring: https://twiki.cern.ch/twiki/bin/view/CMSPublic/CompOpsRun2T0T1TransferTestsMonitoring
