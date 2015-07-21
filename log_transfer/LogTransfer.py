@@ -91,6 +91,29 @@ def getAlreadyInjectedFiles():
     return injectedFiles
 
 
+def addToPhEDEx(WFName, fileList):
+    dsName = getDatasetName(WFName)
+
+    # no file to inject for the dataset
+    if not fileList:
+        return
+
+    # create xml data for injection&subscription
+    Logger.log('Creating xml file for injection')
+    xmlData = createXML(WFName, fileList)
+
+    # inject data
+    Logger.log("Injecting to CASTOR: %s" %dsName)
+    data = request.send(urlInject, {'data':xmlData,'node':'T0_CH_CERN_Export'})
+    if data:
+        # subscribed it so that transfer can start from CASTOR to EOS
+        Logger.log("Subscribing at EOS : %s" % dsName)
+        request.send(urlSubscribe, {'data':xmlData,'node':'T2_CH_CERN','group':'transferops','no_mail':'y','comments':'auto-approved log transfer from CASTOR to EOS'})
+    else:
+        Logger.log('Skipping subscription since injection got failed')
+
+
+
 if __name__ == '__main__':
     # Get request object for future PhEDEx calls
     request = Request()
@@ -103,18 +126,15 @@ if __name__ == '__main__':
     #list log directories on CASTOR
     Logger.log('listing files under %s' % logCastorPath)
     cmd = 'nsls -lR --checksum %s' % logCastorPath
-    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    outDirs,errDirs = process.communicate()
 
-    if errDirs:
-        Logger.log('Failed to list directory, exiting now reason: %s' % errDirs)
-        sys.exit(1)
+    process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    #process.wait()
 
     Logger.log('listing is completed, parsing the output')
-    WFList = {}
+    fileList = []
     currentWF = None
     #collect info from castor
-    for line in outDirs.splitlines():
+    for line in process.stdout:
         line = line.strip()
         # skip empty lines in the output
         if len(line) == 0:
@@ -123,41 +143,36 @@ if __name__ == '__main__':
         # if directory, add it to the list key
         if line.startswith('/'):
             line = line.strip(':')
+
             # skip the root dir
             if line == logCastorPath:
                 continue
 
-            line = line.split('/')[-1]
-            WFList[line] = []
-            # it will be used in the next iteration while adding files in the dictionary
-            currentWF = line
+            if currentWF:
+                # add collected files into PhEDEx
+                addToPhEDEx(currentWF, fileList)
+
+            # reset variables for the next iteration
+            currentWF = line.split('/')[-1]
+            fileList = []
         # if file, add it to its dir's list
         elif not line.startswith('d'):
             # using nsls output, get file's lfn, size and checksum
             fileInfo = getFileInfo(line)
             fileLFN = getLFN(currentWF, fileInfo['name'])
             if fileLFN not in injectedFiles:
-                WFList[currentWF].append(fileInfo)
+                fileList.append(fileInfo)
 
 
-    for WFName in WFList:
-        dsName = getDatasetName(WFName)
-        fileInfoList = WFList[WFName]
+    # loop above won't inject the files collected in the last iteration, so add them to PhEDEx too
+    if currentWF:
+        addToPhEDEx(currentWF, fileList)
+    # if there is an error, log and exit
+    else:
+        Logger.log('Failed to list directory, exiting now')
+        for err in process.stderr:
+            err = err.strip()
+            Logger.log('error: %s' % err)
+        sys.exit(1)
 
-        # no file to inject for the dataset
-        if not fileInfoList:
-            continue
 
-        # create xml data for injection&subscription
-        Logger.log('Creating xml file for injection')
-        xmlData = createXML(WFName, fileInfoList)
-
-        # inject data
-        Logger.log("Injecting to CASTOR: %s" %dsName)
-        data = request.send(urlInject, {'data':xmlData,'node':'T0_CH_CERN_Export'})
-        if data:
-            # subscribed it so that transfer can start from CASTOR to EOS
-            Logger.log("Subscribing at EOS : %s" % dsName)
-            request.send(urlSubscribe, {'data':xmlData,'node':'T2_CH_CERN','group':'transferops','no_mail':'y','comments':'auto-approved log transfer from CASTOR to EOS'})
-        else:
-            Logger.log('Skipping subscription since injection got failed')
