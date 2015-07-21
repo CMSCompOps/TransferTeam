@@ -82,7 +82,7 @@ for dataset in result['phedex']['dataset']:
         if debugMode: print >> sys.stderr, 'checking: %s' % datasetName
 
         # skip pileup samples
-        if re.match(r'/MinBias*/*/GEN-SIM',datasetName):
+        if re.match(r'/MinBias.*/.*/GEN-SIM',datasetName):
             if debugMode: print >> sys.stderr, 'skipping pileup dataset: %s' % datasetName
             continue
 
