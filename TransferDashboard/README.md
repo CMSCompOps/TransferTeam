@@ -1,5 +1,7 @@
 # Transfer Team - Dashboard
 
+http://transferteam.cern.ch
+
 ### Local Installation using VirtualBox
 1) Install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/)
 
@@ -8,7 +10,7 @@
 vagrant ssh
 cd /vagrant/monitoring/
 python application.py
-``
+```
 
 3) Check the page on your browser
 http://localhost:8080
@@ -25,7 +27,7 @@ http://localhost:8080
 
 #### Config file
 * Located at ./DataCollector/config.cfg
-* As application reads the JSON files produced by Collectors, do not forget to update output folder accordingly
+* As application reads the JSON files produced by Collectors, do not forget to update output directories accordingly
 * New sites or error regex can easily be added
 ```perl
 our ($errorList,@siteList);
