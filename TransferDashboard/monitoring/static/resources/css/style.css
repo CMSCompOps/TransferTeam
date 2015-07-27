@@ -1,0 +1,15 @@
+.pointer {
+  cursor: pointer;
+}
+
+[data-func="sortable"] {
+  cursor: pointer;
+}
+
+.label a {
+  color: white;
+}
+
+.progress {
+  margin-bottom: 0px !important;
+}

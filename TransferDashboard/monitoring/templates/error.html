@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="row">
+    <ol class="breadcrumb">
+      <li><a href="/">Dashboard</a></li>
+      <li>{{error_name}}</li>
+    </ol>
+  </div>
+  <div class="row">
+    <table class="table table-striped" data-module="sortable-table">
+      <thead>
+        <tr>
+          <th data-func="sortable">LFN</th>
+          <th data-func="sortable">Source</th>
+          <th data-func="sortable">Destination</th>
+          <th>Error</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for error in errors %}
+        <tr>
+          <td>{{ error.lfn }}</td>
+          <td>{{ error.source }}</td>
+          <td>{{ error.destination }}</td>
+          <td><a href="https://cmsweb.cern.ch/phedex/prod/Activity::ErrorInfo?fileid={{ error.fileid }}">error</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

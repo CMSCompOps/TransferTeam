@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="row">
+    <ol class="breadcrumb">
+      <li class="active">Dashboard</li>
+    </ol>
+  </div>
+  <div class="row">
+    <div class="col-sm-4">
+      <h2>Transfers</h2>
+      <div><small>time update:{{transfer_time_create}}</small></div>
+      {% for site in sites %}
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="{{url_for('transfer', site_name=site.name)}}">{{site.name}}<span class="badge">{{site.count}}</span></a></li>
+      </ul>
+      {% endfor%}
+    </div>
+    <div class="col-sm-4">
+      <h2>Errors</h2>
+      <div><small>time update:{{error_time_create}}</small></div>
+      {% for error in errors %}
+      <ul class="nav nav-pills nav-stacked">
+        <li><a href="{{url_for('error', error_name=error.name)}}">{{error.name}}<span class="badge">{{error.count}}</span></a></li>
+      </ul>
+      {% endfor%}
+    </div>
+  </div>
+{% endblock %}

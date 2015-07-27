@@ -1,0 +1,128 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="row">
+    <ol class="breadcrumb">
+      <li><a href="/">Dashboard</a></li>
+      <li>{{site_name}}</li>
+    </ol>
+  </div>
+  <div class="row">
+    <table class="table">
+      <tr>
+        <th>Request No</th>
+        <th>Latest transfer</th>
+        <th>Time Create</th>
+        <th>Progress</th>
+        <th>Destination</th>
+      </tr>
+    
+      {% for req in site %}
+      <tr class="pointer info" data-toggle="collapse" data-target="#{{ req }}">
+        <td><a href="{{LINK['SubscriptionByRequest'] % (site_name,req)}}">{{ req }}</a></td>
+        <td>{{ getTimeString(reqInfo[req].latest_replica) }}</td>
+        <td>{{ getTimeString(site[req][0]['time_create']) }}</td>
+        <td>
+          <div class="progress">
+            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{'%0.3f%%' % reqInfo[req].progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{'%0.3f%%' % reqInfo[req].progress}};">
+              {{'%0.3f%%' % reqInfo[req].progress}}
+            </div>
+          </div>
+        </td>
+        <td>{{ site_name }}</td>
+      </tr>
+      <tr>
+        <td colspan="10">
+          <div class="collapse" id="{{ req }}">
+            {% for dataset in site[req] %}
+            <table class="table table-striped">
+              <tr class="success">
+                <th>Dataset</th>
+                <td>{{ dataset.name }}</td>
+              </tr>
+              <tr>
+                <th>Transferred Files</th>
+                <td>{{ dataset.node_files }} / {{ dataset.files }}</td>
+              </tr>
+              <tr>
+                <th>Transferred Bytes</th>
+                <td>{{ getSizeString(dataset.node_bytes, False) }} / {{ getSizeString(dataset.bytes) }}</td>
+              </tr>
+              <tr>
+                <th>Routed Files</th>
+                <td><a href="{{LINK['Routing'] % (site_name, dataset['name'])}}">{{ dataset.route_files }}</a></td>
+              </tr>
+              <tr>
+                <th>Routed From</th>
+                <td>{{ dataset.source|join(", ") }}</td>
+              </tr>
+              <tr>
+                <th>Files in Transfer</th>
+                <td><a href="{{LINK['Transfer'] % site_name}}">{{ dataset.xfer_files }}</a></td>
+              </tr>
+              <tr>
+                <th>Latest File Transfer</th>
+                <td>{{ getTimeString(dataset.latest_replica) }}</td>
+              </tr>
+              <tr>
+                <th>Replica</th>
+                <td>{{ dataset.replica|join(", ") }}</td>
+              </tr>
+              <tr>
+                <th>Block Level Problems</th>
+                <td>
+                {% for b in dataset.basis %}
+                  {% if b|int() == -6 %}
+                  <span class="label label-danger"><a href="{{LINK['MissingFilesByDataset'] % (dataset.name, site_name)}}">No replica</a></span>
+                  {% elif b|int() == -5 %}
+                  <span class="label label-danger"><a href="{{LINK['LinkBySourceDestination'] % (site_name, '|'.join(dataset['replica']))}}">Missing Link</a></span>
+                  {% elif b|int() == -4 %}
+                  <span class="label label-danger"><a href="{{LINK['SuspendScript']}}">Suspended by Router</a></span>
+                  {% elif b|int() == -3 %}
+                  <span class="label label-danger"><a href="{{LINK['LinkByDestination'] % site_name}}">No download link</a></span>
+                  {% elif b|int() == -2 %}
+                  <span class="label label-danger"><a href="{{LINK['SubscriptionByDataset'] % (site_name, dataset['name'])}}">Suspended manually</a></span>
+                  {% elif b|int() == -1 %}
+                  <span class="label label-danger"><a href="{{LINK['IncompleteBlockReplicas'] % dataset['name']}}">Open Block</a></span>
+                  {% elif b|int() == 0 %}
+                  <span class="label label-success">OK</span>
+                  {% elif b|int() == 1 %}
+                  <span class="label label-warning"><a href="{{LINK['QueuePlot'] % site_name}}">Destination Queue Full</a></span>
+                  {% elif b|int() == 2 %}
+                  <span class="label label-warning"><a href="{{LINK['Routing'] % (site_name, dataset['name'])}}">Waiting for re-routing</a></span>
+                  {% else %}
+                  -
+                  {% endif %}
+                {% endfor %}
+                </td>
+              </tr>
+              <tr>
+                <th>ETA</th>
+                <td>{{ getTimeString(dataset.time_arrive) }}</td>
+              </tr>
+              <tr>
+                <th>DBS API</th>
+                <td>
+                  <a href="https://cmsweb.cern.ch/das/request?input=dataset%3D{{dataset.name}}">DAS</a>
+                  <span> | </span>
+                  <a href="https://cmsweb.cern.ch/dbs/prod/global/DBSReader/datasets?detail=1&dataset_access_type=*&dataset={{dataset.name}}">DBS-Dataset</a>
+                  <span> | </span>
+                  <a href="https://cmsweb.cern.ch/dbs/prod/global/DBSReader/files?detail=1&dataset={{dataset.name}}">DBS-File</a>
+                </td>
+              </tr>
+              <tr>
+                <th>PhEDEx API</th>
+                <td>
+                  <a href="{{LINK['MissingFilesByDataset'] % (dataset.name,site_name)}}">Missing Files</a>
+                  <span> | </span>
+                </td>
+              </tr>
+            </table>
+            <hr />
+            {% endfor %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
