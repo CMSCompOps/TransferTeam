@@ -27,6 +27,10 @@ my $self = { DBCONFIG => $args{DBCONFIG} };
 my $dbh = &connectToDatabase ($self);
 $dbh->{LongReadLen} = 100000;
 
+# read the config file
+do('config.cfg');
+our (@errorList, $out_error);
+
 my $sql = qq{
     SELECT
       xf.id,
@@ -39,20 +43,23 @@ my $sql = qq{
       JOIN t_dps_block bl ON xf.inblock = bl.id  
       JOIN t_adm_node nd ON nd.id = xe.to_node
       JOIN t_adm_node ns ON ns.id = xe.from_node
+      LEFT JOIN t_xfer_replica xr ON xr.fileid = xe.fileid AND xr.node = xe.to_node
       LEFT JOIN t_dps_subs_dataset sd ON sd.dataset = bl.dataset 
       LEFT JOIN t_dps_subs_block sb ON sb.block = xf.inblock
-    WHERE xe.log_detail like :error_text AND (sd.destination = xe.to_node OR sb.destination = xe.to_node)
+    WHERE xr.id IS NULL AND (sd.destination = xe.to_node OR sb.destination = xe.to_node) AND xe.{COLUMN} LIKE :error_text
     GROUP BY xf.id,xf.logical_name,ns.name,nd.name
 };
 
-# read the config file
-do('config.cfg');
-our ($errorList, $out_error);
+my $sqlNew;
+foreach(@errorList){
+    # take care of where clause
+    ($sqlNew = $sql) =~ s/{COLUMN}/log_xfer/ if($_->{'type'} eq 't');
+    ($sqlNew = $sql) =~ s/{COLUMN}/log_detail/ if($_->{'type'} eq 'd');
+    ($sqlNew = $sql) =~ s/{COLUMN}/log_validate/ if($_->{'type'} eq 'v');
 
-for(keys %$errorList){
-    # execute the query
-    my %params = (":error_text" => $errorList->{$_});
-    my $q = &dbexec($dbh, $sql, %params);
+    # execute the query    
+    my %params = (":error_text" => $_->{'regex'});
+    my $q = &dbexec($dbh, $sqlNew, %params);
 
     my @errorData;
 
@@ -68,7 +75,7 @@ for(keys %$errorList){
     }
     
     
-    $data{'errors'}{$_} = \@errorData;
+    $data{'errors'}{$_->{'name'}} = \@errorData;
 }
 
 # store the time when we collect the data

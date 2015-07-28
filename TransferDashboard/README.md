@@ -30,13 +30,14 @@ http://localhost:8080
 * As application reads the JSON files produced by Collectors, do not forget to update output directories accordingly
 * New sites or error regex can easily be added
 ```perl
-our ($errorList,@siteList);
+our (@errorList,@siteList);
 our ($out_error,$out_tranfer);
 
-$errorList = {
-               'Missing_File'=>'%No%file%',
-               'Checksum_Mismatch'=>'%checksums do not match%'
-             };
+@errorList = (
+               {name=>'Missing_File', regex=>'%No%file%', type=>'d'},
+               {name=>'Checksum_Mismatch', regex=>'%checksums do not match%', type=>'d'},
+               {name=>'Expired_Proxy', regex=>'%expired % minutes ago%', type=>'t'}
+             );
 
 @siteList = (
               'T1_DE_KIT_Disk',
@@ -48,15 +49,15 @@ $errorList = {
               'T1_US_FNAL_Disk',
             );
 
-$out_tranfer = '/afs/cern.ch/user/m/mtaze/Project/monitoring/static/data/transfers.json';
-$out_error = '/afs/cern.ch/user/m/mtaze/Project/monitoring/static/data/errors.json';
+$out_tranfer = '/afs/cern.ch/user/m/mtaze/TransferTeam/TransferDashboard/monitoring/static/data/transfers.json';
+$out_error = '/afs/cern.ch/user/m/mtaze/TransferTeam/TransferDashboard/monitoring/static/data/errors.json';
 ```
 
 #### Running the Collectors regularly
 * You can use crontabs to run Collectors regularly
 ```sh
-./DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Meric
-./DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Meric
+./DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader
+./DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader
 ```
 * output will be written to ```$out_tranfer``` and ```out_error```, make sure that flask application reads these files
 

@@ -1,12 +1,11 @@
 from flask import Flask, render_template, url_for, request, redirect, flash, jsonify
 from flask import session as login_session
-import random, string, os
-
-import httplib2
-import json
 from flask import make_response
-import requests
 
+import random
+import string
+import os
+import json
 import time
 
 app = Flask(__name__)
