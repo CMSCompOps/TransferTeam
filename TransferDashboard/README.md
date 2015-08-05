@@ -1,7 +1,8 @@
 # Transfer Team - Dashboard
+https://cmsmonitoring.web.cern.ch/cmsmonitoring/
 
 ### Setup
-* intall python packages and set the virtual environment
+* install python packages and set the virtual environment
 ```sh
 # directory structure
 www=/afs/cern.ch/work/m/mtaze/cmsmonitoring;
