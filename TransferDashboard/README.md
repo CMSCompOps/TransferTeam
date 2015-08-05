@@ -1,41 +1,69 @@
 # Transfer Team - Dashboard
 
-http://transferteam.cern.ch
-
 ### Setup
 * intall python packages and set the virtual environment
 ```sh
-www=/afs/cern.ch/work/m/mtaze/www;
+# directory structure
+www=/afs/cern.ch/work/m/mtaze/cmsmonitoring;
+src=$www/monitoring-src
+
+out=$www
+base_url=/cmsmonitoring
+
+# copy the project into www
+cp -r ~/TransferTeam/TransferDashboard/monitoring $src
+cp -r ~/TransferTeam/TransferDashboard/DataCollector $src/
+
+# install packages
 yum install python-pip
 pip install virtualenv
-cd $www
+
 # init and activate the virtual env
+cd $src
 virtualenv venv
 source venv/bin/activate
-# install the packages
+# install the packages in the virtual env
 pip install Flask Frozen-Flask Flask-FlatPages
 ```
-* copy the project into www
+* build the static content using flask application
 ```sh
-cp -r ~/TransferTeam/TransferDashboard/monitoring $www/monitoring-src
-cd monitoring-src
-# python freeze.py BASE_URL DESTINATION
-python freeze.py /transferteam/monitoring/ /afs/cern.ch/work/m/mtaze/www/monitoring
+python freeze.py $base_url $out
 
 # deactivate the environment
 deactivate
 ```
 * if all are completed successfuly, set the acrontab
-```sh
-# collect the data
-./DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader
-./DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader
-cd /afs/cern.ch/work/m/mtaze/www
-source venv/bin/activate
-cd monitoring-src
-python freeze.py /transferteam/monitoring/ /afs/cern.ch/work/m/mtaze/www/monitoring
-deactivate
-```
+  * Update the DataCollector output dir
+
+    ```
+    vim $src/DataCollector/config.cfg
+    # update the following lines
+    # $src -> /afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src
+    $out_tranfer = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/transfers.json';
+    $out_error = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/errors.json';
+    ```
+  * save the following in a script called ```monitoring_crontab.sh``` in $src folder and make it executable
+
+    ```sh
+    # variables
+    www=/afs/cern.ch/work/m/mtaze/cmsmonitoring;
+    src=$www/monitoring-src
+    out=$www
+    base_url=/cmsmonitoring
+    
+    # set phedex environment before runnning the collectors
+    source ~/phedex/PHEDEX-micro/etc/profile.d/env.sh
+    
+    # collect the data
+    $src/DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader
+    $src/DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader
+    
+    # produce the static page
+    cd $src
+    source venv/bin/activate
+    python freeze.py $base_url $out
+    deactivate
+    ```
 
 ### Configuration
 
@@ -70,8 +98,8 @@ our ($out_error,$out_tranfer);
               'T1_US_FNAL_Disk',
             );
 
-$out_tranfer = '/afs/cern.ch/user/m/mtaze/TransferTeam/TransferDashboard/monitoring/static/data/transfers.json';
-$out_error = '/afs/cern.ch/user/m/mtaze/TransferTeam/TransferDashboard/monitoring/static/data/errors.json';
+$out_tranfer = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/transfers.json';
+$out_error = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/errors.json';
 ```
 
 #### Running the Collectors regularly
