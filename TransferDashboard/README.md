@@ -2,19 +2,40 @@
 
 http://transferteam.cern.ch
 
-### Local Installation using VirtualBox
-1) Install [Vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/)
-
-2) Connect and run the application
+### Setup
+* intall python packages and set the virtual environment
 ```sh
-vagrant ssh
-cd /vagrant/monitoring/
-python application.py
+www=/afs/cern.ch/work/m/mtaze/www;
+yum install python-pip
+pip install virtualenv
+cd $www
+# init and activate the virtual env
+virtualenv venv
+source venv/bin/activate
+# install the packages
+pip install Flask Frozen-Flask Flask-FlatPages
 ```
+* copy the project into www
+```sh
+cp -r ~/TransferTeam/TransferDashboard/monitoring $www/monitoring-src
+cd monitoring-src
+# python freeze.py BASE_URL DESTINATION
+python freeze.py /transferteam/monitoring/ /afs/cern.ch/work/m/mtaze/www/monitoring
 
-3) Check the page on your browser
-http://localhost:8080
-
+# deactivate the environment
+deactivate
+```
+* if all are completed successfuly, set the acrontab
+```sh
+# collect the data
+./DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader
+./DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader
+cd /afs/cern.ch/work/m/mtaze/www
+source venv/bin/activate
+cd monitoring-src
+python freeze.py /transferteam/monitoring/ /afs/cern.ch/work/m/mtaze/www/monitoring
+deactivate
+```
 
 ### Configuration
 
