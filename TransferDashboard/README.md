@@ -66,6 +66,23 @@ deactivate
     deactivate
     ```
 
+### Local Installation for test purposes
+```
+src=~/TransferTeam/TransferDashboard/monitoring
+# install packages
+yum install python-pip
+pip install virtualenv
+
+# init and activate the virtual env
+cd $src
+virtualenv venv
+source venv/bin/activate
+# install the packages in the virtual env
+pip install Flask 
+python application.py
+# check localhost:8080 in your browser
+```
+
 ### Configuration
 
 #### Data Collectors
