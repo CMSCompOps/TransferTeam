@@ -3,6 +3,7 @@ https://cmsmonitoring.web.cern.ch/cmsmonitoring/
 
 ### Setup
 * set the variables
+
   ```sh
   # directory structure
   www=/afs/cern.ch/work/m/mtaze/cmsmonitoring
@@ -11,12 +12,16 @@ https://cmsmonitoring.web.cern.ch/cmsmonitoring/
   # variables for freeze script
   out=$www
   base_url=/cmsmonitoring
+  ```
 * copy the project or clone the repo with sparse-checkout
+
   ```sh
   mkdir $src
   cp -r ~/TransferTeam/TransferDashboard/* $src
   ```
 * install the packages and set the virtual environment
+
+
   ```sh
   yum install python-pip
   pip install virtualenv
@@ -29,6 +34,7 @@ https://cmsmonitoring.web.cern.ch/cmsmonitoring/
   pip install Flask Frozen-Flask Flask-FlatPages
   ```
 * build the static content using flask application
+
   ```sh
   (cd monitoring; python freeze.py $base_url $out)
 
