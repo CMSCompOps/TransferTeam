@@ -4,6 +4,7 @@ use warnings;
 use Getopt::Long;
 use PHEDEX::Core::DB;
 use JSON;
+use FindBin '$Bin';
 
 my (%args,@h);
 
@@ -89,7 +90,7 @@ my $sql = qq{
 };
 
 # read the config file
-do('config.cfg');
+do( $Bin.'/config.cfg');
 our (@siteList, $out_tranfer);
 
 foreach(@siteList){
@@ -137,6 +138,5 @@ my $json = encode_json \%data;
 open(my $fh, '>', $out_tranfer) or die "Could not open file";
 print $fh $json;
 close $fh;
-
 
 &disconnectFromDatabase ($self, $dbh, 1);

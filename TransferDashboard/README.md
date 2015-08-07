@@ -2,48 +2,51 @@
 https://cmsmonitoring.web.cern.ch/cmsmonitoring/
 
 ### Setup
-* install python packages and set the virtual environment
-```sh
-# directory structure
-www=/afs/cern.ch/work/m/mtaze/cmsmonitoring;
-src=$www/monitoring-src
+* set the variables
+  ```sh
+  # directory structure
+  www=/afs/cern.ch/work/m/mtaze/cmsmonitoring
+  src=$www/monitoring-src
 
-out=$www
-base_url=/cmsmonitoring
+  # variables for freeze script
+  out=$www
+  base_url=/cmsmonitoring
+* copy the project or clone the repo with sparse-checkout
+  ```sh
+  mkdir $src
+  cp -r ~/TransferTeam/TransferDashboard/* $src
+  ```
+* install the packages and set the virtual environment
+  ```sh
+  yum install python-pip
+  pip install virtualenv
 
-# copy the project into www
-cp -r ~/TransferTeam/TransferDashboard/monitoring $src
-cp -r ~/TransferTeam/TransferDashboard/DataCollector $src/
-
-# install packages
-yum install python-pip
-pip install virtualenv
-
-# init and activate the virtual env
-cd $src
-virtualenv venv
-source venv/bin/activate
-# install the packages in the virtual env
-pip install Flask Frozen-Flask Flask-FlatPages
-```
+  # init and activate the virtual env
+  cd $src
+  virtualenv venv
+  source venv/bin/activate
+  # install the packages in the virtual env
+  pip install Flask Frozen-Flask Flask-FlatPages
+  ```
 * build the static content using flask application
-```sh
-python freeze.py $base_url $out
+  ```sh
+  (cd monitoring; python freeze.py $base_url $out)
 
-# deactivate the environment
-deactivate
-```
+  # deactivate the environment
+  deactivate
+  ```
 * if all are completed successfuly, set the acrontab
   * Update the DataCollector output dir
 
     ```
+    $src -> /afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src
     vim $src/DataCollector/config.cfg
-    # update the following lines
-    # $src -> /afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src
-    $out_tranfer = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/transfers.json';
-    $out_error = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/errors.json';
+    # update the output directories
+    $out_tranfer = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/monitoring/static/data/transfers.json';
+    $out_error = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/monitoring/static/data/errors.json';
+    $out_storage = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/monitoring/static/data/storages.json';
     ```
-  * save the following in a script called ```monitoring_crontab.sh``` in $src folder and make it executable
+  * make ```monitoring_crontab.sh``` script executable and set the acrontab (do not forget to update the paths)
 
     ```sh
     # variables
@@ -51,14 +54,18 @@ deactivate
     src=$www/monitoring-src
     out=$www
     base_url=/cmsmonitoring
-    
-    # set phedex environment before runnning the collectors
-    source ~/phedex/PHEDEX-micro/etc/profile.d/env.sh
-    
-    # collect the data
-    $src/DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader
-    $src/DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader
-    
+
+    # run in the local scope to prevenent environment collision
+    (
+      # set phedex environment before runnning the collectors
+      source ~/phedex/PHEDEX-micro/etc/profile.d/env.sh;
+
+      # collect the data
+      $src/DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader;
+      $src/DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader;
+      $src/DataCollector/StorageDataCollector.pl --db ~/param/DBParam:Prod/Reader;
+    )
+
     # produce the static page
     cd $src
     source venv/bin/activate
@@ -91,47 +98,53 @@ python application.py
 * Current Collectors
   * ./DataCollector/TransferDataCollector.pl
   * ./DataCollector/ErrorDataCollector.pl
+  * ./DataCollector/StorageDataCollector.pl
 
 #### Config file
 * Located at ./DataCollector/config.cfg
 * As application reads the JSON files produced by Collectors, do not forget to update output directories accordingly
 * New sites or error regex can easily be added
-```perl
-our (@errorList,@siteList);
-our ($out_error,$out_tranfer);
 
+```perl
+our (@errorList,@siteList,@storageList);
+our ($out_error,$out_tranfer,$out_storage);
+
+# used in ErrorDataCollector
+# error type which will be used to query corresponding column
+# t: transfer log
+# d: detail Log
+# v: validate Log
 @errorList = (
                {name=>'Missing_File', regex=>'%No%file%', type=>'d'},
                {name=>'Checksum_Mismatch', regex=>'%checksums do not match%', type=>'d'},
                {name=>'Expired_Proxy', regex=>'%expired % minutes ago%', type=>'t'}
              );
 
+# used in TransferDataCollector
 @siteList = (
+              'T1_ES_PIC_MSS',
+              'T1_FR_CCIN2P3_MSS',
               'T1_DE_KIT_Disk',
-              'T1_ES_PIC_Disk',
-              'T1_FR_CCIN2P3_Disk',
-              'T1_IT_CNAF_Disk',
-              'T1_RU_JINR_Disk',
-              'T1_UK_RAL_Disk',
-              'T1_US_FNAL_Disk',
+              'T2_CH_CERN'
             );
 
-$out_tranfer = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/transfers.json';
-$out_error = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/static/data/errors.json';
-```
+# used in StorageDataCollector
+@storageList = (
+              'T0_CH_CERN_MSS',
+              'T1_UK_RAL_MSS',
+              'T1_US_FNAL_MSS',
+            );
 
-#### Running the Collectors regularly
-* You can use crontabs to run Collectors regularly
-```sh
-./DataCollector/TransferDataCollector.pl --db ~/param/DBParam:Prod/Reader
-./DataCollector/ErrorDataCollector.pl --db ~/param/DBParam:Prod/Reader
+# output JSON files will be written to the following paths
+$out_tranfer = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/monitoring/static/data/transfers.json';
+$out_error = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/monitoring/static/data/errors.json';
+$out_storage = '/afs/cern.ch/work/m/mtaze/cmsmonitoring/monitoring-src/monitoring/static/data/storages.json';
 ```
-* output will be written to ```$out_tranfer``` and ```out_error```, make sure that flask application reads these files
-
 
 ### API Endpoints
 | Method | Endpoint                           | Description
 |--------|------------------------------------|--------------------------------------------------------
 | GET    | /                                  | Shows all current monitoring pages in the system
-| GET    | /transfer/{node_name}              | Shows the transfers for the given node name
+| GET    | /transfer/{site_name}              | Shows the transfers for the given site
 | GET    | /error/{error_text}                | Shows the errors with the given text
+| GET    | /storage/{site_name}               | Shows the storage usage for the given site

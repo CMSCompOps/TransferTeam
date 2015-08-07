@@ -7,11 +7,12 @@
     </ol>
   </div>
   <div class="row">
-    <table class="table">
+    <table class="table table-hover">
       <tr>
         <th>Request No</th>
         <th>Latest transfer</th>
         <th>Time Create</th>
+        <th>Size</th>
         <th>Progress</th>
         <th>Destination</th>
       </tr>
@@ -20,7 +21,8 @@
       <tr class="pointer info" data-toggle="collapse" data-target="#{{ req }}">
         <td><a href="{{LINK['SubscriptionByRequest'] % (site_name,req)}}">{{ req }}</a></td>
         <td>{{ getTimeString(reqInfo[req].latest_replica) }}</td>
-        <td>{{ getTimeString(site[req][0]['time_create']) }}</td>
+        <td>{{ getTimeString(reqInfo[req].time_create) }}</td>
+        <td>{{ getSizeString(reqInfo[req].bytes) }}</td>
         <td>
           <div class="progress">
             <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{'%0.3f%%' % reqInfo[req].progress}}" aria-valuemin="0" aria-valuemax="100" style="width: {{'%0.3f%%' % reqInfo[req].progress}};">

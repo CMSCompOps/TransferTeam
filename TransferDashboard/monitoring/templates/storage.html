@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+  <div class="row">
+    <ol class="breadcrumb">
+      <li><a href="/">Dashboard</a></li>
+      <li>{{storage_name}}</li>
+    </ol>
+  </div>
+  <div class="row">
+    <h3>Overview</h3>
+    <table class="table table-bordered">
+      <!-- by custodiality -->
+      <tr>
+        {% for custodiality in size_by_type %}
+        <th>{{custodiality}}</th>
+        {% endfor %}
+      </tr>
+      <tr>
+        {% for custodiality in size_by_type %}
+        <td>{{ getSizeString(size_by_type[custodiality]['total']|default(0)) }}</td>
+        {% endfor %}
+      </tr>
+
+      <!-- by type -->
+      <tr>
+        {% for custodiality in size_by_type %}
+        <td>
+          <table class="table table-striped">
+            <tr>
+              <th>type</th>
+              <th>size</th>
+            </tr>
+            {% for type in size_by_type[custodiality].keys() | sort %}
+            <tr>
+              <td>{{type}}</td>
+              <td>{{ getSizeString(size_by_type[custodiality][type]|default(0)) }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+        {% endfor %}
+      </tr>
+
+      <!-- by tier -->
+      <tr>
+        {% for custodiality in size_by_tier %}
+        <td>
+          <table class="table table-striped">
+            <tr>
+              <th>tier</th>
+              <th>size</th>
+            </tr>
+            {% for tier in size_by_tier[custodiality].keys() | sort %}
+            <tr>
+              <td>{{tier}}</td>
+              <td>{{ getSizeString(size_by_tier[custodiality][tier]|default(0)) }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+     {% endfor %}
+     
+      <!-- by era -->
+      <tr>
+        {% for custodiality in size_by_era %}
+        <td>
+          <table class="table table-striped">
+            <tr>
+              <th>era</th>
+              <th>size</th>
+            </tr>
+            {% for era in size_by_era[custodiality].keys() | sort %}
+            <tr>
+              <td>{{era}}</td>
+              <td>{{ getSizeString(size_by_era[custodiality][era]|default(0)) }}</td>
+            </tr>
+            {% endfor %}
+          </table>
+        </td>
+        {% endfor %}
+      </tr>
+    </table>
+  </div> 
+
+  <div class="row">
+    {% if unknown_samples %}
+    <h4>Unknown samples</h4>
+    <p>These are the samples not matching with our regex for data/mc/other. Please contact to CMS Transfer Team to update the script</p>
+    {% for ds in unknown_samples %}
+    <div>{{ds}}</div>
+    {% endfor %}
+    {% endif %}
+  </div>
+{% endblock %}

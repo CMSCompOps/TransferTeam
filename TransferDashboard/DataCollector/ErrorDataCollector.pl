@@ -4,6 +4,7 @@ use warnings;
 use Getopt::Long;
 use PHEDEX::Core::DB;
 use JSON;
+use FindBin '$Bin';
 
 my (%args,@h);
 
@@ -28,7 +29,7 @@ my $dbh = &connectToDatabase ($self);
 $dbh->{LongReadLen} = 100000;
 
 # read the config file
-do('config.cfg');
+do($Bin.'/config.cfg');
 our (@errorList, $out_error);
 
 my $sql = qq{
