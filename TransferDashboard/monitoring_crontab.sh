@@ -18,5 +18,5 @@ base_url=/cmsmonitoring
 # produce the static page
 cd $src
 source venv/bin/activate
-python freeze.py $base_url $out
+(cd monitoring; python freeze.py $base_url $out)
 deactivate
