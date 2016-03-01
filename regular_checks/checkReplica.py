@@ -1,1 +1,1 @@
-/afs/cern.ch/user/m/mtaze/TransferTeam/commons/checkReplica.py
+/afs/cern.ch/user/j/jodiazcr/TransferTeam/commons/checkReplica.py
