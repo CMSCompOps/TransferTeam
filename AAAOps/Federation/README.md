@@ -7,7 +7,7 @@ Cronjob is done via "create-fedfiles.sh" script. From that script, we are callin
  **create_allow-list.sh**:
 	
 	-Input : 
-		Redirector names -> cms-xrd-global.cern.ch:1094 and cms-xrd-transit.cern.ch:1094
+		Redirector names -> xrdcmsglobal01.cern.ch:1094, xrdcmsglobal02.cern.ch:1094  and cms-xrd-transit.cern.ch:1094
  
 	-Purpose : 
 		Query gloabal redirectors above and get the sites and regional redirectors who are subscribed to these global redirectors. 
@@ -16,7 +16,7 @@ Cronjob is done via "create-fedfiles.sh" script. From that script, we are callin
 		Allow list of both US and EU regions are produced. 
 		Host names are produced for both production and transational federation. (prod.txt and trans.txt)
 
-  **create_fedmaps.py** :
+  **create_fedmaps_DEV.py** :
 	
 	-Input : 
 		1. Hostnames in in/prod.txt and in/trans.txt
