@@ -1,0 +1,70 @@
+{
+	"ccxrpli001.in2p3.fr" : {
+		"VOname" : "T1_FR_CCIN2P3" 
+	},
+	
+	"llrpp01.in2p3.fr" : {
+		"VOname" : "T2_FR_GRIF_LLR"
+	},
+
+	"sbgse1.in2p3.fr" : {
+		"VOname" : "T2_FR_IPHC"
+	},
+	
+	"polgrfs20.in2p3.fr " : {
+		"VOname" : "T2_FR_GRIF_LLR"
+	},
+
+	"unl.edu" : {
+		"VOname" : "T2_US_Nebraska"
+	},
+
+	"ds-05-01.cr.cnaf.infn.it" : {
+		"VOname" : "T3_IT_Bologna"
+	},
+
+	"ds-05-02.cr.cnaf.infn.it" : {
+		"VOname" : "T3_IT_Bologna"
+	},
+	
+	"ds-202-06-33.cnaf" : {
+		"VOname" : "T1_IT_CNAF"
+	},
+	
+	"ds-202-06-37.cnaf" : {
+		"VOname" : "T1_IT_CNAF"
+	},
+
+	"gridpp.rl.ac.uk" : {
+		"VOname" : "T1_UK_RAL"
+	},
+
+	"pp.rl.ac.uk" : {
+		"VOname" : "T2_UK_SGrid_RALPP"
+	},
+
+	"xrootd.knu.ac.kr" : {
+		"VOname" : "T2_KR_KNU"
+	},
+	
+	"ucl.ac.be" : {
+		"VOname" : "T2_BE_UCL"
+	},
+
+	"iihe.ac.be" : {
+		"VOname" : "T2_BE_IIHE"
+	},
+
+	"cmsxrootd-site1.fnal.gov" : {
+		"VOname" : "T1_US_FNAL"
+	},
+	
+	"cmsxrootd-site2.fnal.gov" : {
+		"VOname" : "T1_US_FNAL"
+	},
+	
+	"cmsxrd.ts.infn.it" : {
+		"VOname" : "T3_IT_Trieste"
+	}
+
+}
