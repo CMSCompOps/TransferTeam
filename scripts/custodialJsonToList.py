@@ -8,8 +8,5 @@ with open(argv[1]) as jsonFile:
 
 for k,v in stuck.iteritems():
   if k.find('SIM')>=0 or k.find('GEN')>=0 or k.find('LHE')>=0:
-    try:
-      for kk,vv in v['nodes'].iteritems():
-        print '%-180s %s'%(k,kk)
-    except:
-      print k
+    for n in v['nodes']:
+      print k,n
