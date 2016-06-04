@@ -4,28 +4,73 @@ import json
 from os import system
 from sys import argv,exit
 from re import sub
+from time import time
 
-verbose=True
+tmpdir = '/tmp/'
 
-lfn = argv[1]
+verbose=False
+threshold = 86400*7*2
+
+dsList = open(argv[1])
+datasets = list(dsList)
+
+for iA in xrange(1,len(argv)):
+  if 'verbose' in argv[iA]:
+    verbose = ('rue' in argv[iA].split('=')[-1])
+  if 'threshold' in argv[iA]: 
+    threshold = float(argv[iA].split('=')[-1])*86400
 
 class TMDBFile():
   def __init__(self,n):
     self.name = n
     self.missing = []
-    self.subscribed = []
+    self.basis = []
+    self.eta = []
+    self.complete = []
 
-if verbose: print 'investigating',lfn
+for ds in datasets:
+  bad = {}
+  if verbose: print 'investigating',ds
+  cmd = 'wget --no-check-certificate -O '+tmpdir+'missingfiles.json "https://cmsweb.cern.ch/phedex/datasvc/json/prod/missingfiles?block='+ds+'%23*" > /dev/null 2>/dev/null'
+  system(cmd)
+  with open(tmpdir+'missingfiles.json') as jsonFile:
+    missingBlocks = json.load(jsonFile)['phedex']['block']
+  for block in missingBlocks:
+    for missingFile in block['file']:
+      if len(missingFile['missing'])>0:
+        try:
+          f = bad[missingFile['name']]
+        except KeyError:
+          f = TMDBFile(missingFile['name'])
+          bad[missingFile['name']] = f
+        for m in missingFile['missing']:
+          f.missing.append(m['node_name'])
 
-try:
-  site = argv[2]
-  cmd = 'wget --no-check-certificate -O /tmp/snarayan/missingfiles.json "https://cmsweb.cern.ch/phedex/datasvc/json/prod/missingfiles?block='+lfn+'%23*&node='+site+'" > /dev/null 2>/dev/null'
-except IndexError:
-  cmd = 'wget --no-check-certificate -O /tmp/snarayan/missingfiles.json "https://cmsweb.cern.ch/phedex/datasvc/json/prod/missingfiles?block='+lfn+'%23*" > /dev/null 2>/dev/null'
-system(cmd)
+  cmd = 'wget --no-check-certificate -O '+tmpdir+'data.json "https://cmsweb.cern.ch/phedex/datasvc/json/prod/data?dataset='+ds+'" > /dev/null 2>/dev/null'
+  system(cmd)
+  file2block = {}
+  with open(tmpdir+'data.json') as jsonFile:
+    blocks = json.load(jsonFile)['phedex']['dbs'][0]['dataset'][0]['block']
+    for b in blocks:
+      for f in b['file']:
+        file2block[f['lfn']] = b['name']
 
-with open('/tmp/snarayan/missingfiles.json') as jsonFile:
-  missingBlocks = json.load(jsonFile)['phedex']['block']
+  cmd = 'wget --no-check-certificate -O '+tmpdir+'ba.json "https://cmsweb.cern.ch/phedex/datasvc/json/prod/blockarrive?dataset='+ds+'" > /dev/null 2>/dev/null'
+  system(cmd)
+  blockArrives = {}
+  with open(tmpdir+'ba.json') as jsonFile:
+    blocks = json.load(jsonFile)['phedex']['block']
+    for b in blocks:
+      blockArrives[b['name']] = {}
+      for d in b['destination']:
+        blockArrives[b['name']][d['name']] = {'basis':d['basis'], 'eta':d['time_arrive']}
+
+  for lfn,f in bad.iteritems():
+    block = file2block[lfn]
+    blockArrive = blockArrives[block]
+    
+
+
 
 bad = []
 for block in missingBlocks:
