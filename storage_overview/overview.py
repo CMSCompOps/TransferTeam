@@ -3,7 +3,7 @@ Created on Mar 27, 2013
 Edited on Jul 8, 2016
 
 @author: cassel
-@edited: Jorge Diaz
+@edited: Jorge Diaz and David Urbina
 
 To add a new site, you must edit the {SITES} and {PLEDGES} variables.
 If last week data does not exist for the site, it will be set to this week data
@@ -391,6 +391,7 @@ class TableMaker(object):
                 if interests.match(key):
                     total += long(value)
             total = pledgeSite*UNIT - total        
+            '''
             if site.name == "T1_US_FNAL_MSS":
                 row.append(self._create_cell(to_TB(0)))
             elif site.name == "T1_DE_KIT_MSS":
@@ -400,7 +401,9 @@ class TableMaker(object):
             else:
                 row.append(self._create_cell(to_TB(total)))
                 grand_total += total
-                
+             '''
+            row.append(self._create_cell(to_TB(total)))
+            grand_total += total
         row.append(self._create_cell(to_TB(grand_total)))
         table.append(row)        
 
@@ -434,10 +437,13 @@ class TableMaker(object):
                 jsonsummary['Free'][site.name] = int((PLEDGES[site.name]*UNIT - T1FNALMSSUSED)/UNIT)
        
         for site in jsonsummary['Free']:
+            '''
             if (site == 'T1_US_FNAL_MSS' or site =='T1_DE_KIT_MSS'):
                 jsonsummary['Usable'][site] = 0
             else:
-                jsonsummary['Usable'][site]=jsonsummary['Free'][site] 
+                jsonsummary['Usable'][site]=jsonsummary['Free'][site]
+            '''
+            jsonsummary['Usable'][site]=jsonsummary['Free'][site] 
         return jsonsummary
     
     
@@ -1140,6 +1146,7 @@ def main():
     
     # Output for tapes
     tables_tape.produce_htmls('tape')
+    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)=========== 
     plots = PlotMaker(sites_tape)
     total_name = os.path.join(output_dir, 'total_tape_storage_overview.png')
     delta_name = os.path.join(output_dir, 'delta_tape_storage_overview.png')
@@ -1152,15 +1159,18 @@ def main():
     plots.create_overview_pie('data','Custodial Data Tape Storage Overview', pie)
     pie = os.path.join(output_dir, 'custodial_mc_tape_storage_pie.png')
     plots.create_overview_pie('mc','Custodial MC Tape Storage Overview', pie)
+    #=======================================================================
 
     # Output for disks
     tables_disk.produce_htmls('disk')
+    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)=========== 
     plots = PlotMaker(sites_disk)
     total_name = os.path.join(output_dir, 'total_disk_storage_overview.png')
     delta_name = os.path.join(output_dir, 'delta_disk_storage_overview.png')
     plots.create_overview_bar('Total Disk Storage Overview', total_name)
     plots.create_overview_bar('Delta Disk Storage Overview', delta_name, delta=True)
-
+    #=======================================================================
+    
     # Create main.html and meeting.html
     create_main_html(tables_tape, tables_disk, sites_tape, sites_disk, output_dir)
     create_meeting_html(tables_tape, tables_disk, output_dir, output_root_dir)
