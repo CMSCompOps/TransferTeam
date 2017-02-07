@@ -1,9 +1,10 @@
 '''
 Created on Mar 27, 2013
-Edited on Jul 8, 2016
+Edited on Jan 26, 2017
 
 @author: cassel
 @edited: Jorge Diaz and David Urbina
+@last_edited David Urbina
 
 To add a new site, you must edit the {SITES} and {PLEDGES} variables.
 If last week data does not exist for the site, it will be set to this week data
