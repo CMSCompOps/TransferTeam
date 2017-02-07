@@ -1,6 +1,6 @@
 '''
 Created on Mar 27, 2013
-Edited on Jan 26, 2017
+Edited on Feb 7, 2017
 
 @author: cassel
 @edited: Jorge Diaz and David Urbina
@@ -399,12 +399,18 @@ class TableMaker(object):
                 row.append(self._create_cell(to_TB(0)))
                 #row.append(self._create_cell(to_TB(PLEDGES[FNALTAPE]*UNIT - T1FNALMSSUSED)))
                 #grand_total += T1FNALMSSUSED
+            '''
+            if site.name == "T0_CH_CERN_MSS":
+                row.append(self._create_cell(to_TB(0)))
             else:
                 row.append(self._create_cell(to_TB(total)))
                 grand_total += total
-             '''
+            
+            #uncoment this part when there is no blacklisting to any site
+            '''
             row.append(self._create_cell(to_TB(total)))
             grand_total += total
+            '''
         row.append(self._create_cell(to_TB(grand_total)))
         table.append(row)        
 
@@ -441,9 +447,13 @@ class TableMaker(object):
             '''
             if (site == 'T1_US_FNAL_MSS' or site =='T1_DE_KIT_MSS'):
                 jsonsummary['Usable'][site] = 0
+            '''
+            if (site == 'T0_CH_CERN_MSS'):
+                jsonsummary['Usable'][site] = 0
             else:
                 jsonsummary['Usable'][site]=jsonsummary['Free'][site]
-            '''
+
+            #uncoment this part when there is no blacklisting to any site
             jsonsummary['Usable'][site]=jsonsummary['Free'][site] 
         return jsonsummary
     
@@ -1147,7 +1157,7 @@ def main():
     
     # Output for tapes
     tables_tape.produce_htmls('tape')
-    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)=========== 
+    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)===========
     plots = PlotMaker(sites_tape)
     total_name = os.path.join(output_dir, 'total_tape_storage_overview.png')
     delta_name = os.path.join(output_dir, 'delta_tape_storage_overview.png')
@@ -1164,14 +1174,14 @@ def main():
 
     # Output for disks
     tables_disk.produce_htmls('disk')
-    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)=========== 
+    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)===========
     plots = PlotMaker(sites_disk)
     total_name = os.path.join(output_dir, 'total_disk_storage_overview.png')
     delta_name = os.path.join(output_dir, 'delta_disk_storage_overview.png')
     plots.create_overview_bar('Total Disk Storage Overview', total_name)
     plots.create_overview_bar('Delta Disk Storage Overview', delta_name, delta=True)
-    #=======================================================================
-    
+    #======================================================================= 
+
     # Create main.html and meeting.html
     create_main_html(tables_tape, tables_disk, sites_tape, sites_disk, output_dir)
     create_meeting_html(tables_tape, tables_disk, output_dir, output_root_dir)
