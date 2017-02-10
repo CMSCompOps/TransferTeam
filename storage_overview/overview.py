@@ -1,8 +1,10 @@
 '''
 Created on Mar 27, 2013
+Edited on Feb 7, 2017
 
 @author: cassel
-@edited: meric
+@edited: Jorge Diaz and David Urbina
+@last_edited David Urbina
 
 To add a new site, you must edit the {SITES} and {PLEDGES} variables.
 If last week data does not exist for the site, it will be set to this week data
@@ -13,6 +15,8 @@ import sys
 import os
 import os.path
 import re
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import argparse
@@ -27,46 +31,50 @@ import utils
 DUMP_DIR = "dumps"
 
 # can be relative path to the script or absolute path
-OUTPUT_ROOT = "/afs/cern.ch/work/m/mtaze/www/StorageOverview"
+OUTPUT_ROOT = "/afs/cern.ch/work/c/cmstteam/www/storageoverview"
 UNIT = 1000 ** 4 #TB
 
 SITES = (
+    "T0_CH_CERN_MSS",
     "T1_DE_KIT_MSS",
     "T1_ES_PIC_MSS",
     "T1_FR_CCIN2P3_MSS",
     "T1_IT_CNAF_MSS",
+    "T1_RU_JINR_MSS",
     "T1_UK_RAL_MSS",
     "T1_US_FNAL_MSS",
     "T1_DE_KIT_Disk",
     "T1_ES_PIC_Disk",
     "T1_FR_CCIN2P3_Disk",
     "T1_IT_CNAF_Disk",
+    "T1_RU_JINR_Disk",
     "T1_UK_RAL_Disk",
     "T1_US_FNAL_Disk",
-    "T1_RU_JINR_Disk",
     "T2_CH_CERN"
 )
 # TB
 PLEDGES = {
-    "T1_DE_KIT_MSS": 5500,
-    "T1_ES_PIC_MSS": 2805,
-    "T1_FR_CCIN2P3_MSS": 4475,
-    "T1_IT_CNAF_MSS": 7150,
-    "T1_UK_RAL_MSS": 4400,
-    "T1_US_FNAL_MSS": 24000,
-    "T1_DE_KIT_Disk": 1900,
-    "T1_ES_PIC_Disk": 1000,
-    "T1_FR_CCIN2P3_Disk": 1418,
-    "T1_IT_CNAF_Disk": 3000,
-    "T1_UK_RAL_Disk": 2000,
-    "T1_US_FNAL_Disk": 10000,
-    "T1_RU_JINR_Disk": 450,
-    "T2_CH_CERN": 3560
+    "T0_CH_CERN_MSS": 44000,
+    "T1_DE_KIT_MSS": 10000,
+    "T1_ES_PIC_MSS": 5100,
+    "T1_FR_CCIN2P3_MSS": 8100,
+    "T1_IT_CNAF_MSS": 12000,
+    "T1_RU_JINR_MSS": 5000,
+    "T1_UK_RAL_MSS": 8000,
+    "T1_US_FNAL_MSS": 40000,
+    "T1_DE_KIT_Disk": 3300,
+    "T1_ES_PIC_Disk": 1683,
+    "T1_FR_CCIN2P3_Disk": 2700,
+    "T1_IT_CNAF_Disk": 3960,
+    "T1_RU_JINR_Disk": 2800,# SE(2800TB) + cache for tapes(400TB)
+    "T1_UK_RAL_Disk": 2640,
+    "T1_US_FNAL_Disk": 13200,
+    "T2_CH_CERN": 5370
 }
-T0CERNPLEDGE=28500
-T0CERNUSED=17654*UNIT
+T0CERNPLEDGE=44000
+T0CERNUSED=31524.8*UNIT
 # special condition for FNAL, total used by PhEDEx: (total[custodial]-0.5)*1.1
-FNALTAPE="T1_US_FNAL_MSS"
+FNALTAPE="T1_US_FNAL_MSSjorge"
 T1FNALMSSUSED=0
 
 ERAS_DATA = (
@@ -82,7 +90,8 @@ ERAS_MC = (
     'Summer08', 'Fall08', 'Winter09', 'Summer09', 'Spring10', 'Summer10', 
     'Fall10', 'Winter10', 'Spring11', 'Summer11', 'Fall11', 'Summer12', 
     'Summer12_DR53X', 'HiWinter13', 'Nov2011_HI', 'PreProd12_7TeV', 'Summer13',
-    'Summer13dr53X','Fall13','HiFall13','UpgFall13','Fall13wmLHE','Fall13pLHE','HiFall11','CommissioningDisk'
+    'Summer13dr53X','Fall13','HiFall13','UpgFall13','Fall13wmLHE','Fall13pLHE','HiFall11','CommissioningDisk',
+    'LowPU2010','Spring14dr','SHCALUpg142023','Spring14miniaod','GEM2019Upg14','Muon2023Upg14' 
 )
 
 ERAS_OTHER = ("RelVal", "StoreResults", "CMSSW", "T0TEST", "HC", "SAM", 
@@ -281,20 +290,20 @@ class TableMaker(object):
         row.append(self._create_cell(""))
         
         # Site names
-        if isTape:
-            row.append(self._create_cell("T0_CH_CERN", header=True))
+        #if isTape:
+        #    row.append(self._create_cell("T0_CH_CERN", header=True))
         
         self._add_site_names(table, row)
 
         # Pledges
         row = ET.Element("tr")
-        row.append(self._create_cell("Pledges [TB]", header=True))
+        row.append(self._create_cell("Pledge for PhEDEx [TB]", header=True))
         
         
         total = 0
-        if isTape:
-            row.append(self._create_cell(to_3f(T0CERNPLEDGE), color=True))
-            total += T0CERNPLEDGE
+        #if isTape:
+        #    row.append(self._create_cell(to_3f(T0CERNPLEDGE), color=True))
+        #    total += T0CERNPLEDGE
             
         for site in self.sites:
             data = PLEDGES[site.name] if site.name in PLEDGES else 0
@@ -311,9 +320,9 @@ class TableMaker(object):
         row.append(self._create_cell("Used (PhEDEx) [TB]", header=True))
         grand_total = 0
         
-        if isTape:
-            row.append(self._create_cell(to_TB(T0CERNUSED)))
-            grand_total += T0CERNUSED
+        #if isTape:
+        #    row.append(self._create_cell(to_TB(T0CERNUSED)))
+        #    grand_total += T0CERNUSED
         
         for site in self.sites:
             params = {"node":"{site}".format(site=site.name)}
@@ -333,10 +342,120 @@ class TableMaker(object):
         row.append(self._create_cell(to_TB(grand_total)))
         table.append(row)
         
+	# Diff (PhEDEx)
+        url = "https://cmsweb.cern.ch/phedex/datasvc/json/prod/nodeusage"
+        interests = re.compile(r".*_node_bytes$")
+        row = ET.Element("tr")
+        row.append(self._create_cell("Difference [TB]", header=True))
+        grand_total = 0
+        
+        #if isTape:
+        #    row.append(self._create_cell(to_TB(T0CERNPLEDGE*UNIT - T0CERNUSED)))
+        #    grand_total += T0CERNUSED
+        
+        for site in self.sites:
+            params = {"node":"{site}".format(site=site.name)}
+            pledgeSite = PLEDGES[site.name] if site.name in PLEDGES else 0
+            data = json.loads(utils.download_data(url, params))["phedex"]["node"][0]
+            total = 0
+            for key, value in data.items():
+                if interests.match(key):
+                    total += long(value)
+            total = pledgeSite*UNIT - total        
+            if site.name == FNALTAPE:
+                row.append(self._create_cell(to_TB(PLEDGES[FNALTAPE]*UNIT - T1FNALMSSUSED)))
+                grand_total += T1FNALMSSUSED
+            else:
+                row.append(self._create_cell(to_TB(total)))
+                grand_total += total
+                
+        row.append(self._create_cell(to_TB(grand_total)))
+        table.append(row)        
+
+        # Usable
+        url = "https://cmsweb.cern.ch/phedex/datasvc/json/prod/nodeusage"
+        interests = re.compile(r".*_node_bytes$")
+        row = ET.Element("tr")
+        row.append(self._create_cell("Usable [TB]", header=True))
+        grand_total = 0
+        
+        #if isTape:
+        #    row.append(self._create_cell(to_TB(T0CERNPLEDGE*UNIT - T0CERNUSED)))
+        #    grand_total += T0CERNUSED
+        
+        for site in self.sites:
+            params = {"node":"{site}".format(site=site.name)}
+            pledgeSite = PLEDGES[site.name] if site.name in PLEDGES else 0
+            data = json.loads(utils.download_data(url, params))["phedex"]["node"][0]
+            total = 0
+            for key, value in data.items():
+                if interests.match(key):
+                    total += long(value)
+            total = pledgeSite*UNIT - total        
+            '''
+            if site.name == "T1_US_FNAL_MSS":
+                row.append(self._create_cell(to_TB(0)))
+            elif site.name == "T1_DE_KIT_MSS":
+                row.append(self._create_cell(to_TB(0)))
+                #row.append(self._create_cell(to_TB(PLEDGES[FNALTAPE]*UNIT - T1FNALMSSUSED)))
+                #grand_total += T1FNALMSSUSED
+            '''
+            if site.name == "T0_CH_CERN_MSS":
+                row.append(self._create_cell(to_TB(0)))
+            else:
+                row.append(self._create_cell(to_TB(total)))
+                grand_total += total
+            
+            #uncoment this part when there is no blacklisting to any site
+            '''
+            row.append(self._create_cell(to_TB(total)))
+            grand_total += total
+            '''
+        row.append(self._create_cell(to_TB(grand_total)))
+        table.append(row)        
+
         return table
-    
-    
-    
+        
+    def jsonSummary(self, isTape=False):
+        jsonsummary = {}
+        jsonsummary['Used'] = {}
+        jsonsummary['Free'] = {}
+        jsonsummary['Pledge'] = {}
+        jsonsummary['Usable'] = {}
+        url = "https://cmsweb.cern.ch/phedex/datasvc/json/prod/nodeusage"
+        interests = re.compile(r".*_node_bytes$")
+        # Site names
+        #if isTape:
+        #    jsonsummary['Pledge']["T0_CH_CERN_MSS"] = T0CERNPLEDGE
+        #    jsonsummary['Used']['T0_CH_CERN_MSS'] = T0CERNUSED /UNIT
+        #    jsonsummary['Free']['T0_CH_CERN_MSS'] = T0CERNPLEDGE - (T0CERNUSED /UNIT)
+        for site in self.sites:
+            jsonsummary['Pledge'][site.name] = PLEDGES[site.name] if site.name in PLEDGES else 0
+            params = {"node":"{site}".format(site=site.name)}
+            data = json.loads(utils.download_data(url, params))["phedex"]["node"][0]
+            total = 0
+            for key, value in data.items():
+                if interests.match(key):
+                    total += long(value)
+            jsonsummary['Used'][site.name] = total/UNIT
+            jsonsummary['Free'][site.name] = (PLEDGES[site.name]*UNIT - total)/UNIT
+            if site.name == FNALTAPE:
+                jsonsummary['Used'][site.name] = int( T1FNALMSSUSED /UNIT)
+                jsonsummary['Free'][site.name] = int((PLEDGES[site.name]*UNIT - T1FNALMSSUSED)/UNIT)
+       
+        for site in jsonsummary['Free']:
+            '''
+            if (site == 'T1_US_FNAL_MSS' or site =='T1_DE_KIT_MSS'):
+                jsonsummary['Usable'][site] = 0
+            '''
+            if (site == 'T0_CH_CERN_MSS'):
+                jsonsummary['Usable'][site] = 0
+            else:
+                jsonsummary['Usable'][site]=jsonsummary['Free'][site]
+
+            #uncoment this part when there is no blacklisting to any site
+            #jsonsummary['Usable'][site]=jsonsummary['Free'][site] 
+        return jsonsummary
     
     
     def _create_html(self, title, filename, func, **kwargs):
@@ -960,6 +1079,13 @@ def create_meeting_html(tables_tape,tables_disk, output_dir, output_root_dir):
 
     fp.close()
 
+def create_json_file(tables_tape,tables_disk, output_dir, output_root_dir):
+    jsonTotal = {}
+    jsonTotal['Disk'] = tables_disk.jsonSummary(isTape=False)
+    jsonTotal['Tape'] = tables_tape.jsonSummary(isTape=True)
+    fp = open(os.path.join(output_dir, "StorageOverview.json"), "w")
+    fp.write(json.dumps(jsonTotal))
+    fp.close()
 
 def parse_args():
     """Parse and return provided arguments if any"""
@@ -987,6 +1113,7 @@ def main():
         sort_func = lambda path: stat(path).st_mtime
         latest_dump = sorted(os.listdir(DUMP_DIR), key=sort_func)[-1]
         last_week_dump = os.path.join(DUMP_DIR, latest_dump)
+        print last_week_dump
 
     output_dir = prepare_output_directory()
     output_root_dir = get_output_root_directory();
@@ -1030,6 +1157,7 @@ def main():
     
     # Output for tapes
     tables_tape.produce_htmls('tape')
+    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)===========
     plots = PlotMaker(sites_tape)
     total_name = os.path.join(output_dir, 'total_tape_storage_overview.png')
     delta_name = os.path.join(output_dir, 'delta_tape_storage_overview.png')
@@ -1042,18 +1170,24 @@ def main():
     plots.create_overview_pie('data','Custodial Data Tape Storage Overview', pie)
     pie = os.path.join(output_dir, 'custodial_mc_tape_storage_pie.png')
     plots.create_overview_pie('mc','Custodial MC Tape Storage Overview', pie)
+    #=======================================================================
 
     # Output for disks
     tables_disk.produce_htmls('disk')
+    #====== Dependent on matplotlib 2.0 (needs python 2.7 to run)===========
     plots = PlotMaker(sites_disk)
     total_name = os.path.join(output_dir, 'total_disk_storage_overview.png')
     delta_name = os.path.join(output_dir, 'delta_disk_storage_overview.png')
     plots.create_overview_bar('Total Disk Storage Overview', total_name)
     plots.create_overview_bar('Delta Disk Storage Overview', delta_name, delta=True)
+    #======================================================================= 
 
     # Create main.html and meeting.html
     create_main_html(tables_tape, tables_disk, sites_tape, sites_disk, output_dir)
     create_meeting_html(tables_tape, tables_disk, output_dir, output_root_dir)
+
+    #Create Json
+    create_json_file(tables_tape, tables_disk, output_dir, output_root_dir)
 
     #create the soft link for the folder
     linkPath = output_root_dir+"/latest";
