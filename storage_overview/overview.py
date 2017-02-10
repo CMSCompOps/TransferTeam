@@ -454,11 +454,7 @@ class TableMaker(object):
                 jsonsummary['Usable'][site]=jsonsummary['Free'][site]
 
             #uncoment this part when there is no blacklisting to any site
-<<<<<<< HEAD
             #jsonsummary['Usable'][site]=jsonsummary['Free'][site] 
-=======
-            jsonsummary['Usable'][site]=jsonsummary['Free'][site] 
->>>>>>> 1acb1ad680e4ba11fc9f9a394d707bef5ffae3f6
         return jsonsummary
     
     
