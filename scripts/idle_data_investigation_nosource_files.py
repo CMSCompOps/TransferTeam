@@ -297,7 +297,7 @@ def check_idle_no_source(site):
             deletion_json = search_deletions(j)
             deletions_json.append(deletion_json)
 
-        write_deletions_json(i, deletions_json)
+        write_deletions_json(site, deletions_json)
 
 
 def main():
