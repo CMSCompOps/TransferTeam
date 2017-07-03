@@ -1,12 +1,34 @@
  #!/usr/bin/env python
 
 '''
-This script produces a list of files that have no source (no replica). The files are identified by taking a look at blocks associated with basis value of -6 (at least one file in the block has no source replica remaining) for a specific site. The blocks are retrieved using PhEDEx API (https://cmsweb.cern.ch/phedex/datasvc/doc/blockarrive).
-These files are mostly responsible for the piling of idle data from subscriptions to different sites (https://cmsweb.cern.ch/phedex/prod/Activity::QueuePlots?graph=idle&entity=dest&dest_filter=T0%7CT1%7CT2_CH_CERN&no_mss=true&period=l12h&upto=&.submit=Update).
-The script recovers all the blocks related to specific site subscriptions, then retrieves the responsible files. It checks their creation date. Produces a report of the datasets involve and in which extent are they affected (files with no source/ total files in the dataset and distribution across the dataset blocks ).
-A list of the files separated for each "type" ( whether they are 'data', 'mc' ... ) is generated. This list is intended to be used to proceed with global invalidation or for further investigation, depending on the type.
-If all the files of a block or dataset have no source. A file with a list of such blocks and a file with a list of such datasets are generated. These lists can facilitate the invalidation process to be performed in bulk instead of by files. Additionally, a list of files with no source is generated, excluding the files that are listed in the block list or datasets list. A list including the whole set of files per type is also generated.
-Finally, a search for deletions subscriptions related to the involved blocks is perform. A file concatenating the information pulled is generated. Until now, there hasn't been any case in which a deletion request is found. In case this starts happening the script functionality should be extended.
+This script produces a list of files that have no source (no replica).
+
+The files are identified by taking a look at blocks associated with basis value
+ of -6 (at least one file in the block has no source replica remaining) for a specific site.
+
+The blocks are retrieved using PhEDEx API (https://cmsweb.cern.ch/phedex/datasvc/doc/blockarrive).
+These files are mostly responsible for the piling of idle data from subscriptions
+to different sites (https://cmsweb.cern.ch/phedex/prod/Activity::QueuePlots?graph=idle&entity=dest&dest_filter=T0%7CT1%7CT2_CH_CERN&no_mss=true&period=l12h&upto=&.submit=Update).
+
+The script recovers all the blocks related to specific site subscriptions, then
+retrieves the responsible files. It checks their creation date. Produces a report
+of the datasets involve and in which extent are they affected
+(files with no source/ total files in the dataset and distribution across the dataset blocks ).
+
+
+A list of the files separated for each "type" ( whether they are 'data', 'mc' ... ) is generated.
+This list is intended to be used to proceed with global invalidation or for further investigation, depending on the type.
+If all the files of a block or dataset have no source. A file with a list of such
+blocks and a file with a list of such datasets are generated.
+These lists can facilitate the invalidation process to be performed in bulk instead of by files.
+Additionally, a list of files with no source is generated, excluding the files
+that are listed in the block list or datasets list. A list including the whole set
+of files per type is also generated.
+
+Finally, a search for deletions subscriptions related to the involved blocks is perform.
+A file concatenating the information pulled is generated. Until now, there hasn't
+been any case in which a deletion request is found. In case this starts happening
+the script functionality should be extended.
 '''
 
 import json
