@@ -179,11 +179,13 @@ def write_nosource_files_site(site, file_type, list_files):
         f.write("\n".join(list_files) + "\n")
 
 
+
 def write_nosource_block_list(site, file_type, list_blocks):
     filename = "nosource_blocks_" + file_type + "_" + site + ".txt"
 
     with open(filename, "w") as f:
         f.write("\n".join(list_blocks) + "\n")
+
 
 
 def write_nosource_dataset_list(site, file_type, list_datasets):
@@ -207,6 +209,7 @@ def write_deletions_json(site, deletions_json_list):
 
 
 def check_idle_no_source(site):
+
 
     nosource_site_info = site_nosource_files_df(site)
 
@@ -248,6 +251,7 @@ def check_idle_no_source(site):
             if (dataset_kind_is(dataset) == file_type):
                 n_files = datasets_total[dataset]['num_files']
                 ns_blocks_info_subset = ns_blocks_info[ns_blocks_info.dataset == dataset]
+
                 num_ns_files = ns_blocks_info_subset.num_nosource_files_in_block.sum()
                 num_ns_blocks = datasets_count[dataset]
                 num_tot_blocks = datasets_total[dataset]['num_blocks']
@@ -275,6 +279,7 @@ def check_idle_no_source(site):
         write_nosource_files_site(
             site, file_type + '_whole', list_whole_ns_files)
 
+
         #deletions_json = []
         #for j in ns_files_info.blockname:
             #deletion_json = search_deletions(j)
@@ -283,13 +288,16 @@ def check_idle_no_source(site):
         #write_deletions_json(site, deletions_json)
 
 
+
 def main():
 
     sites = [
+
         "T1_US_FNAL_MSS",
         "T1_RU_JINR_Disk",
         "T1_IT_CNAF_MSS",
         "T1_UK_RAL_MSS"
+
     ]
 
     for site in sites:
