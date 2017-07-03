@@ -1,25 +1,12 @@
-#!/usr/bin/env python
+ #!/usr/bin/env python
 
 '''
-This scripts produces a list of of files was no source (no replica) and are identified by taking
-a look to blocks asociated with basis value of -6 (at least one file in the block has no source
- replica remaining).
-
-This files keep piling as idle data from subscriptions to diferent sites
-(https://cmsweb.cern.ch/phedex/prod/Activity::QueuePlots?graph=idle&entity=dest&dest_filter=T0%7CT1%7CT2_CH_CERN&no_mss=true&period=l12h&upto=&.submit=Update).
-
-The script recovers all the blocks realted to specific site subscriptions, then retrieves the responsible files.
-It checks their creation date. Produces a report of the datasets involve and in with extent (files with non source/ total files in the dataset ).
-
-A list of the files separated for each "type" ( whether they are 'data', 'mc' ... ) is generated.
-This list is intended to be used to proced with global invalidation or further investigation, depending the type.
-If all the files of a block or dataset have no source. A file with a list of for such blocks and a file with a list for such datasets is generated.
-This lists can facilitate the invalidation process to be performe in bulk instead of by files.
-Aditionally a list of non source files is generated, excluding the files that are included in the block list or datasets list.
-The later also to considering the case in which a bulk invalidation wants to be performed.
-Finally, deletions subscriptions for the involve blocks are performed. A file concateneting the information pulled is generated.
- Until it haven't present the case of finding a deletion request related.
- In the case this starts happening the script funtionallity should be extended.
+This script produces a list of files that have no source (no replica). The files are identified by taking a look at blocks associated with basis value of -6 (at least one file in the block has no source replica remaining) for a specific site. The blocks are retrieved using PhEDEx API (https://cmsweb.cern.ch/phedex/datasvc/doc/blockarrive).
+These files are mostly responsible for the piling of idle data from subscriptions to different sites (https://cmsweb.cern.ch/phedex/prod/Activity::QueuePlots?graph=idle&entity=dest&dest_filter=T0%7CT1%7CT2_CH_CERN&no_mss=true&period=l12h&upto=&.submit=Update).
+The script recovers all the blocks related to specific site subscriptions, then retrieves the responsible files. It checks their creation date. Produces a report of the datasets involve and in which extent are they affected (files with no source/ total files in the dataset and distribution across the dataset blocks ).
+A list of the files separated for each "type" ( whether they are 'data', 'mc' ... ) is generated. This list is intended to be used to proceed with global invalidation or for further investigation, depending on the type.
+If all the files of a block or dataset have no source. A file with a list of such blocks and a file with a list of such datasets are generated. These lists can facilitate the invalidation process to be performed in bulk instead of by files. Additionally, a list of files with no source is generated, excluding the files that are listed in the block list or datasets list. A list including the whole set of files per type is also generated.
+Finally, a search for deletions subscriptions related to the involved blocks is perform. A file concatenating the information pulled is generated. Until now, there hasn't been any case in which a deletion request is found. In case this starts happening the script functionality should be extended.
 '''
 
 import json
@@ -189,14 +176,14 @@ def write_nosource_files_site(site, file_type, list_files):
     filename = "nosource_files_" + file_type + "_" + site + ".txt"
 
     with open(filename, "w") as f:
-        f.write("\n".join(list_files))
+        f.write("\n".join(list_files) + "\n")
 
 
 def write_nosource_block_list(site, file_type, list_blocks):
     filename = "nosource_blocks_" + file_type + "_" + site + ".txt"
 
     with open(filename, "w") as f:
-        f.write("\n".join(list_blocks))
+        f.write("\n".join(list_blocks) + "\n")
 
 
 def write_nosource_dataset_list(site, file_type, list_datasets):
@@ -216,11 +203,10 @@ def write_deletions_json(site, deletions_json_list):
 
     with open(filename, "w") as f:
         deletions_json_list = map(str, deletions_json_list)
-        f.write("\n".join(deletions_json_list))
+        f.write("\n".join(deletions_json_list) + "\n")
 
 
 def check_idle_no_source(site):
-    nosource_site_info = site_nosource_files_df(site)
 
     nosource_site_info = site_nosource_files_df(site)
 
@@ -261,8 +247,7 @@ def check_idle_no_source(site):
         for dataset in datasets_count:
             if (dataset_kind_is(dataset) == file_type):
                 n_files = datasets_total[dataset]['num_files']
-                ns_blocks_info_subset = ns_blocks_info[
-                    ns_blocks_info.dataset == dataset]
+                ns_blocks_info_subset = ns_blocks_info[ns_blocks_info.dataset == dataset]
                 num_ns_files = ns_blocks_info_subset.num_nosource_files_in_block.sum()
                 num_ns_blocks = datasets_count[dataset]
                 num_tot_blocks = datasets_total[dataset]['num_blocks']
@@ -275,16 +260,14 @@ def check_idle_no_source(site):
 
                 for idx, row in ns_blocks_info_subset.iterrows():
                     print ' {} {}/{}'.format(row['name'], row.num_nosource_files_in_block, row.num_files_in_block)
-                    if (row.num_nosource_files_in_block == row.num_files_in_block and (num_ns_blocks != num_tot_blocks and num_ns_files != n_files)):
+                    if (row.num_nosource_files_in_block == row.num_files_in_block and (num_ns_blocks !=num_tot_blocks and num_ns_files != n_files)):
                         whole_blocks_ns.append(row['name'])
                 print '=' * 100
-        list_whole_ns_files = ns_files_info[ns_files_info.name.apply(
-            check_filetype, file_type=file_type)]['name'].tolist()
-        nosource_files_site_df = ns_files_info[~ns_files_info.dataset.isin(
-            whole_datasets_ns) & ~ns_files_info.blockname.isin(whole_blocks_ns)]
+        list_whole_ns_files = ns_files_info[ns_files_info.name.apply(check_filetype, file_type = file_type)]['name'].tolist()
+        nosource_files_site_df = ns_files_info[~ns_files_info.dataset.isin(whole_datasets_ns) & ~ns_files_info.blockname.isin(whole_blocks_ns)]
         list_ns_files = ns_files_info['name'].tolist()
-        list_ns_files = [ns_file for ns_file in list_ns_files if re.search(
-            '^/store/' + file_type, ns_file)]
+        list_ns_files = [ ns_file for ns_file in list_ns_files if re.search('^/store/' + file_type, ns_file)]
+
 
         write_nosource_block_list(site, file_type, whole_blocks_ns)
         write_nosource_dataset_list(site, file_type, whole_datasets_ns)
@@ -292,20 +275,21 @@ def check_idle_no_source(site):
         write_nosource_files_site(
             site, file_type + '_whole', list_whole_ns_files)
 
-        deletions_json = []
-        for j in ns_files_info.blockname:
-            deletion_json = search_deletions(j)
-            deletions_json.append(deletion_json)
+        #deletions_json = []
+        #for j in ns_files_info.blockname:
+            #deletion_json = search_deletions(j)
+            #deletions_json.append(deletion_json)
 
-        write_deletions_json(site, deletions_json)
+        #write_deletions_json(site, deletions_json)
 
 
 def main():
 
     sites = [
-        "T1_US_FNAL_Disk",
-        "T2_CH_CERN",
-        "T1_RU_JINR_Disk"
+        "T1_US_FNAL_MSS",
+        "T1_RU_JINR_Disk",
+        "T1_IT_CNAF_MSS",
+        "T1_UK_RAL_MSS"
     ]
 
     for site in sites:
