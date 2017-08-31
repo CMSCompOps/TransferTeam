@@ -54,22 +54,22 @@ SITES = (
 )
 # TB
 PLEDGES = {
-    "T0_CH_CERN_MSS": 44000,
-    "T1_DE_KIT_MSS": 10000,
-    "T1_ES_PIC_MSS": 5100,
-    "T1_FR_CCIN2P3_MSS": 8100,
-    "T1_IT_CNAF_MSS": 12000,
-    "T1_RU_JINR_MSS": 5000,
-    "T1_UK_RAL_MSS": 8000,
-    "T1_US_FNAL_MSS": 40000,
-    "T1_DE_KIT_Disk": 3300,
-    "T1_ES_PIC_Disk": 1683,
-    "T1_FR_CCIN2P3_Disk": 2700,
-    "T1_IT_CNAF_Disk": 3960,
-    "T1_RU_JINR_Disk": 2800,# SE(2800TB) + cache for tapes(400TB)
-    "T1_UK_RAL_Disk": 2640,
-    "T1_US_FNAL_Disk": 13200,
-    "T2_CH_CERN": 5370
+    "T0_CH_CERN_MSS": 70500, #2016 pledge 44000
+    "T1_DE_KIT_MSS": 19500, #2016 pledge 10000
+    "T1_ES_PIC_MSS": 6885, #2016 pledge 5100
+    "T1_FR_CCIN2P3_MSS": 11000, #2016 pledge 8100
+    "T1_IT_CNAF_MSS": 21000, #early 2017 16000 #2016 pledge 12000
+    "T1_RU_JINR_MSS": 8000, #2016 pledge 5000
+    "T1_UK_RAL_MSS": 12720, #2016 pledge 8000
+    "T1_US_FNAL_MSS": 54000, #2016 pledge 40000
+    "T1_DE_KIT_Disk": 5140, #until early 2017 3500
+    "T1_ES_PIC_Disk": 2499, #until early 2017 1683
+    "T1_FR_CCIN2P3_Disk": 3600, #until early 2017 2700
+    "T1_IT_CNAF_Disk": 5880, #until early 2017 3960
+    "T1_RU_JINR_Disk": 3900, #early 2017 4000 #2800,# SE(2800TB) + cache for tapes(400TB)
+    "T1_UK_RAL_Disk": 4304, #early 2027 2640
+    "T1_US_FNAL_Disk": 19600, # pledge 13200 until April 1 2017
+    "T2_CH_CERN": 24600 # early 2017 5370
 }
 T0CERNPLEDGE=44000
 T0CERNUSED=31524.8*UNIT
@@ -400,7 +400,7 @@ class TableMaker(object):
                 #row.append(self._create_cell(to_TB(PLEDGES[FNALTAPE]*UNIT - T1FNALMSSUSED)))
                 #grand_total += T1FNALMSSUSED
             '''
-            if site.name == "T0_CH_CERN_MSS":
+            if site.name == "T0_CH_CERN_MSS" or site.name == "T1_DE_KIT_MSS" or site.name == "T1_DE_KIT_Disk" or site.name == "T1_IT_CNAF_MSS" or site.name == "T1_IT_CNAF_Disk":
                 row.append(self._create_cell(to_TB(0)))
             else:
                 row.append(self._create_cell(to_TB(total)))
