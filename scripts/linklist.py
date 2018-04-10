@@ -6,7 +6,7 @@ import httplib
 import json
 
 # Sites to have links to/from disabled completely
-disabled_nodes = ['T2_BR_UERJ', 'T2_PK_NCP', 'T2_RU_PNPI', 'T2_RU_SINP', 'T2_TH_CUNSTDA', 'T2_RU_ITEP'] # [node]
+disabled_nodes = ['T2_BR_UERJ', 'T2_RU_PNPI', 'T2_RU_SINP', 'T2_TH_CUNSTDA'] # [node]
 # Specific links to disable
 disabled_links = [] # [(to, from)]
 # Sites to not touch (e.g. being commissioned) - T3s are also skipped
@@ -52,12 +52,15 @@ if __name__ == '__main__':
         links[(link['from'], link['to'])] = link['status']
     
     for from_node in list(nodes):
+        if from_node != 'T2_PK_NCP':
+            continue
+
         for to_node in list(nodes):
             try:
                 current = links[(from_node, to_node)]
             except KeyError:
                 continue
-    
+
             # Will not touch links that are not in ok or deactivated states
             if current not in ['ok', 'deactivated']:
                 continue
