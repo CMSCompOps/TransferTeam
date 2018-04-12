@@ -30,23 +30,28 @@ def get_file_replicas(lfn):
                 for f in b['file']:
                         for r in f['replica']:
                                 sites.append(r['node'])
-
 def get_cksum_from_replica(lfn):
-        print "-----------------------"
-        print "FILE: " + lfn
-        print "TMDB: " + adler32[0]
-        print "Replicas: (" + str(len(sites)) + ") " + str(sites).replace("u'","").replace("'","").replace("[","").replace("]","")
-        print "-----------------------"
-        for s in range(len(sites)):
-                url = 'https://cmsweb.cern.ch/phedex/datasvc/json/prod/lfn2pfn?protocol=srmv2&lfn=' + str(lfn) + '&node=' + str(sites[s])
-                result = json.load(urllib.urlopen(url))
-                for m in result['phedex']['mapping']:
-                        pfn.append(m['pfn'])
-                        cmd = "gfal-sum " + pfn[s] + " adler32"
-                        result = subprocess.check_output(cmd, shell=True)
-                        cksm = str(result).split('.root ')[1]
-                        if str(adler32[0]).strip() != str(cksm).strip():
-                                print "site: " + sites[s] + " - " + result
+	print "-----------------------"
+	print "FILE: " + lfn
+	print "TMDB: " + adler32[0]
+	print "Replicas: (" + str(len(sites)) + ") " + str(sites).replace("u'","").replace("'","").replace("[","").replace("]","")
+	print "-----------------------"
+	if len(sites) == 0:
+		print "no corrupt files found"
+	else:
+		cf = 0
+		for s in range(len(sites)):
+			url = 'https://cmsweb.cern.ch/phedex/datasvc/json/prod/lfn2pfn?protocol=srmv2&lfn=' + str(lfn) + '&node=' + str(sites[s])
+			result = json.load(urllib.urlopen(url))
+			for m in result['phedex']['mapping']:
+				pfn.append(m['pfn'])
+				cmd = "gfal-sum " + pfn[s] + " adler32"
+				result = subprocess.check_output(cmd, shell=True)    
+				cksm = str(result).split('.root ')[1]
+				if str(adler32[0]).strip() != str(cksm).strip():
+					print "site: " + sites[s] + " - " + result
+					cf = cf + 1
+			print str(cf) + " site(s) with corrupt files found"
 
 sites = []
 adler32 = []
