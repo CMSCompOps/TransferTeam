@@ -16,6 +16,7 @@
 /usr/bin/curl -i -F file=@/var/www/html/sls/xrdfed_kibana/XRDFED_CMS-TRANSIT.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 /usr/bin/curl -i -F file=@/var/www/html/sls/xrdfed_kibana/XRDFED_CMS-TRANSIT01.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 /usr/bin/curl -i -F file=@/var/www/html/sls/xrdfed_kibana/XRDFED_CMS-TRANSIT02.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
+/usr/bin/curl -i -F file=@/var/www/html/sls/xrdfed_kibana/XRDFED_CMS-EU-IPV6.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 
 /root/check_XMLs.sh >> /var/log/check_XMLs.log 2>&1
 

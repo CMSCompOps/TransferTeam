@@ -224,7 +224,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
                 serviceUpdate.appendChild(c)
                 need_xml_link=1
             else:
-                availinfo=availinfo+"<br />File below: OK"
+                availinfo=availinfo+"<br />File below: OK <br />"
             nValue = doc.createElement("numericvalue")
             nValue.setAttribute("name", "xrdcp_below_time")
             nValue.setAttribute("desc", "Time to copy a file below redirector")
@@ -247,7 +247,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
                 serviceUpdate.appendChild(c)
                 need_xml_link=1
             else:
-                availinfo=availinfo+"<br />File above: OK"
+                availinfo=availinfo+"<br />File above: OK <br />"
             nValue = doc.createElement("numericvalue")
             nValue.setAttribute("name", "xrdcp_above_time")
             nValue.setAttribute("desc", "Time to copy a file elsewhere in the federation")
@@ -259,7 +259,8 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     # save functional test info to XML
     if need_xml_link:
         myhostname = socket.gethostname()
-        notes_text = notes_text + "Details for failed test: http://" + myhostname + "/sls/xrdfed/" + servicename + ".xml <br />\n"
+        notes_text = notes_text + "Details for failed test: http://" + myhostname + "/sls/xrdfed_kibana/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms037.cern.ch/sls/xrdfed_kibana/err/ <br />\n" 
+	availinfo = availinfo + "<br />" + notes_text 
     availabilityF = doc.createElement("status")
     availabilityF.appendChild(doc.createTextNode(str(availability)))
     serviceUpdate.appendChild(availabilityF)
@@ -313,8 +314,10 @@ def main():
     CMSLINK="%BR%Monitoring:%BR%\n http://xrootd.t2.ucsd.edu/dashboard/ %BR%\n http://dashb-cms-xrootd-transfers.cern.ch/ui %BR%\n"
     #FILEABOVE="/store/test/xrootd/T2_US_Nebraska/store/mc/SAM/GenericTTbar/GEN-SIM-RECO/CMSSW_5_3_1_START53_V5-v1/0013/CE4D66EB-5AAE-E111-96D6-003048D37524.root"
     #FILEBELOW="/store/test/xrootd/T2_CH_CERN/store/mc/SAM/GenericTTbar/GEN-SIM-RECO/CMSSW_5_3_1_START53_V5-v1/0013/CE4D66EB-5AAE-E111-96D6-003048D37524.root"
-    FILEABOVE="/store/mc/SAM/GenericTTbar/GEN-SIM-RECO/CMSSW_5_3_1_START53_V5-v1/0013/CE4D66EB-5AAE-E111-96D6-003048D37524.root"
-    FILEBELOW="/store/mc/SAM/GenericTTbar/GEN-SIM-RECO/CMSSW_5_3_1_START53_V5-v1/0013/CE4D66EB-5AAE-E111-96D6-003048D37524.root"
+    #FILEABOVE="/store/mc/SAM/GenericTTbar/GEN-SIM-RECO/CMSSW_5_3_1_START53_V5-v1/0013/CE4D66EB-5AAE-E111-96D6-003048D37524.root"
+    #FILEBELOW="/store/mc/SAM/GenericTTbar/GEN-SIM-RECO/CMSSW_5_3_1_START53_V5-v1/0013/CE4D66EB-5AAE-E111-96D6-003048D37524.root"
+    FILEABOVE="/store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root"
+    FILEBELOW="/store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root"    
 
     services = {
         "XRDFED_CMS-GLOBAL01":{'redirector':'xrdcmsglobal01.cern.ch:1094',
@@ -327,7 +330,7 @@ def main():
                              'file_above': FILEBELOW,
                              'extra_notes':CMSLINK},
 
-        "XRDFED_CMS-US-FNAL":{'redirector':'cmsxrootd1.fnal.gov:1094',
+        "XRDFED_CMS-US-FNAL":{'redirector':'cmsxrootd2.fnal.gov:1094',
                          'file_below': FILEABOVE,
                          'file_above': FILEBELOW,
                          'extra_notes':CMSLINK},
@@ -367,17 +370,21 @@ def main():
                          'file_above': FILEABOVE,
                          'extra_notes':CMSLINK},
 	
+	"XRDFED_CMS-EU-IPv6":{ 'redirector':'xrootd-cms-redir-01.cr.cnaf.infn.it:1094',
+                         	'file_below': FILEBELOW,
+                         	'file_above': FILEABOVE,
+                         	'extra_notes':CMSLINK},	
 	"XRDFED_CMS-TRANSIT":{'redirector':'cms-xrd-transit.cern.ch:1094',
                          'file_below': FILEBELOW,
                          'file_above': FILEABOVE,
                          'extra_notes':CMSLINK},
 	
-	"XRDFED_CMS-TRANSIT01":{'redirector':'vocms027.cern.ch:1094',
+	"XRDFED_CMS-TRANSIT01":{'redirector':'vocms031.cern.ch:1094',
                          'file_below': FILEBELOW,
                          'file_above': FILEABOVE,
                          'extra_notes':CMSLINK},
 
-	"XRDFED_CMS-TRANSIT02":{'redirector':'vocms028.cern.ch:1094',
+	"XRDFED_CMS-TRANSIT02":{'redirector':'vocms032.cern.ch:1094',
                          'file_below': FILEBELOW,
                          'file_above': FILEABOVE,
                          'extra_notes':CMSLINK},
