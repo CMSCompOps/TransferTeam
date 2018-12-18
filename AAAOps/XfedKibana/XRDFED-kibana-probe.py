@@ -23,7 +23,7 @@ import atexit
 import threading
 import tempfile
 
-html_dir = '/var/www/html/sls/xrdfed_kibana'   # will create per-service xml files here
+html_dir = '/var/www/html/aaa-probe/xrdfed_kibana'   # will create per-service xml files here
 
 #CERN_eosfile_rucio='/atlas/rucio/user/ivukotic:user.ivukotic.xrootd.cern-prod-1M'
 
