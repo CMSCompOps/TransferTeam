@@ -259,7 +259,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     # save functional test info to XML
     if need_xml_link:
         myhostname = socket.gethostname()
-        notes_text = notes_text + "Details for failed test: http://" + myhostname + "/sls/xrdfed_kibana/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms037.cern.ch/sls/xrdfed_kibana/err/ <br />\n" 
+        notes_text = notes_text + "Details for failed test: http://" + myhostname + "/aaa-probe/xrdfed_kibana/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms039.cern.ch/aaa-probe/xrdfed_kibana/err/ <br />\n" 
 	availinfo = availinfo + "<br />" + notes_text 
     availabilityF = doc.createElement("status")
     availabilityF.appendChild(doc.createTextNode(str(availability)))
