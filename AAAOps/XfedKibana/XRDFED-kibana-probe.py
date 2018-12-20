@@ -23,7 +23,7 @@ import atexit
 import threading
 import tempfile
 
-html_dir = '/var/www/html/sls/xrdfed_kibana'   # will create per-service xml files here
+html_dir = '/var/www/html/aaa-probe/'   # will create per-service xml files here
 
 #CERN_eosfile_rucio='/atlas/rucio/user/ivukotic:user.ivukotic.xrootd.cern-prod-1M'
 
@@ -259,7 +259,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     # save functional test info to XML
     if need_xml_link:
         myhostname = socket.gethostname()
-        notes_text = notes_text + "Details for failed test: http://" + myhostname + "/sls/xrdfed_kibana/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms037.cern.ch/sls/xrdfed_kibana/err/ <br />\n" 
+        notes_text = notes_text + "Details for failed test: http://" + myhostname + "/aaa-probe/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms039.cern.ch/aaa-probe/err/ <br />\n" 
 	availinfo = availinfo + "<br />" + notes_text 
     availabilityF = doc.createElement("status")
     availabilityF.appendChild(doc.createTextNode(str(availability)))
