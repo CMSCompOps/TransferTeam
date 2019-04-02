@@ -59,7 +59,7 @@ except Exception as e :
     sys.exit(1)
 
 #import expection dictionary
-with open('/root/FederationInfo/exceptions.json') as f: exc = f.read()
+with open('/opt/TransferTeam/AAAOps/Federation/exceptions.json') as f: exc = f.read()
 exc = json.loads(exc)
 
 def exception(name):
@@ -82,8 +82,8 @@ def siteName2CMSSiteName(dom):
 if __name__ == "__main__":
     # get domains
     domains = {}
-    with open('/root/FederationInfo/in/prod_domain.txt') as f:  domains['prod']  = parseHN(f.read())
-    with open('/root/FederationInfo/in/trans_domain.txt') as f: domains['trans'] = parseHN(f.read())
+    with open('/opt/TransferTeam/AAAOps/Federation/in/prod_domain.txt') as f:  domains['prod']  = parseHN(f.read())
+    with open('/opt/TransferTeam/AAAOps/Federation/in/trans_domain.txt') as f: domains['trans'] = parseHN(f.read())
 
     # find CMS site name of prod sites
     for federation in ['prod', 'trans']:
@@ -101,5 +101,5 @@ if __name__ == "__main__":
 	if cmsSite == "T1_FR_CCIN2P3" and cmsSite in output['prod'] :
 	    output["prod"].append("T2_FR_CCIN2P3")
 
-    with open('/root/FederationInfo/out/federations.json', 'w') as f:
+    with open('/opt/TransferTeam/AAAOps/Federation/out/federations.json', 'w') as f:
         f.write(json.dumps(output, indent = 1))

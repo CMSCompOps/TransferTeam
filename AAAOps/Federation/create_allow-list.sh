@@ -1,7 +1,7 @@
 #!/bin/bash
 
-BASE=/root
-FEDINFO=/root/FederationInfo
+BASE=/root/
+FEDINFO=/opt/TransferTeam/AAAOps/Federation/
 export XRD_NETWORKSTACK=IPv4
 
 declare -a redirectors=("xrdcmsglobal01.cern.ch:1094" "xrdcmsglobal02.cern.ch:1094" "cms-xrd-transit.cern.ch:1094")
@@ -22,9 +22,9 @@ for j in "${redirectors[@]}";do
 		done
 	
 
-		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | sort -u > $FEDINFO/in/prod_$j.txt 
+		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | grep -v "\[" | sort -u > $FEDINFO/in/prod_$j.txt 
 		cat $BASE/tmp_total_us_$j | cut -d : -f1 | sort -u >> $FEDINFO/in/prod_$j.txt 
-		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | sort -u | awk -F. '{print "*."$(NF-2)"."$(NF-1)"."$NF}' | sort -u > $FEDINFO/out/list_eu_$j.allow
+		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | grep -v "\[" | sort -u | awk -F. '{print "*."$(NF-2)"."$(NF-1)"."$NF}' | sort -u > $FEDINFO/out/list_eu_$j.allow
 		cat $BASE/tmp_total_us_$j | cut -d : -f1 | sort -u | awk -F. '{print "*."$(NF-2)"."$(NF-1)"."$NF}' | sort -u > $FEDINFO/out/list_us_$j.allow
 		rm hostIPv4.txt hostIPv6.txt
 		for f in $(cat $FEDINFO/in/prod_$j.txt);do
@@ -90,6 +90,3 @@ rm $FEDINFO/in/tmp
 cat $FEDINFO/in/prod.txt |  sort -u | awk -F. '{if ($NF == "uk" && $(NF-2) != "rl" || $NF == "fr" || $(NF-1) == "cern" || $(NF-1) == "fnal" ) print $(NF-2)"."$(NF-1)"."$NF; else if ( $(NF-2) == "cnaf") print $(NF-4)"."$(NF-2); else if ( $NF == "it" && $(NF-2) != "cnaf" ) print $(NF-2)"."$(NF-1)"."$NF; else if ( $(NF-1) == "vanderbilt" ) print $(NF-3)"."$(NF-2)"."$(NF-1)"."$NF; else if ( $(NF-1) == "mit" ) print $(NF-2)"."$(NF-1)"."$NF; else if ( $(NF-2) == "rl" ) print $(NF-3)"."$(NF-2)"."$(NF-1)"."$NF; else if ( $NF == "kr") print $(NF-2)"."$(NF-1)"."$NF; else if ( $NF == "be" ) print $(NF-2)"."$(NF-1)"."$NF; else print $(NF-1)"."$NF}' | sort -u > $FEDINFO/in/prod_domain.txt
 
 cat $FEDINFO/in/trans.txt | cut -d : -f1 | sort -u | awk -F. '{if ($NF == "uk" || $NF == "fr" || $NF == "kr" || $NF == "it" || $NF == "ch" && $(NF-2) != "cnaf" ) print $(NF-2)"."$(NF-1)"."$NF; else if ($NF == "it" && $(NF-2) == "cnaf" ) print $(NF-4)"."$(NF-3)"."$(NF-2)"."$(NF-1)"."$NF; else print $(NF-1)"."$NF}' | sort -u > $FEDINFO/in/trans_domain.txt
-
-
-exit 0;
