@@ -24,7 +24,7 @@ for j in "${redirectors[@]}";do
 
 		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | grep -v "\[" | sort -u > $FEDINFO/in/prod_$j.txt 
 		cat $BASE/tmp_total_us_$j | cut -d : -f1 | sort -u >> $FEDINFO/in/prod_$j.txt 
-		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | grep -v "\[" | sort -u | awk -F. '{print "*."$(NF-2)"."$(NF-1)"."$NF}' | sort -u > $FEDINFO/out/list_eu_$j.allow
+		cat $BASE/tmp_total_eu_$j | cut -d : -f1 | grep -v "\[" |  sort -u | awk -F. '{print "*."$(NF-2)"."$(NF-1)"."$NF}' | sort -u > $FEDINFO/out/list_eu_$j.allow
 		cat $BASE/tmp_total_us_$j | cut -d : -f1 | sort -u | awk -F. '{print "*."$(NF-2)"."$(NF-1)"."$NF}' | sort -u > $FEDINFO/out/list_us_$j.allow
 		rm hostIPv4.txt hostIPv6.txt
 		for f in $(cat $FEDINFO/in/prod_$j.txt);do
