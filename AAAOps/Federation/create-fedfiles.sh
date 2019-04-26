@@ -20,12 +20,13 @@ if [ ! -r $PROD_hosts ] || [ ! -r $TRANS_hosts ]; then
 	exit 1
 fi
 
-python /opt/TransferTeam/AAAOps/Federation/create_fedmaps_DEV.py
+python /opt/TransferTeam/AAAOps/Federation/create_fedmaps.py
 
 if [ ! -r $FED_json ]; then
 	echo "We have a problem creating JSON file.\n"
 	exit 1
 fi
+
 cp /opt/TransferTeam/AAAOps/Federation/out/* /var/www/html/aaa-fedinfo/
 
 exit 0;

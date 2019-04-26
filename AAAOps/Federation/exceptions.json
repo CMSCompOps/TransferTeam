@@ -1,5 +1,5 @@
 {
-	"ccxrpli001.in2p3.fr" : {
+	"ccxrpli003.in2p3.fr" : {
 		"VOname" : "T1_FR_CCIN2P3" 
 	},
 	
@@ -11,7 +11,7 @@
 		"VOname" : "T2_FR_IPHC"
 	},
 	
-	"polgrfs20.in2p3.fr " : {
+	"polgrid4.in2p3.fr" : {
 		"VOname" : "T2_FR_GRIF_LLR"
 	},
 
@@ -19,19 +19,19 @@
 		"VOname" : "T2_US_Nebraska"
 	},
 
-	"ds-05-01.cr.cnaf.infn.it" : {
+	"ds-t3-01.cr.cnaf.infn.it" : {
 		"VOname" : "T3_IT_Bologna"
 	},
 
-	"ds-05-02.cr.cnaf.infn.it" : {
+	"ds-t3-02.cr.cnaf.infn.it" : {
 		"VOname" : "T3_IT_Bologna"
 	},
 	
-	"ds-202-06-33.cnaf" : {
+	"xrootd-cms-01.cnaf" : {
 		"VOname" : "T1_IT_CNAF"
 	},
 	
-	"ds-202-06-37.cnaf" : {
+	"xrootd-cms-01.cnaf" : {
 		"VOname" : "T1_IT_CNAF"
 	},
 
@@ -41,6 +41,10 @@
 
 	"pp.rl.ac.uk" : {
 		"VOname" : "T2_UK_SGrid_RALPP"
+	},
+
+	"ic.ac.uk" : {
+		"VOname" : "T2_UK_London_IC"
 	},
 
 	"xrootd.knu.ac.kr" : {
@@ -65,6 +69,40 @@
 	
 	"cmsxrd.ts.infn.it" : {
 		"VOname" : "T3_IT_Trieste"
-	}
+	},
 
+	"se11.accre.vanderbilt.edu" : {
+		"VOname" : "T2_US_Vanderbilt"
+	},
+	
+	"se9.accre.vanderbilt.edu" : {
+		"VOname" : "T2_US_Vanderbilt"
+	},
+	
+	"se1.accre.vanderbilt.edu" : {
+		"VOname" : "T2_US_Vanderbilt"
+	},
+
+	"se4.accre.vanderbilt.edu" : {
+		"VOname" : "T2_US_Vanderbilt"
+	},
+
+	"se8.accre.vanderbilt.edu" : {
+		"VOname" : "T2_US_Vanderbilt"
+	},
+	"purdue.edu" : {
+		"VOname" : "T2_US_Purdue"
+	},
+	"cscs.ch" : {
+		"VOname" : "T2_CH_CSCS"
+	},
+	"csc.fi" : {
+		"VOname" : "T2_FI_HIP"
+	},
+	"eoscms-srv-m1.cern.ch" : {
+               "VOname" : "T2_CH_CERN"
+       },
+       "cmsxrootd-2.gridka.de" : {
+               "VOname" : "T1_DE_KIT"
+       }
 }
