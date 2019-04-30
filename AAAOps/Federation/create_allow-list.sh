@@ -81,7 +81,7 @@ echo "* redirect cms-xrd-transit.cern.ch+:1213" >> $FEDINFO/out/list_eu.allow
 #cat $FEDINFO/in/prod.txt | cut -d : -f1 | sort -u | awk -F. '{if ($NF == "uk" || $NF == "fr" || $NF == "it" || $(NF-1) == "cern" ) print $(NF-2)"."$(NF-1)"."$NF; else if ( $(NF-1) == "vanderbilt" ) print $(NF-3)"."$(NF-2)"."$(NF-1)"."$NF; else if ( $(NF-1) == "mit" ) print $(NF-2)"."$(NF-1)"."$NF;  else print $(NF-1)"."$NF}' | sort -u > $FEDINFO/in/prod_domain.txt
 
 #Quick fix for "[" character in prod.txt 
-cat $FEDINFO/in/prod.txt | awk '{ if ($1 == "[2804") print "Unknown.Host"; else print $1;}' > $FEDINFO/in/tmp
+cat $FEDINFO/in/prod.txt | awk '{ if ($1 ~ /\[+/ ) print "Unknown.Host"; else print $1;}' > $FEDINFO/in/tmp
 cp $FEDINFO/in/tmp $FEDINFO/in/prod.txt
 rm $FEDINFO/in/tmp
 
