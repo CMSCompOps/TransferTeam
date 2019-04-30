@@ -82,7 +82,6 @@ echo "* redirect cms-xrd-transit.cern.ch+:1213" >> $FEDINFO/out/list_eu.allow
 
 #Quick fix for "[" character in prod.txt 
 cat $FEDINFO/in/prod.txt | awk '{ if ($1 == "[2804") print "Unknown.Host"; else print $1;}' > $FEDINFO/in/tmp
-cat $FEDINFO/in/prod.txt > $FEDINFO/in/tmp
 cp $FEDINFO/in/tmp $FEDINFO/in/prod.txt
 rm $FEDINFO/in/tmp
 
