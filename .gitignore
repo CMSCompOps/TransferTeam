@@ -1,8 +1,5 @@
-works/
 AAAOps/Federation/in/
 AAAOps/Federation/out/
 AAAOps/tools/timestamp.sh
-../Federation/hostIPv4.txt
-../Federation/transit-hostIPv4.txt
 AAAOps/Federation/hostIPv4.txt
 AAAOps/Federation/transit-hostIPv4.txt
