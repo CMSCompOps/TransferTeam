@@ -38,7 +38,7 @@ for j in "${redirectors[@]}";do
 		done	
 	else
 		xrdmapc --list all "$j" | tail -n +2 | awk '{if($2=="Man") print $3; else print $2}' > $BASE/tmp_total
-		cat $BASE/tmp_total | cut -d : -f1 |  grep -v "\[" | sort -u > $FEDINFO/in/trans.txt
+		cat $BASE/tmp_total | cut -d : -f1 | sort -u > $FEDINFO/in/trans.txt
 		
 		rm transit-hostIPv4.txt transit-hostIPv6.txt
 		for f in $(cat $FEDINFO/in/trans.txt);do
