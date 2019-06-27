@@ -3,3 +3,5 @@ AAAOps/Federation/out/
 AAAOps/tools/timestamp.sh
 AAAOps/Federation/hostIPv4.txt
 AAAOps/Federation/transit-hostIPv4.txt
+hostIPv4.txt
+transit-hostIPv4.txt
