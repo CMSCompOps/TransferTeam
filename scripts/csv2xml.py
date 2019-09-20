@@ -31,7 +31,7 @@ for key, items in itertools.groupby(values, operator.itemgetter(0)):
                 block = ET.SubElement(dataset,"block", name=key2)
                 block.set("is-open", "n")                
                 for subitem in items2:
-                        file = ET.SubElement(block,"file",name=subitem[2],bytes=subitem[3],checksum=subitem[4]+","+subitem[5])
+                        file = ET.SubElement(block,"file",name=subitem[2],bytes=subitem[3],checksum='cksum:'+subitem[4]+",adler32:"+subitem[5])
 
 outfile = open(sys.argv[1]+'.xml', 'w')
 outfile.writelines(minidom.parseString(ET.tostring(root)).toprettyxml(indent = "    "))
