@@ -6,7 +6,7 @@ import urllib2
 
 ## Get the volume routed to a site given the CMS site name + Phedex queue (priority)
 ## This tools uses Phedex API routedblocks
-## USAGE: python get_routed_bytes.py <CMS Site> <Phedex queue>
+## USAGE: python get_routed_bytes.py <CMS Site>
 
 def formatSize(size):
     output = ''
@@ -24,20 +24,25 @@ def formatSize(size):
         output += "%.3f PB" % (float(size)/1E15)
     return output
 
-def get_routed_bytes(site, priority):
+def get_routed_bytes(site):
     url='https://cmsweb.cern.ch/phedex/datasvc/json/prod/routedblocks?to=' + site
     jstr = urllib2.urlopen(url).read()
     jstr = jstr.replace("\n", " ")
     result = json.loads(jstr)
+    all_priorities = ["low", "normal", "high", "reserved"]
     bytes = 0
+    for priority in all_priorities:
+        get_priority(result,priority,bytes)
 
+def get_priority(result,priority,bytes):
     for route in result['phedex']['route']:
         if (route['priority'] == priority):
             for block in route['block']:
                 bytes += float(block['route_bytes'])
-    print formatSize(bytes)
+    final_record = priority + " "+ formatSize(bytes)
+    print final_record
 
 def init():
-    get_routed_bytes(str(sys.argv[1]), str(sys.argv[2]))
+    get_routed_bytes(str(sys.argv[1]))
 
 init()
