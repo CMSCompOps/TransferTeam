@@ -61,8 +61,8 @@ if __name__ == "__main__":
         topic = creds['topic']
         host, port = creds['host_and_ports'].split(':')
         port = int(port)
-        ckey = os.path.join("/root/pradeep/send_aaa_matrics/", 'userkey.pem')
-        cert = os.path.join("/root/pradeep/send_aaa_matrics/", 'usercert.pem')
+        ckey = os.path.join("/root/.globus/", 'userkey.pem')
+        cert = os.path.join("/root/.globus/", 'usercert.pem')
         producer = creds['producer']
         topic = creds['topic']
         if creds and StompAMQ:
