@@ -1,4 +1,9 @@
-# Basic setup
+
+# Spark code run consistency between DBS and Phedex databases
+
+
+
+## Basic setup
 
 
 login to lxplus7.cern.ch
@@ -13,6 +18,8 @@ login to lxplus7.cern.ch
 Example : python dbs_phedex_consistency.py --timestamp 2019-12-09 --dbs invalid --phedex present --output hdfs://analytix/user/pjasal/
 
 
-## run file mismatch using
+## It returns the list of file which are invalidated by the unified for bad workflows
 Example : 
+--timestamp argument for checking the list for last n number of days 
+
 python filemismatch.py --timestamp 7
