@@ -1,5 +1,5 @@
 
-# Spark code run consistency between DBS and Phedex databases
+# Spark code to run consistency between DBS and Phedex databases
 
 
 
