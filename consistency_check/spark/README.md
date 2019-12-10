@@ -3,7 +3,7 @@
 
 
 
-## Basic setup
+## Basic lxplus7 setup
 
 
 login to lxplus7.cern.ch
