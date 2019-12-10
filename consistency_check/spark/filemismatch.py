@@ -43,15 +43,15 @@ def fileMismatch(args):
 
     if args.out_path:
         out = args.out_path + "filemismatch"
-        working_set = (dbs_files
+        mismatch_df = (dbs_files
              .filter(col('f_is_file_valid')=='0')
              .filter(col('f_last_modification_date') >= delta_t)
              .join(dbs_datasets,col('f_dataset_id')==col('d_dataset_id'))
              .filter(col('d_dataset_access_type_id')=='1')
              .select('d_dataset','d_last_modified_by','f_logical_file_name')    # you can select more columns for detail info
              .distinct())
-        working_set.select('f_logical_file_name').repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save(out)
-        working_set.groupby('d_dataset').agg((fn.count(fn.col("f_logical_file_name").isNotNull()))).show()
+        mismatch_df.select('f_logical_file_name').repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save(out)
+        mismatch_df.groupby('d_dataset').agg((fn.count(fn.col("f_logical_file_name").isNotNull()))).show()
 if __name__ == '__main__':
     optmgr = OptionParser()
     args = optmgr.parser.parse_args()
