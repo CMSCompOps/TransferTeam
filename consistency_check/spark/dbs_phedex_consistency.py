@@ -40,8 +40,7 @@ def run_consistency(args):
     dbs_blocks = csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/BLOCKS/part-m-00000")
     dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")
 
-    yesturday = datetime.date.today() - datetime.timedelta(days=1)
-    phedex_time_stamp = yesturday.strftime("%Y-%m-%d")  ## specifying date for phedex replicas
+    phedex_time_stamp = datetime.date.today().strftime("%Y-%m-%d")  ## specifying date for phedex replicas
 
     if args.phedex_status == 'present' and args.dbs_status == 'invalid':
         phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(phedex_time_stamp) + "_*/part-m-00000"
