@@ -102,4 +102,3 @@ if __name__ == '__main__':
     spark = SparkSession(sc)
     con =  run_consistency(args.out_path)
     df = con.valid_dbs_missing_phedex()
-    df.show()
