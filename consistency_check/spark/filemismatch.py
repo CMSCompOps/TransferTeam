@@ -34,8 +34,8 @@ def fileMismatch(args):
 
     avroreader = spark.read.format("com.databricks.spark.avro")
     csvreader = spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode", "FAILFAST")
-    dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/FILES/part-m-00000")
-    dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")
+    dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/FILES/part-m-00000")
+    dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000")
 
     current = time.time()
     past_n_days = args.timestamp
@@ -45,7 +45,7 @@ def fileMismatch(args):
         out = args.out_path + "filemismatch"
         mismatch_df = (dbs_files
              .filter(col('f_is_file_valid')=='0')
-             .filter(col('f_last_modification_date') >= delta_t)
+             .filter(col('f_last_modification_date') > delta_t)
              .join(dbs_datasets,col('f_dataset_id')==col('d_dataset_id'))
              .filter(col('d_dataset_access_type_id')=='1')
              .select('d_dataset','d_last_modified_by','f_logical_file_name')    # you can select more columns for detail info
