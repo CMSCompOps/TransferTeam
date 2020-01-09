@@ -75,7 +75,6 @@ class run_consistency(object):
         return deleted_dbs_present_phedex.select("d_dataset")
 
     def valid_dbs_missing_phedex(self):
-        # to be on the safe side : adding time difference for block replicas injected
         dbs_files = self.csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/FILES/part-m-00000")
         dbs_blocks = self.csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/BLOCKS/part-m-00000")
         dbs_datasets = self.csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")

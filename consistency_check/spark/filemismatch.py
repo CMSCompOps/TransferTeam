@@ -44,7 +44,7 @@ def fileMismatch(args):
     if args.out_path:
         mismatch_df = (dbs_files
              .filter(col('f_is_file_valid')=='0')
-             .filter(col('f_last_modification_date') >= delta_t)
+             .filter(col('f_last_modification_date') > delta_t)
              .join(dbs_datasets,col('f_dataset_id')==col('d_dataset_id'))
              .filter(col('d_dataset_access_type_id')=='1')
              .filter(col('f_logical_file_name').isNotNull())
