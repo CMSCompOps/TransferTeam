@@ -11,8 +11,6 @@ import pyspark.sql.functions as fn
 import pyspark.sql.types as types
 from pyspark.sql import DataFrame
 import datetime
-
-
 # stolen from CMSSpark
 import schemas
 
@@ -26,17 +24,15 @@ class OptionParser():
 class run_consistency(object):
     def __init__(self, out):
         self.out = out
-        self.avroreader = spark.read.format("com.databricks.spark.avro")
-        self.csvreader  =  spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode","FAILFAST")
-        self.phedex_time_stamp = datetime.date.today().strftime("%Y-%m-%d")
+        avroreader = spark.read.format("com.databricks.spark.avro")
+        csvreader  =  spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode","FAILFAST")
+        phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(datetime.date.today().strftime("%Y-%m-%d")) + "_*/part-m-00000"
+        self.phedex_block_replicas = self.csvreader.schema(schemas.schema_phedex()).load(phedex_path)
+        self.dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/FILES/part-m-00000")
+        self.dbs_blocks = csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/BLOCKS/part-m-00000")
+        self.dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000"
 
     def invalid_dbs_present_phedex(self):
-        print("Initiated spark session on yarn, web URL: http://ithdp1101.cern.ch:8088/proxy/%s" % sc.applicationId)
-        dbs_files = self.csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/FILES/part-m-00000")
-        dbs_blocks = self.csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/BLOCKS/part-m-00000")
-        dbs_datasets = self.csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")
-        phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(self.phedex_time_stamp) + "_*/part-m-00000"
-        phedex_block_replicas = self.csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         '''
         for reference dbs d_dataset_access_type_id:
              1 :  valid
@@ -45,10 +41,10 @@ class run_consistency(object):
              41 : Production
              81 : Deleted
         '''
-        invalid_dbs_present_phedex = (dbs_datasets
+        invalid_dbs_present_phedex = (self.dbs_datasets
                 .filter(col('d_dataset_access_type_id')=='2')
-                .join(dbs_blocks,col('d_dataset_id')==col('b_dataset_id'))
-                .join(phedex_block_replicas,col('d_dataset')==col('dataset_name'))
+                .join(self.dbs_blocks,col('d_dataset_id')==col('b_dataset_id'))
+                .join(self.phedex_block_replicas,col('d_dataset')==col('dataset_name'))
                 .filter(col('dataset_name').isNotNull())
                 .withColumn('input_campaign', fn.regexp_extract(col('d_dataset'), "^/[^/]*/((?:HI|PA|PN|XeXe|)Run201\d\w-[^-]+|CMSSW_\d+|[^-]+)[^/]*/", 1))
                 .select('input_campaign','d_dataset','d_last_modified_by')    # you can select more columns for detail info
@@ -57,16 +53,11 @@ class run_consistency(object):
         return invalid_dbs_present_phedex.select("d_dataset")
 
     def deleted_dbs_present_phedex(self):
-        dbs_files = self.csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/FILES/part-m-00000")
-        dbs_blocks = self.csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/BLOCKS/part-m-00000")
-        dbs_datasets = self.csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")
-        phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(self.phedex_time_stamp) + "_*/part-m-00000"
-        phedex_block_replicas = csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         out = args.out_path + "/deleted_dbs_present_phedex"
-        deleted_dbs_present_phedex = (dbs_datasets
+        deleted_dbs_present_phedex = (self.dbs_datasets
                 .filter(col('d_dataset_access_type_id')=='81')
-                .join(dbs_blocks,col('d_dataset_id')==col('b_dataset_id'))
-                .join(phedex_block_replicas,col('d_dataset')==col('dataset_name'))
+                .join(self.dbs_blocks,col('d_dataset_id')==col('b_dataset_id'))
+                .join(self.phedex_block_replicas,col('d_dataset')==col('dataset_name'))
                 .filter(col('dataset_name').isNotNull())
                 .withColumn('input_campaign', fn.regexp_extract(col('d_dataset'), "^/[^/]*/((?:HI|PA|PN|XeXe|)Run201\d\w-[^-]+|CMSSW_\d+|[^-]+)[^/]*/", 1))
                 .select('input_campaign','d_dataset')    # you can select more columns for detail info
@@ -75,16 +66,13 @@ class run_consistency(object):
         return deleted_dbs_present_phedex.select("d_dataset")
 
     def valid_dbs_missing_phedex(self):
-        dbs_files = self.csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/FILES/part-m-00000")
-        dbs_blocks = self.csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/BLOCKS/part-m-00000")
-        dbs_datasets = self.csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")
         phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(self.phedex_time_stamp) + "_*/part-m-00000"
         phedex_block_replicas = self.csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         out = args.out_path + "/valid_dbs_missing_phedex"
-        valid_dbs_missing_phedex = (dbs_datasets
+        valid_dbs_missing_phedex = (self.dbs_datasets
                 .filter(col('d_dataset_access_type_id')=='1')
-                .join(dbs_blocks,col('d_dataset_id')==col('b_dataset_id'))
-                .join(phedex_block_replicas,col('d_dataset')==col('dataset_name'))
+                .join(self.dbs_blocks,col('d_dataset_id')==col('b_dataset_id'))
+                .join(self.phedex_block_replicas,col('d_dataset')==col('dataset_name'))
                 .filter(col('block_name').isNotNull() & col('node_id').isNull())
                 .withColumn('input_campaign', fn.regexp_extract(col('d_dataset'), "^/[^/]*/((?:HI|PA|PN|XeXe|)Run201\d\w-[^-]+|CMSSW_\d+|[^-]+)[^/]*/", 1))
                 .select('input_campaign','block_name')
@@ -100,4 +88,3 @@ if __name__ == '__main__':
     sc = SparkContext(conf=conf)
     spark = SparkSession(sc)
     con =  run_consistency(args.out_path)
-    df = con.valid_dbs_missing_phedex()
