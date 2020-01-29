@@ -30,7 +30,7 @@ class run_consistency(object):
         self.phedex_block_replicas = self.csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         self.dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/FILES/part-m-00000")
         self.dbs_blocks = csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/BLOCKS/part-m-00000")
-        self.dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000"
+        self.dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000")
 
     def invalid_dbs_present_phedex(self):
         '''
