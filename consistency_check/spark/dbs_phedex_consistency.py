@@ -10,7 +10,7 @@ from pyspark.sql.functions import col
 import pyspark.sql.functions as fn
 import pyspark.sql.types as types
 from pyspark.sql import DataFrame
-import datetime
+from datetime import date , timedelta
 # stolen from CMSSpark
 import schemas
 
@@ -24,13 +24,17 @@ class OptionParser():
 class run_consistency(object):
     def __init__(self, out):
         self.out = out
-        avroreader = spark.read.format("com.databricks.spark.avro")
-        csvreader  =  spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode","FAILFAST")
-        phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(datetime.date.today().strftime("%Y-%m-%d")) + "_*/part-m-00000"
-        self.phedex_block_replicas = self.csvreader.schema(schemas.schema_phedex()).load(phedex_path)
+        conf = SparkConf().setMaster("yarn").setAppName("CMS Working Set")
+        sc = SparkContext(conf=conf)
+        self.spark = SparkSession(sc)
+        avroreader = self.spark.read.format("com.databricks.spark.avro")
+        csvreader  =  self.spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode","FAILFAST")
+        ## check if path exist or not on hdfs area and you can directly assign it
+        phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str((date.today() - timedelta(days=2)).strftime("%Y-%m-%d")) + "_*/part-m-00000"
+        self.phedex_block_replicas = csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         self.dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/FILES/part-m-00000")
         self.dbs_blocks = csvreader.schema(schemas.schema_blocks()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/BLOCKS/part-m-00000")
-        self.dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000"
+        self.dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000")
 
     def invalid_dbs_present_phedex(self):
         '''
@@ -66,8 +70,6 @@ class run_consistency(object):
         return deleted_dbs_present_phedex.select("d_dataset")
 
     def valid_dbs_missing_phedex(self):
-        phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str(self.phedex_time_stamp) + "_*/part-m-00000"
-        phedex_block_replicas = self.csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         out = args.out_path + "/valid_dbs_missing_phedex"
         valid_dbs_missing_phedex = (self.dbs_datasets
                 .filter(col('d_dataset_access_type_id')=='1')
@@ -81,10 +83,9 @@ class run_consistency(object):
         return valid_dbs_missing_phedex.select("block_name")
 
 
+
 if __name__ == '__main__':
     optmgr = OptionParser()
     args = optmgr.parser.parse_args()
-    conf = SparkConf().setMaster("yarn").setAppName("CMS Working Set")
-    sc = SparkContext(conf=conf)
-    spark = SparkSession(sc)
     con =  run_consistency(args.out_path)
+    invalid_dbs_present_phedex = con.deleted_dbs_present_phedex()
