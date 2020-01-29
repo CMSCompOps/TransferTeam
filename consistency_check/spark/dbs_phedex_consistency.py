@@ -38,6 +38,11 @@ class run_consistency(object):
 
     def invalid_dbs_present_phedex(self):
         '''
+
+        Returns a dataframe with datasets which have "INVALID" status in DBS and are "PRESENT" in phedex
+
+        :func: run_consistency.deleted_dbs_present_phedex()
+
         for reference dbs d_dataset_access_type_id:
              1 :  valid
              2 :  invalid
@@ -53,10 +58,17 @@ class run_consistency(object):
                 .withColumn('input_campaign', fn.regexp_extract(col('d_dataset'), "^/[^/]*/((?:HI|PA|PN|XeXe|)Run201\d\w-[^-]+|CMSSW_\d+|[^-]+)[^/]*/", 1))
                 .select('input_campaign','d_dataset','d_last_modified_by')    # you can select more columns for detail info
                 .distinct())
+
         invalid_dbs_present_phedex.groupby("input_campaign").agg((fn.count(fn.col("d_dataset")))).show()
         return invalid_dbs_present_phedex.select("d_dataset")
 
     def deleted_dbs_present_phedex(self):
+        '''
+        Returns a dataframe with datasets which have "DELETED" status in DBS and "PRESENT" status in phedex
+
+        :func: run_consistency.deleted_dbs_present_phedex()
+
+        '''
         out = args.out_path + "/deleted_dbs_present_phedex"
         deleted_dbs_present_phedex = (self.dbs_datasets
                 .filter(col('d_dataset_access_type_id')=='81')
@@ -66,10 +78,17 @@ class run_consistency(object):
                 .withColumn('input_campaign', fn.regexp_extract(col('d_dataset'), "^/[^/]*/((?:HI|PA|PN|XeXe|)Run201\d\w-[^-]+|CMSSW_\d+|[^-]+)[^/]*/", 1))
                 .select('input_campaign','d_dataset')    # you can select more columns for detail info
                 .distinct())
+
         deleted_dbs_present_phedex.groupby("input_campaign").agg(fn.count(fn.col("d_dataset"))).show()
         return deleted_dbs_present_phedex.select("d_dataset")
 
     def valid_dbs_missing_phedex(self):
+        '''
+        Returns a dataframe with block name which have "VALID" status in DBS and are "MISSING" in phedex
+
+        :func: run_consistency.deleted_dbs_present_phedex()
+
+        '''
         out = args.out_path + "/valid_dbs_missing_phedex"
         valid_dbs_missing_phedex = (self.dbs_datasets
                 .filter(col('d_dataset_access_type_id')=='1')
@@ -79,6 +98,8 @@ class run_consistency(object):
                 .withColumn('input_campaign', fn.regexp_extract(col('d_dataset'), "^/[^/]*/((?:HI|PA|PN|XeXe|)Run201\d\w-[^-]+|CMSSW_\d+|[^-]+)[^/]*/", 1))
                 .select('input_campaign','block_name')
                 .distinct())
+
+        print("Please check the below list of datasets with phedex api calls , Its possible you encounter discrepency due to the time difference of dataset injection in both databases and snapshot stored on HDFS")
         valid_dbs_missing_phedex.groupby("input_campaign").agg(fn.count(fn.col("block_name"))).show()
         return valid_dbs_missing_phedex.select("block_name")
 
