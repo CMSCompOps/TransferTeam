@@ -29,10 +29,7 @@ class run_consistency(object):
         self.spark = SparkSession(sc)
         avroreader = self.spark.read.format("com.databricks.spark.avro")
         csvreader  =  self.spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode","FAILFAST")
-<<<<<<< HEAD
-        ## check if path exist or not on hdfs area and you can directly assign it
-=======
->>>>>>> 92dba751e37bde15dada49e47d4cbae84a455cd8
+        ## check if phedex_path exist or not on hdfs area and you can directly assign it
         phedex_path = "/project/awg/cms/phedex/block-replicas-snapshots/csv/time=" + str((date.today() - timedelta(days=2)).strftime("%Y-%m-%d")) + "_*/part-m-00000"
         self.phedex_block_replicas = csvreader.schema(schemas.schema_phedex()).load(phedex_path)
         self.dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/FILES/part-m-00000")
@@ -92,7 +89,3 @@ if __name__ == '__main__':
     args = optmgr.parser.parse_args()
     con =  run_consistency(args.out_path)
     invalid_dbs_present_phedex = con.deleted_dbs_present_phedex()
-<<<<<<< HEAD
-=======
-    invalid_dbs_present_phedex.show(20,False)
->>>>>>> 92dba751e37bde15dada49e47d4cbae84a455cd8
