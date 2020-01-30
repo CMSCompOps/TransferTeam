@@ -41,7 +41,7 @@ class run_consistency(object):
 
         Returns a dataframe with datasets which have "INVALID" status in DBS and are "PRESENT" in phedex
 
-        :func: run_consistency.deleted_dbs_present_phedex()
+        :func: run_consistency.invalid_dbs_present_phedex()
 
         for reference dbs d_dataset_access_type_id:
              1 :  valid
@@ -86,7 +86,7 @@ class run_consistency(object):
         '''
         Returns a dataframe with block name which have "VALID" status in DBS and are "MISSING" in phedex
 
-        :func: run_consistency.deleted_dbs_present_phedex()
+        :func: run_consistency.valid_dbs_missing_phedex()
 
         '''
         out = args.out_path + "/valid_dbs_missing_phedex"
