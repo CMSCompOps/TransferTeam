@@ -21,4 +21,4 @@ login to lxplus7.cern.ch
 Example : 
 --timestamp argument for checking the list for last n number of days   
 
-python filemismatch.py --timestamp 7
+python filemismatch.py --past_days 7
