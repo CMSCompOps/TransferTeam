@@ -320,15 +320,25 @@ def main():
     FILEBELOW="/store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root"    
 
     services = {
-        "XRDFED_CMS-GLOBAL01":{'redirector':'xrdcmsglobal01.cern.ch:1094',
+        "XRDFED_CMS-GLOBAL01-NEW":{'redirector':'cms-xrd-global01.cern.ch:1094',
                              'file_below': FILEABOVE,
                              'file_above': FILEBELOW,
                              'extra_notes':CMSLINK},
 	
-	"XRDFED_CMS-GLOBAL02":{'redirector':'xrdcmsglobal02.cern.ch:1094',
+	"XRDFED_CMS-GLOBAL02-NEW":{'redirector':'cms-xrd-global02.cern.ch:1094',
                              'file_below': FILEABOVE,
                              'file_above': FILEBELOW,
                              'extra_notes':CMSLINK},
+
+#        "XRDFED_CMS-GLOBAL01":{'redirector':'xrdcmsglobal01.cern.ch:1094',
+#                             'file_below': FILEABOVE,
+#                             'file_above': FILEBELOW,
+#                             'extra_notes':CMSLINK},
+	
+#	"XRDFED_CMS-GLOBAL02":{'redirector':'xrdcmsglobal02.cern.ch:1094',
+#                             'file_below': FILEABOVE,
+#                             'file_above': FILEBELOW,
+#                             'extra_notes':CMSLINK},
 
         "XRDFED_CMS-US-FNAL":{'redirector':'cmsxrootd2.fnal.gov:1094',
                          'file_below': FILEABOVE,

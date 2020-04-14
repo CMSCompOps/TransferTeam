@@ -6,6 +6,9 @@
 /usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-US.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 /usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-EU.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 
+/usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-GLOBAL01-NEW.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
+/usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-GLOBAL02-NEW.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
+
 /usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-GLOBAL01.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 /usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-GLOBAL02.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
 /usr/bin/curl -i -F file=@/var/www/html/aaa-probe/XRDFED_CMS-EU-LLR.xml xsls.cern.ch 2>&1 | /bin/awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; }' >> /var/log/XRDFED-kibana-xml-push.log
