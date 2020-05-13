@@ -18,6 +18,13 @@ import time
 import schemas
 
 class OptionParser():
+    """Dataset access types:
+    81,DELETED
+    42,DEPRECATED
+    2,INVALID
+    41,PRODUCTION
+    1,VALID
+    """
     def __init__(self):
         "option Parser"
         self.parser = argparse.ArgumentParser(prog='consistency')
@@ -34,20 +41,23 @@ def fileMismatch(args):
 
     avroreader = spark.read.format("com.databricks.spark.avro")
     csvreader = spark.read.format("com.databricks.spark.csv").option("nullValue","null").option("mode", "FAILFAST")
-    dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/FILES/part-m-00000")
-    dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/new/DATASETS/part-m-00000")
+    dbs_files = csvreader.schema(schemas.schema_files()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/FILES/part-m-00000")
+    dbs_datasets = csvreader.schema(schemas.schema_datasets()).load("/project/awg/cms/CMS_DBS3_PROD_GLOBAL/current/DATASETS/part-m-00000")
 
     current = time.time()
     past_n_days = args.days
-    delta_t = current  - past_n_days*60*60*24
+    delta_t = current - past_n_days*60*60*24
+    delta_t_str = str(delta_t)
+    delta_t = delta_t_str[:10]
 
     if args.out_path:
         mismatch_df = (dbs_files
-             .filter(col('f_is_file_valid')=='0')
+             .filter(col('f_is_file_valid') == '0')
              .filter(col('f_last_modification_date') > delta_t)
-             .join(dbs_datasets,col('f_dataset_id')==col('d_dataset_id'))
-             .filter(col('d_dataset_access_type_id')=='1')
+             .join(dbs_datasets,col('f_dataset_id') == col('d_dataset_id'))
+             .filter((col('d_dataset_access_type_id') == '1') | (col('d_dataset_access_type_id') == '41'))
              .filter(col('f_logical_file_name').isNotNull())
+             .where(~(dbs_files.f_last_modified_by.contains('dmielaik') | dbs_files.f_last_modified_by.contains('ogarzonm')))
              .select('d_dataset','f_last_modified_by','f_logical_file_name')
              .distinct())
         mismatch_df.select('f_logical_file_name','f_last_modified_by').repartition(1).write.format("com.databricks.spark.csv").option("header", "true").save(args.out_path)
