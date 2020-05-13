@@ -71,7 +71,7 @@
 		"VOname" : "T3_IT_Trieste"
 	},
 
-	"se11.accre.vanderbilt.edu" : {
+	"xrootd-vanderbilt.sites.opensciencegrid.org" : {
 		"VOname" : "T2_US_Vanderbilt"
 	},
 	
@@ -99,10 +99,13 @@
 	"csc.fi" : {
 		"VOname" : "T2_FI_HIP"
 	},
-	"eoscms-srv-m1.cern.ch" : {
+	"eoscms-qdb-250e2da131.cern.ch" : {
                "VOname" : "T2_CH_CERN"
        },
        "cmsxrootd-2.gridka.de" : {
                "VOname" : "T1_DE_KIT"
+       },
+       "cms-t2-se01.sdfarm.kr" : {
+               "VOname" : "T2_KR_KISTI"
        }
 }

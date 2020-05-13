@@ -18,15 +18,13 @@ import time
 import schemas
 
 class OptionParser():
-
-    """Dataset access types:
+   """Dataset access types:
     81,DELETED
     42,DEPRECATED
     2,INVALID
     41,PRODUCTION
     1,VALID
     """
-
     def __init__(self):
         "option Parser"
         self.parser = argparse.ArgumentParser(prog='consistency')
@@ -48,7 +46,7 @@ def fileMismatch(args):
 
     current = time.time()
     past_n_days = args.days
-    delta_t = current  - past_n_days*60*60*24
+    delta_t = current - past_n_days*60*60*24
     delta_t_str = str(delta_t)
     delta_t = delta_t_str[:10]
 
@@ -68,4 +66,3 @@ if __name__ == '__main__':
     optmgr = OptionParser()
     args = optmgr.parser.parse_args()
     fileMismatch(args)
-
