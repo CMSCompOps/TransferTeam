@@ -17,7 +17,7 @@ class x509RESTSession(object):
     def __init__(self):
         self._session = requests.Session()
         home = os.path.expanduser('~/')
-        # $ openssl rsa -in userkey_protected.pem -out userkey.pem; chmod 0600 userkey.pem
+        os.system("openssl rsa -in "+home+".globus/userkey.pem -out "+home+".globus/userkey2.pem; chmod 0600 "+home+".globus/userkey2.pem")
         self._session.cert = (home+'.globus/usercert.pem', home+'.globus/userkey2.pem')
         self._session.verify = os.getenv('X509_CERT_DIR')
     
@@ -86,8 +86,6 @@ def get_datasets(web):
 
 def main(sesion, web):
     datasets = get_datasets(web)
-    print(datasets)
-    print(len(datasets))
     invalidate_in_phedex = []
     invalidate_in_dbs = []
     dataset_empty_dbs = []
