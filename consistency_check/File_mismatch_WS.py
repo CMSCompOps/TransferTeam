@@ -86,6 +86,8 @@ def get_datasets(web):
 
 def main(sesion, web):
     datasets = get_datasets(web)
+    print(datasets)
+    print(len(datasets))
     invalidate_in_phedex = []
     invalidate_in_dbs = []
     dataset_empty_dbs = []
