@@ -75,7 +75,7 @@ def try_lock():
     return True
 
 def prepare_dictionary(servicename):
-    dic={'serviceName':servicename}
+    dic={'service':servicename}
     return dic
 def dnsalias_to_nodes(redirector):
     (host,port) = redirector.split(':')
@@ -161,8 +161,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
 
     # prepare the dictionary.
     dicci = prepare_dictionary(servicename)
-    notes_text = "Redirector:"+redirector
-    dicci['Host Name'] = redirector 
+    dicci['Host'] = redirector.split(':')[0]
 
     # run the functional tests - first some simple check to get the version, if OK look for files
     (err_info,version,dump_info) = xrd_info(redirector)
@@ -223,7 +222,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
         dicci ['availInfo'] = availinfo
         dicci ['Comment'] = c
     else:
-        dicci['availInfo'] = "Version check: "+ version
+        dicci['Version'] = version
     #dicci['availabilityinfo']=availinfo
     with open(html_dir  +'KIBANA_PROBES.json', 'a') as f:
         json.dump(dicci, f)
