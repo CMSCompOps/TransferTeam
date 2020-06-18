@@ -221,6 +221,8 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     if availability == 'unavailable' or availability == 'degraded':
         dicci ['availInfo'] = availinfo
         dicci ['Comment'] = c
+    else:
+        dicci['availInfo'] = "Version check: "+ version
     #dicci['availabilityinfo']=availinfo
     with open(html_dir  +'KIBANA_PROBES.json', 'a') as f:
         json.dump(dicci, f)
