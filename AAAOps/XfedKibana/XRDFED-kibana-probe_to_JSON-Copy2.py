@@ -197,9 +197,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
                 availinfo=availinfo+" Error above redirector "+err_above
                 # sanitize the raw output in order to not trigger XML errors.. in a comment.
                 dump_sane = re.sub('---*','__',dump_above)
-                c = "Detailed output for file ABOVE "+redirector+":"+file_above+" "+
-                                  err_above+" "
-                                  +dump_sane
+                c = "Detailed output for file ABOVE "+redirector+":"+file_above+" "+err_above+" "+dump_sane
                 #dicci = {**dicci, **{'comment': c}}
                 #serviceUpdate.appendChild(c)
                 #need_xml_link=1
@@ -220,7 +218,7 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
       #  notes_text = notes_text + "Details for failed test: http://" + myhostname + "/aaa-probe/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms039.cern.ch/aaa-probe/err/ <br />\n" 
     availinfo = availinfo + " " + notes_text
     dicci['status']= str(availability)
-    if availability == 'unavailable' or if availability == 'degraded':
+    if availability == 'unavailable' or availability == 'degraded':
         dicci ['availInfo'] = availinfo
         dicci ['Comment'] = c
     #dicci['availabilityinfo']=availinfo
