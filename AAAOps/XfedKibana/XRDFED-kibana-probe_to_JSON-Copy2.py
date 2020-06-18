@@ -155,6 +155,7 @@ def run_xrd_commands(cmd,args):
                      
 def test_redirector(servicename, redirector, file_below=None, file_above=None, extra_notes=""):
     servicename=servicename.upper()
+    notes_text = "Redirector:"+redirector
     availability = 'available'
     availinfo = ''
     c = 'No comment'
