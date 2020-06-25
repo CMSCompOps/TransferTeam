@@ -24,7 +24,14 @@ def which_to_invalidate_in_dbs(fname):
         sites = file_read("aux.txt")
         if sites[0] == "[FATAL] Redirect limit has been reached":
             invalidate.append(line_)
+    print(invalidate)
     return invalidate
 
-def invalidate_in_dbs(list_of_files):
+def main(list_of_files):
+        print('Files will be invalidated in DBS', list_of_files)
+
+if __name__ == '__main__':
+
+    list_of_files = which_to_invalidate_in_dbs('invalidate_in_dbs.txt')
+    main(list_of_files)
     
