@@ -1,11 +1,4 @@
-import urllib.request as request
-import urllib
-import json
-import requests
 import os
-import pandas
-from pandas.io.json import json_normalize
-from bs4 import BeautifulSoup as soup
 import warnings
 warnings.filterwarnings('ignore')
 
