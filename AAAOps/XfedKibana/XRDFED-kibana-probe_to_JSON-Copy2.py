@@ -90,7 +90,7 @@ def dnsalias_to_nodes(redirector):
 
 def xrdcp_test(redirector,file):
     (errtext,out,err,elapsed) = run_xrd_commands("xrdcp",
-                                                 ["-d","2",
+                                                 ["-d","1",
                                                   "-f",
                                                   "-DIReadCacheSize","0",
                                                   "-DIRedirCntTimeout","180",
