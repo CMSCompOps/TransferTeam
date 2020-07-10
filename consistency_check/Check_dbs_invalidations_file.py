@@ -13,18 +13,21 @@ def which_to_invalidate_in_dbs(fname):
     invalidate = []
     files = file_read(fname)
     for line_ in files:
+        line_ = line_[:-1]
         os.system("xrdfs cms-xrd-global.cern.ch locate -d -m "+line_+" > aux.txt")
         sites = file_read("aux.txt")
-        if sites[0] == "[FATAL] Redirect limit has been reached":
+	#:print(sites[0])
+        if len(sites) == 0:
             invalidate.append(line_)
-    print(invalidate)
     return invalidate
 
-def main(list_of_files):
-        print('Files will be invalidated in DBS', list_of_files)
-
+def main(list_of_files_): 
+    with open('Invalidate_in_DBS.txt', 'w') as f:
+        for item in list_of_files_:
+            f.write("%s\n" % item)
+    
 if __name__ == '__main__':
 
-    list_of_files = which_to_invalidate_in_dbs('invalidate_in_dbs.txt')
+    list_of_files = which_to_invalidate_in_dbs('check_in_dbs.txt')
     main(list_of_files)
-    
+    print(list_of_files)

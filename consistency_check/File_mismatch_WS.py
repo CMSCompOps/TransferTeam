@@ -17,7 +17,7 @@ class x509RESTSession(object):
     def __init__(self):
         self._session = requests.Session()
         home = os.path.expanduser('~/')
-        os.system("openssl rsa -in "+home+".globus/userkey.pem -out "+home+".globus/userkey2.pem; chmod 0600 "+home+".globus/userkey2.pem")
+        #os.system("openssl rsa -in "+home+".globus/userkey.pem -out "+home+".globus/userkey2.pem; chmod 0600 "+home+".globus/userkey2.pem")
         self._session.cert = (home+'.globus/usercert.pem', home+'.globus/userkey2.pem')
         self._session.verify = os.getenv('X509_CERT_DIR')
     
@@ -86,6 +86,7 @@ def get_datasets(web):
 
 def main(sesion, web):
     datasets = get_datasets(web)
+    print(datasets)
     invalidate_in_phedex = []
     invalidate_in_dbs = []
     dataset_empty_dbs = []
@@ -114,7 +115,7 @@ def main(sesion, web):
                 array = dbs_valid.loc[dbs_valid["in_phedex"] == False, 'File_name'].to_numpy()
                 for i in range(len(array)):
                     invalidate_in_dbs.append(array[i])
-    with open('invalidate_in_dbs.txt', 'w') as f:
+    with open('check_in_dbs.txt', 'w') as f:
         for item in invalidate_in_dbs:
             f.write("%s\n" % item)
     with open('invalidate_in_phedex.txt', 'w') as f:
