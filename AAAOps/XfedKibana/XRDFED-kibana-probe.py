@@ -23,7 +23,7 @@ import atexit
 import threading
 import tempfile
 
-html_dir = '/var/www/html/aaa-probe/'   # will create per-service xml files here
+html_dir = '/root/ogarzonm/'   # will create per-service xml files here
 
 #CERN_eosfile_rucio='/atlas/rucio/user/ivukotic:user.ivukotic.xrootd.cern-prod-1M'
 
@@ -132,9 +132,11 @@ def xrd_info(redirector):
                                                       [redirector,
                                                        "query","1", # 1:kXR_QStats
                                                        "a"])         # a_ll stats
-    if not errtext:
+    if not out:
+        out = "<root><a>1</a></root>" 
+    if not errtext: 
         try:
-            dom = xml.dom.minidom.parseString(out)
+            dom = xml.dom.minidom.parseString(out) 
             root_node = dom.documentElement
             if root_node.tagName == 'statistics':
                 v_attr = root_node.getAttributeNode('ver')
