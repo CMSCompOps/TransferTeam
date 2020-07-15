@@ -151,6 +151,8 @@ def run_xrd_commands(cmd,args):
                  "-DIConnectTimeout","30",
                  "-DITransactionTimeout","60",
                  "-DIRequestTimeout","60" ] + args
+    if not out:
+        out = "<root><a>1</a></root>"
     try:
         start = time.time()
         proc = subprocess.Popen(xrd_args,
