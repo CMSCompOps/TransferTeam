@@ -132,6 +132,8 @@ def xrd_info(redirector):
                                                       [redirector,
                                                        "query","1", # 1:kXR_QStats
                                                        "a"])         # a_ll stats
+    if not out:
+        out = "<root><a>1</a></root>"
     if not errtext:
         try:
             dom = xml.dom.minidom.parseString(out)
@@ -150,9 +152,7 @@ def run_xrd_commands(cmd,args):
     xrd_args = [ 'perl','-e',"alarm 180; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
                  "-DIConnectTimeout","30",
                  "-DITransactionTimeout","60",
-                 "-DIRequestTimeout","60" ] + args
-    if not out:
-        out = "<root><a>1</a></root>"
+                 "-DIRequestTimeout","60" ] + args    
     try:
         start = time.time()
         proc = subprocess.Popen(xrd_args,
