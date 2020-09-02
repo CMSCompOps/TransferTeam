@@ -132,27 +132,15 @@ def xrd_info(redirector):
                                                       [redirector,
                                                        "query","config", # 1:kXR_QStats
                                                        "version"])         # a_ll stats
-    
-    if not out:
-        errtext = ''
-        os.system("xrdfs "+ redirector+" query config version > /root/aux.txt")
-        os.system("head -n 1 /root/aux.txt > /root/aux2.txt ")  
-        f = open('/root/aux2.txt', 'r')
-        version = f.read()
-        if not version:
-            version = "(unknown)"
-        else:
-            version = version[:-1]
-    else:
-        if not errtext:
-            try:
-                dom = xml.dom.minidom.parseString(out)
-                root_node = dom.documentElement
-                if root_node.tagName == 'statistics':
-                    v_attr = root_node.getAttributeNode('ver')
-                    version = v_attr.nodeValue
-            except Exception,e:
-                errtext = "ERROR: cannot parse answer:"+str(e)
+    if not errtext:
+        try:
+            dom = xml.dom.minidom.parseString(out)
+            root_node = dom.documentElement
+            if root_node.tagName == 'statistics':
+                v_attr = root_node.getAttributeNode('ver')
+                version = v_attr.nodeValue
+        except Exception,e:
+            errtext = "ERROR: cannot parse answer:"+str(e)
     return (errtext,version,out)
 
 def run_xrd_commands(cmd,args):
