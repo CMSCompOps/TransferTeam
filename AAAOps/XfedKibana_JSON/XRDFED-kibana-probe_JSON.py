@@ -23,7 +23,7 @@ import threading
 import tempfile
 import json
 import shutil
-html_dir = '/var/www/html/aaa-probe/'   # will create per-service json files here
+html_dir = '/root/ogarzonm/'   # will create per-service json files here
 LOCKFILE='/var/lock/subsys/xrdfed-kibana-probe'
 class Alarm(Exception):
     pass
@@ -65,12 +65,17 @@ def try_lock():
     return True
 def prepare_dictionary(servicename,redirector):
     (errtext,version,out) = xrd_info(redirector)
-    dic={'service':servicename, 'version': version, 'host': redirector[:redirector.find(':')]}
+    dic={'service':servicename, 'host': redirector[:redirector.find(':')]}
     if(errtext):
+        dic['version'] = 'unavailable'
         dic['status'] = 'unavailable'
-        dic['availinfo'] = " Error getting info from redirector: "+err_info
+        errtext = errtext.replace("'", "")
+        errtext = errtext.replace('"', '')
+        dic['comment'] = "Error getting info from redirector: "+errtext
         dic["xrdcp_below_time"] = 0
         dic["xrdcp_above_time"] = 0
+    else:
+        dic['version'] = version
     return dic
 def xrdcp_test(redirector,file):
     (errtext,out,err,elapsed) = run_xrd_commands("xrdcp",
@@ -146,43 +151,55 @@ def run_xrd_commands(cmd,args):
     return (errtxt,out,err,elapsed)
 def test_redirector(dicci, servicename, redirector, file_below=None, file_above=None, extra_notes=""):
     servicename=servicename.upper()
-    notes_text = "Redirector:"+redirector
-    availability = 'available'
+    notes_text = "Redirector: "+redirector
+    availability = 'Available'
     availinfo = ''
-    c = 'No comment'
+    c = ''
     if 'status' in dicci and dicci['status'] == 'unavailable':
         pass
+    elif file_below == None and file_above == None:
+        availability = 'Unavialable'
+        c = 'Non-existing File Above and File Below.'
+        dicci['xrdcp_below_time'] = 0
+        dicci['xrdcp_below_time'] = 0
     else:
         if (file_below):
-            notes_text = notes_text + "File 'below': " + file_below
+            notes_text = notes_text + "File below: " + file_below
             (err_below,dump_below,elapsed_below) = xrdcp_test(redirector, file_below)
             if err_below:
-                availability = 'degraded'
-                availinfo=availinfo+" Error below redirector "+err_below
+                availability = 'Degraded'
+                #availinfo=availinfo+" Error below redirector "+err_below
                 dump_sane = re.sub('---*','__',dump_below)
-                c = "Detailed output for file BELOW "+redirector+":"+file_below+" "+err_below+" "+dump_sane
+                c = c+"Error for file BELOW: "+err_below+". Dumpsane: "+dump_sane+ '.'
+                dicci['xrdcp_below_time'] = 0
             else:
-                availinfo=availinfo+" File below: OK "
+                #availinfo=availinfo+" File below: OK "
                 dicci['xrdcp_below_time'] = elapsed_below
         else:
-            availinfo=availinfo+" File below: not tested." 
+            c = "Error for file BELOW: Non-existing File Below. "
+            dicci['xrdcp_below_time'] = 0
         if(file_above):
-            notes_text = notes_text + "File 'elsewhere': " + file_above 
+            notes_text = notes_text + "File elsewhere: " + file_above
             (err_above,dump_above,elapsed_above) = xrdcp_test(redirector, file_above)
             if err_above :
-                availinfo=availinfo+" Error above redirector "+err_above
+                availability = 'Degraded'
+                #availinfo=availinfo+" Error above redirector "+err_above
                 dump_sane = re.sub('---*','__',dump_above)
-                c = "Detailed output for file ABOVE "+redirector+":"+file_above+" "+err_above+" "+dump_sane
+                c = c+"Error for file ABOVE: "+err_above+". Dumpsane: "+dump_sane+'.'
+                dicci['xrdcp_above_time'] = 0
             else:
-                availinfo = availinfo+" File above: OK "
-            dicci['xrdcp_above_time'] = elapsed_above
+                #availinfo = availinfo+" File above: OK "
+                dicci['xrdcp_above_time'] = elapsed_above
         else:
-            availinfo = availinfo+" File above: not tested."
-    availinfo = availinfo + " " + notes_text
+            c = c + "Error for file ABOVE: Non-existing File Above."
+            dicci['xrdcp_above_time'] = 0
+    #availinfo = availinfo + " " + notes_text
     dicci['status']= str(availability)
-    if availability == 'unavailable' or availability == 'degraded':
-        dicci ['availInfo'] = availinfo
-        dicci ['Comment'] = c
+    if c == '':
+        c = 'N/A'
+    c = c.replace("\n", "")
+    c = c.replace("\r", "")
+    dicci ['Comment'] = c
     with open(html_dir  +'KIBANA_PROBES.json', 'a') as f:
         json.dump(dicci, f)
         f.write('\n')
@@ -262,7 +279,6 @@ def main():
                          'extra_notes':CMSLINK},
 	}
     signal.alarm(timeout_sec)
-    os.remove(html_dir+'KIBANA_PROBES.json')
     try:
         diccionaries = []
         for xrd in services:
@@ -279,10 +295,16 @@ def main():
             else:
                 t = threading.Thread(target=test_redirector, kwargs = argus)  # read: "run a thread with the test function and all the parameters above as arguments"
                 t.start()
+                #t.join()
+                #os.system('source ~/single_quotes.sh')
     except Alarm:
         print "ERROR: caught overall timeout after "+str(timeout_sec)+"s\n"
         clear_lock()
         sys.exit(2)
     signal.alarm(0)
 if __name__ == '__main__':
+    for file in os.listdir(html_dir):
+        if file == 'KIBANA_PROBES.json':
+            os.remove(html_dir+'KIBANA_PROBES.json')
+            break
     main()
