@@ -1,0 +1,113 @@
+Failsafe Redirector Probe: Task 5 in AAA Tasks and Milestones~Ref[1] 
+
+
+The probe is running on vocms036 as a root cronscript.
+
+
+[1] Fernando’s Original Version of the Probe for all redirectors
+
+/opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/XRDFED-kibana-probe_JSON.py
+
+
+[2] Fernando’s Failsafe Redirector Probe for one redirector
+
+This one is implemented by Fernando with a PING check:
+
+/opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/XRDFED-kibana-probe_JSON_1_TEST.py
+
+
+[3] Fernando’s cron script
+
+The cron is running every 15min. The cron script, /opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/uploadmetric.sh,
+
+executes the probe for each redirector unlike the one in [1] and uploads the metric to the data source monit_idb_cmsaaa which the Grafana queries to create the Redirector Probe Dashboard~Ref[2] (Service Availability Dashboard) as follows:
+
+python XRDFED-kibana-probe_JSON_1.py
+
+python3 send_metrics.py > $logs/XRDFED_send.log 2>&1
+
+The first line probes one redirector and creates one json file
+
+The second line sends the json file to the MONIT data source monit_idb_cmsaaa.
+
+These two lines are repeated for all redirectors (14 of them as of Aug. 5, 2021).
+
+
+[4] Failsafe Redirector Probe
+
+The probe in [1] was taken and the ping check in [2] is added:
+
+/opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/XRDFED-kibana-probe_JSON_General.py
+
+
+For the redirectors that fail a ping command, the probe produces an output similar to this json:
+
+{"status": "unavailable", "comment": "Unpingable host", "service": "XRDFED_CMS-GLOBAL01-NEW", "host": "cmxrd-global01.cern.ch", "version": "unavailable", "xrdcp_above_time": 0, "xrdcp_below_time": 0, "Comment": "N/A"}
+
+The json is sent as the probed metrics to the MONIT data source.
+
+For the redirectors that can be ping-able, the probe checks the needed metrics to send to the MONIT data source.
+
+
+In the end, the python probe produces a file that contains 14 lines of metrics in the json format.
+
+The execution time of the probe is typically around 2min.
+
+
+[5] The metric uploader
+
+/opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/send_metrics.py sends the output produced by the python probe. The send_metrics.py python script is the same and used without any change.
+
+
+[6] Cron Script
+
+The cron script is renamed to:
+
+/opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/uploadmetricGeneral.sh
+
+The script basically contains these two lines of commands:
+
+python /opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/XRDFED-kibana-probe_JSON_General.py > $logs/XRDFED_probe_json.log 2>&1
+
+python3 /opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/send_metrics.py > $logs/XRDFED_send.log 2>&1
+
+
+[7] Puppetized Cron
+
+The cron can be puppetized by adding a cron entry that contains various crontab parameters for the necessary cron script,  /opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/uploadmetricGeneral.sh
+
+, execution using https://gitlab.cern.ch/ai/it-puppet-hostgroup-vocms/-/blob/qa/code/manifests/xrootd/monitor.pp 
+
+After the puppet agent is run, an entry in the crontab as follows:
+
+\# Puppet Name: AAA Service Availability Grafana Dashboard metric upload
+
+*/15 * * * * /opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/uploadmetricGeneral.sh > /opt/TransferTeam.Jhonatan/AAAOps/XfedKibana_JSON/logs/uploadmetricGeneral.log 2>&1
+
+will appear.
+
+[8] Gitlab
+https://gitlab.cern.ch/bockjoo/aaa-monitoring/-/tree/master/RedirectorServiceAvailability
+
+
+[9] Questions
+
+Do we need to send an alert email for extendedly unavailable redirectors?
+
+How to define ‘extendedly unavailable redirectors’?
+
+Is the Dashboard good enough for the service availability?
+
+
+[10] Summary
+
+The work started by Fernando is completed by merging the ping check capability and consolidating the probe python code in a single file. The Grafana shows the Dashboard correctly.
+
+
+
+References
+[0] ...
+[1] ...
+[2] https://monit-grafana.cern.ch/d/serviceAvailability/overview-service-availability?orgId=11&var-category=All
+
+[3] https://gitlab.cern.ch/ai/it-puppet-hostgroup-vocms/-/blob/qa/code/manifests/xrootd/monitor.pp
