@@ -5,9 +5,9 @@ THELOG=$THEPATH/logs/probe_create_send_aaa_metrics.log
 KIBANA_PAGE=https://monit-kibana.cern.ch/kibana/goto/5d1128ff8482ac3b00e4be3d5a06e954
 
 #bockjoo original export X509_USER_PROXY=/root/.globus/slsprobe.proxy
-export X509_USER_PROXY=$HOME/.cmsuser.proxy #bockoo comment this out when in production
-notifytowhom=bockjoo@gmail.com
+notifytowhom=bockjoo__AT__gmail__dot__com
 export PYTHONPATH=$PYTHONPATH:$THEPATH/CMSMonitoring/src/python/
+notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#")
 
 [ -d $THEPATH/out ] || mkdir -p $THEPATH/out
 
