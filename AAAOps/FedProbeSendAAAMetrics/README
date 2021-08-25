@@ -1,0 +1,37 @@
+[1] Essential Files and Directories
+create_fedmaps.py
+aaa_federation.py
+probe_create_send_aaa_metrics.sh
+CMSMonitoring
+credentials.json
+
+[2] Needed Directories Created
+out
+logs
+
+[3] Utility Scripts
+check_timeout.sh
+compare_timeout_list.sh
+mapHostSitename.sh
+listSrv.sh
+check_xrdmapc_from_vofeed.sh
+check_vofeed_from_xrdmapc.sh
+check_upstream_redirector_examples.sh
+check_production_sites.sh
+
+[4] Installing
+# 1
+cd /opt
+git clone git@github.com:CMSCompOps/TransferTeam.git
+cd TransferTeam/AAAOps/FedProbeSendAAAMetrics
+cp ~/credentials.json ./
+# OR
+# 2
+cd /opt/TransferTeam
+git pull origin master
+cd AAAOps/FedProbeSendAAAMetrics
+cp ~/credentials.json ./
+git clone https://github.com/dmwm/CMSMonitoring.git
+crontab -l > crontab
+echo '14,29,44,59 * * * * /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/probe_create_send_aaa_metrics.sh > /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/logs/probe_create_send_aaa_metrics.log 2>&1' >> crontab
+# Add the cron to the gitlab
