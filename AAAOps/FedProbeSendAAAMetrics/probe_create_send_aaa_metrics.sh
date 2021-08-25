@@ -7,7 +7,7 @@ KIBANA_PAGE=https://monit-kibana.cern.ch/kibana/goto/5d1128ff8482ac3b00e4be3d5a0
 #bockjoo original export X509_USER_PROXY=/root/.globus/slsprobe.proxy
 notifytowhom=bockjoo__AT__gmail__dot__com
 export PYTHONPATH=$PYTHONPATH:$THEPATH/CMSMonitoring/src/python/
-notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#")
+notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#')
 
 [ -d $THEPATH/out ] || mkdir -p $THEPATH/out
 
