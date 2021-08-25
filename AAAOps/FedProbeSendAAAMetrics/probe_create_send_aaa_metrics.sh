@@ -4,7 +4,14 @@ FED_json=$THEPATH/out/federations.json
 THELOG=$THEPATH/logs/probe_create_send_aaa_metrics.log
 KIBANA_PAGE=https://monit-kibana.cern.ch/kibana/goto/5d1128ff8482ac3b00e4be3d5a06e954
 
-#bockjoo original export X509_USER_PROXY=/root/.globus/slsprobe.proxy
+export X509_USER_PROXY=$HOME/.globus/slsprobe.proxy
+if [ -f $X509_USER_PROXY ] ; then
+   if [ $(voms-proxy-info -timeleft 2>/dev/null) -lt 3600 ] ; then
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem with $X509_USER_PROXY.\n$(voms-proxy-info -all | sed 's#%#%%#g')" | mail -s "ERROR $(/bin/hostname -s) $(basename $0) proxy issue 1" $notifytowhom
+   fi
+else   
+   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $X509_USER_PROXY.\nIt does not exist" | mail -s "ERROR $(/bin/hostname -s) $(basename $0) proxy issue 2" $notifytowhom
+fi
 notifytowhom=bockjoo__AT__gmail__dot__com
 export PYTHONPATH=$PYTHONPATH:$THEPATH/CMSMonitoring/src/python/
 notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#')
