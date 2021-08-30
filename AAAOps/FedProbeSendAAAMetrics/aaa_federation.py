@@ -13,10 +13,15 @@ from CMSMonitoring.StompAMQ import StompAMQ
 import uuid
 from itertools import islice
 import hashlib
-import stomp
+#import stomp
 from uuid import uuid4
 from urllib.request import urlopen
 import time
+import re
+__requires__ = 'stomp.py==4.1.21'
+
+from pkg_resources import load_entry_point
+import stomp
 
 #print("stomp version", stomp.__version__)
 
