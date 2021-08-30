@@ -1,7 +1,13 @@
 #!/usr/bin/env python
+import re
+import sys
+
+__requires__ = 'stomp.py==4.1.21'
+
+from pkg_resources import load_entry_point
+import stomp
 
 import os
-import sys
 import subprocess
 import urllib
 import json
@@ -13,17 +19,11 @@ from CMSMonitoring.StompAMQ import StompAMQ
 import uuid
 from itertools import islice
 import hashlib
-#import stomp
 from uuid import uuid4
 from urllib.request import urlopen
 import time
-import re
-__requires__ = 'stomp.py==4.1.21'
 
-from pkg_resources import load_entry_point
-import stomp
-
-#print("stomp version", stomp.__version__)
+print("stomp version", stomp.__version__)
 
 FedProbeSendAAAMetrics = '/opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/'
 FedProbeSendAAAMetrics = '/opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/'
