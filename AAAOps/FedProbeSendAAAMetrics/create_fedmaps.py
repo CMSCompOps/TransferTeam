@@ -50,10 +50,11 @@ timeout_sec = 10 * 60
 output = {"prod" : [], "trans" : [], "nowhere" : []}
 sites = {}
 xrdmapc_output_prod = ''
+xrdmapc_output_prod_2 = ''
 xrdmapc_output_tran = ''
 gRedirectors=['cms-xrd-global01.cern.ch', 'cms-xrd-global02.cern.ch']
 tRedirectors=['cms-xrd-transit.cern.ch']
-topRedirectors = [gRedirectors[0],]+tRedirectors
+topRedirectors = [gRedirectors[0],gRedirectors[1],]+tRedirectors
 
 if not path.exists(THEPATH+'mapHostSitenames.py') : 
    with open(THEPATH+'mapHostSitenames.py','w') as data : data.write('HostSitenames = {}')
@@ -686,6 +687,7 @@ def updateSiteStorage ( site , storage ) :
 
 def getRegionalRedirectors ():
     global xrdmapc_output_prod
+    global xrdmapc_output_prod_2
 
     #Lines=[]
     #with open(THEPATH+'out/xrdmapc_all_0.txt') as f: Lines = f.readlines()
@@ -747,9 +749,9 @@ def getRegionalRedirectorsFromFile ():
 
 def getXrootdServers () :
     global xrdmapc_output_prod
+    global xrdmapc_output_prod_2
     global sites
     #Lines=[]
-    #with open(THEPATH+'out/xrdmapc_all_0.txt') as f: Lines = f.readlines()
     #print ("DEBUG sites ",len ( sites ))
     xrdServers = {}
     for site in sites :
@@ -782,7 +784,7 @@ def getXrootdServers () :
               (site,domain) = findSitename(host)
               updateHostSitename ( host, site )
            #print ( host, site ) 
-           #print ( xrdServers[site]['endpoints'] )
+           #print ( "DEBUG xrdServers[site]['endpoints'] ", xrdServers[site]['endpoints'] )
            #if '[::ffff:144.16.111.9]:11001' in endpoint :
            #   site = 'T2_IN_TIFR'
            #   xrdServers[site]['endpoints'].append('se01.indiacms.res.in:11001')
@@ -978,11 +980,27 @@ def getXrootdsFromTransFile () :
 def queryXrdmapc (redirector) :
     global sites
     global xrdmapc_output_prod
+    global xrdmapc_output_prod_2
     global xrdmapc_output_tran
     if 'trans' in redirector :
         (err_info,xrdmapc_output_tran,dump_info) = xrd_info(redirector,'')
+        with open(THEPATH+'out/xrdmapc_tran.txt','w' ) as f:
+           for line in xrdmapc_output_tran.splitlines() :
+               f.write(str(line.decode()))
+               f.write('\n')
+    elif 'global02' in redirector :
+        (err_info,xrdmapc_output_prod_2,dump_info) = xrd_info(redirector,'')
+        with open(THEPATH+'out/xrdmapc_prod_2.txt','w' ) as f: 
+           for line in xrdmapc_output_prod_2.splitlines() :
+               f.write(str(line.decode()))
+               f.write('\n')
     else :
         (err_info,xrdmapc_output_prod,dump_info) = xrd_info(redirector,'')
+        with open(THEPATH+'out/xrdmapc_prod_1.txt','w' ) as f:
+           for line in xrdmapc_output_prod.splitlines() :
+               f.write(str(line.decode()))
+               f.write('\n')
+
 
 def updateXrdInfo (thesite) :
     global sites
@@ -1257,7 +1275,8 @@ def getDNSARecords ( h ):
     import dns.resolver
     #import socket
     if h in DNSARecords : #.has_key (h) :
-       return ( DNSARecords[h]['Alias'], DNSARecords[h]['A'] )
+       if DNSARecords[h]['Alias'] == True :
+         return ( DNSARecords[h]['Alias'], DNSARecords[h]['A'] )
 
     isAlias = False
     aRecords = []

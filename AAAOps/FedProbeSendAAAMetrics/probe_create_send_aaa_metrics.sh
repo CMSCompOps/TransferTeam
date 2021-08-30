@@ -36,22 +36,34 @@ fi
 rm -f $THEPATH/fed.json
 python3 $THEPATH/aaa_federation.py  --amq $THEPATH/credentials.json > $THEPATH/aaa_federation.log 2>&1
 status=$?
-if [ $(date +%M ) -lt 15 ] ; then
-   if [ $status -eq 0 ] ; then
-      printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
-   else
-      printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
-   fi
+# Check any error from xrdmapc
+xrdmapc_error=$(grep \\[ $THEPATH/out/xrdmapc_prod_1.txt | grep -v "invalid addr" |sort -u)   
+xrdmapc_port0_error=$(grep ":0$\|:0 " $THEPATH/out/xrdmapc_prod_1.txt | awk '{if ($2 == "Man") print $3 ; else print $2}' | sed 's#:0$##g' | while read h ; do grep -v $h:0 $THEPATH/out/xrdmapc_prod_1.txt | grep -q $h  $THEPATH/out/xrdmapc_prod_1.txt ; [ $? -eq 0 ] || echo ${h}:0 ; done)
+if [ $status -eq 0 ] ; then
+      if [ $(date +%M ) -lt 15 ] ; then
+         printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
+      fi
+else
+      printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
 fi
+
 nprod_exp=55
 if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
-   nprod=$($THEPATH/check_subscribed_sites.sh | tail -1 | awk '{print $2}')
+   subscribed_sites=$($THEPATH/check_subscribed_sites.sh)
+   nprod=$(printf "$subscribed_sites\n" | tail -1 | awk '{print $2}')
+   printf "$subscribed_sites\n" > $THEPATH/subscribed_sites_$nprod.txt
    if [ $nprod_exp -gt $nprod ] ; then
-      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
+      thediff=
+      if [ -f $THEPATH/subscribed_sites_$nprod_exp.txt ] ; then
+         thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2)
+      fi
+      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$thediff\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
       #exit 1
    fi
    echo "Sites subscribed to the Production Federation: " $nprod
 fi
+
+printf "$(/bin/hostname -s) $(basename $0) \nxrdmapc errors:\n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n"
 
 [ -f ${THELOG}_$(date +%Y%m%d) ] || touch  ${THELOG}_$(date +%Y%m%d)
 if [ -f $THELOG ] ; then

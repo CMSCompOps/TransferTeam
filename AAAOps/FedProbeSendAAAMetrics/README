@@ -17,9 +17,13 @@ listSrv.sh
 check_xrdmapc_from_vofeed.sh
 check_vofeed_from_xrdmapc.sh
 check_upstream_redirector_examples.sh
-check_production_sites.sh
+check_subscribed_sites.sh
 
 [4] Installing
+# First check the needed python modules 
+python3 -c "import numpy"
+python3 -c "import stomp"
+python3 -c "import dns.resolver"
 # 1
 cd /opt
 git clone git@github.com:CMSCompOps/TransferTeam.git
