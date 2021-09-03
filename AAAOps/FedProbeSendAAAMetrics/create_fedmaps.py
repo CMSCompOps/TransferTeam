@@ -126,8 +126,10 @@ def xrd_info(redirector,what):
           if out.replace(b'\n',b'') : break
           time.sleep(1)
        count += 1
-    if not config_out : config_out = 'timeout'
     #print ( 'DEBUG count = ',count,' config_out ',config_out, ' redirector ',redirector)
+    if not 'xrdmapc' in command :
+       if not config_out : config_out = 'timeout'
+       if 'Auth failed' in config_out : config_out = 'Auth failed'
     return (errtext,config_out,out)
 
 def run_xrd_commands(cmd,args,timelimit):

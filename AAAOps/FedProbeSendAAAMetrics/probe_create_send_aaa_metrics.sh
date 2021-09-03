@@ -3,6 +3,7 @@ THEPATH=/opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics
 FED_json=$THEPATH/out/federations.json
 THELOG=$THEPATH/logs/probe_create_send_aaa_metrics.log
 KIBANA_PAGE=https://monit-kibana.cern.ch/kibana/goto/5d1128ff8482ac3b00e4be3d5a06e954
+GRAFANA_PAGE=https://monit-grafana.cern.ch/goto/Grgw5Q47z
 
 export X509_USER_PROXY=$HOME/.globus/slsprobe.proxy
 if [ -f $X509_USER_PROXY ] ; then
@@ -41,10 +42,10 @@ xrdmapc_error=$(grep \\[ $THEPATH/out/xrdmapc_prod_1.txt | grep -v "invalid addr
 xrdmapc_port0_error=$(grep ":0$\|:0 " $THEPATH/out/xrdmapc_prod_1.txt | awk '{if ($2 == "Man") print $3 ; else print $2}' | sed 's#:0$##g' | while read h ; do grep -v $h:0 $THEPATH/out/xrdmapc_prod_1.txt | grep -q $h  $THEPATH/out/xrdmapc_prod_1.txt ; [ $? -eq 0 ] || echo ${h}:0 ; done)
 if [ $status -eq 0 ] ; then
       if [ $(date +%M ) -lt 15 ] ; then
-         printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
+         printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
       fi
 else
-      printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
+      printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
 fi
 
 nprod_exp=55
