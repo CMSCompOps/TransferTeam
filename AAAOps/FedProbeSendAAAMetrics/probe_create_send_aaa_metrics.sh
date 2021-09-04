@@ -3,7 +3,7 @@ THEPATH=/opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics
 FED_json=$THEPATH/out/federations.json
 THELOG=$THEPATH/logs/probe_create_send_aaa_metrics.log
 KIBANA_PAGE=https://monit-kibana.cern.ch/kibana/goto/5d1128ff8482ac3b00e4be3d5a06e954
-GRAFANA_PAGE=https://monit-grafana.cern.ch/goto/Grgw5Q47z
+GRAFANA_PAGE="https://monit-grafana.cern.ch/d/5njhdTrWk/site-subscription?from=now-7d&orgId=11&to=now"
 
 export X509_USER_PROXY=$HOME/.globus/slsprobe.proxy
 if [ -f $X509_USER_PROXY ] ; then
