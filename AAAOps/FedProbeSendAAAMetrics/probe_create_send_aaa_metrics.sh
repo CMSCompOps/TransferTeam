@@ -48,7 +48,8 @@ else
       printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
 fi
 
-nprod_exp=55
+#nprod_exp=55
+nprod_exp=54
 if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
    subscribed_sites=$($THEPATH/check_subscribed_sites.sh)
    nprod=$(printf "$subscribed_sites\n" | tail -1 | awk '{print $2}')
