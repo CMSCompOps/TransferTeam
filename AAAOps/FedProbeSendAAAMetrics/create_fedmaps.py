@@ -1027,8 +1027,11 @@ def updateXrdInfo (thesite) :
           if 'timeout' in xrootd_role or 'FATAL' in xrootd_role :
               #print ( "( endpont )",endpoint )
               xrootd_role = XrdVersions[endpoint]['Role']
-              sites[thesite]['xrootd_role'][xrd_idxes[idx]] = '['+xrootd_role+']'
-          if 'timeout' in xrootd_version or 'FATAL' in xrootd_version : sites[thesite]['xrootd_version'][xrd_idxes[idx]] = '['+XrdVersions[endpoint]['Version']+']'
+              #sites[thesite]['xrootd_role'][xrd_idxes[idx]] = '['+xrootd_role+']'
+              #if 'timeout' in xrootd_version or 'FATAL' in xrootd_version : sites[thesite]['xrootd_version'][xrd_idxes[idx]] = '['+XrdVersions[endpoint]['Version']+']'
+              sites[thesite]['xrootd_role'][xrd_idxes[idx]] = xrootd_role
+          if 'timeout' in xrootd_version or 'FATAL' in xrootd_version : sites[thesite]['xrootd_version'][xrd_idxes[idx]] = XrdVersions[endpoint]['Version']
+
 
 #def updateFederation (thesite) :
 #    xrdInfo = sites[thesite]
