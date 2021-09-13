@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # functional probe and SLS extractor for the "federation" xroot services
 # highlights:
 # - stateless (i.e. run from cron whenever needed)
@@ -26,8 +26,8 @@ import shutil
 import multiprocessing
 html_dir = '/var/www/html/aaa-probe/'   # will create per-service json files here
 #Bockjoo Uncomment and comment a line below 
-#LOCKFILE='/var/lock/subsys/xrdfed-kibana-probe'
-LOCKFILE='/var/lock/subsys/xrdfed-kibana-probe-general'
+LOCKFILE='/var/lock/subsys/xrdfed-kibana-probe'
+#LOCKFILE='/opt/TransferTeam/AAAOps/RedirectorServiceAvailability/var/lock/subsys/xrdfed-kibana-probe-general'
 # Bockjoo Uncomment and comment a line below 
 #probes_json='KIBANA_PROBES.json'
 probes_json='KIBANA_PROBES_GENERAL.json'
@@ -35,19 +35,20 @@ timeout_sec = 10 * 60
 class Alarm(Exception):
     pass
 def alarm_handler(signum, frame):
-    print "ERROR: caught overall timeout after "+str(timeout_sec)+"s\n"
+    print ("ERROR: caught overall timeout after "+str(timeout_sec)+"s\n")
     clear_lock()
     sys.exit(2)
     raise Alarm
 def clear_lock():
     try:
         os.unlink(LOCKFILE)      
-    except Exception,e:
-        print "could not remove lockfile:"+str(e)
+    except (Exception,e):
+        print ("could not remove lockfile:"+str(e))
 def env_setup():
     os.environ['X509_USER_CERT']='/root/.globus/slsprobe-cert.pem'
     os.environ['X509_USER_KEY']='/root/.globus/slsprobe-key.pem'
     os.environ['X509_USER_PROXY']='/root/.globus/slsprobe.proxy'
+    #os.environ['X509_USER_PROXY']=os.environ['HOME']+'/.cmsuser.proxy' # DEBUG
     os.environ['KRB5CCNAME']='FILE:/dev/null'
     os.environ['PATH']=os.environ['PATH']+":/opt/globus/bin/"
 def get_proxy():
@@ -62,12 +63,12 @@ def get_proxy():
 def cleanup_proxy():
     try:
         os.unlink(os.environ['X509_USER_PROXY'])
-    except Exception,e:
-        print "could not remove proxy file:"+str(e)
+    except (Exception,e):
+        print ("could not remove proxy file:"+str(e))
 def try_lock():
     ret =  subprocess.call(['lockfile','-5','-r2',LOCKFILE])
     if ret > 0:
-        print "could not create lockfile"
+        print ("could not create lockfile")
         return False
     return True
 
@@ -95,7 +96,8 @@ def prepare_dictionary(servicename,redirector):
         dic["xrdcp_below_time"] = 0
         dic["xrdcp_above_time"] = 0
     else:
-        (errtext,version,out) = xrd_info(redirector)
+        # OLD (errtext,version,out) = xrd_info(redirector) 
+        (errtext,version,out) = xrd_info(redirector,'version') # NEW
         if(errtext):
             dic['version'] = 'unavailable'
             dic['status'] = 'unavailable'
@@ -114,47 +116,66 @@ def xrdcp_test(redirector,file):
                                                   "-DIReadCacheSize","0",
                                                   "-DIRedirCntTimeout","180",
                                                   "root://"+redirector+'/'+file,
-                                                  '/dev/null'])
+                                                  '/dev/null'],180)
     return (errtext,err,elapsed)
-def xrd_info(redirector):
-    version = "(unknown)"
-    (errtext,out,err,elapsed) = run_xrd_commands("xrdfs",
-                                                      [redirector,
-                                                       "query","config", # 1:kXR_QStats
-                                                       "version"])         # a_ll stats
-    if not out:
-        errtext = ''
-        os.system("xrdfs "+ redirector+" query config version > /root/aux.txt")
-        os.system("head -n 1 /root/aux.txt > /root/aux2.txt")
-        f = open('/root/aux2.txt', 'r')
-        version = f.read()
-        if not version:
-            version = "(unknown)"
-        else:
-            version = version[:-1]
-    else:
-        if not errtext:
-            try:
-                dom = xml.dom.minidom.parseString(out)
-                root_node = dom.documentElement
-                if root_node.tagName == 'statistics':
-                    v_attr = root_node.getAttributeNode('ver')
-                    version = v_attr.nodeValue
-            except Exception,e:
-                errtext = "ERROR: cannot parse answer:"+str(e)
-    return (errtext,version,out)
-def run_xrd_commands(cmd,args):
+def xrd_info(redirector,what):
+    theargs = [redirector, "query", "config", what]
+    if 'version' in what or 'role' in what : command = 'xrdfs'
+    else :
+       command = 'xrdmapc'
+       theargs = [ '--list', 'all', redirector ]
+    config_out = "unknown"
+    count = 0
+    count_limit = 3
+    timelimit = 2
+    if 'xrdmapc' in command :
+       timelimit = 90
+       count_limit = 1
+    while (count < count_limit):
+       (errtext,out,err,elapsed) = run_xrd_commands(command, theargs, timelimit) #"xrdfs",
+                                                      #[redirector,
+                                                      # "query","config", # 1:kXR_QStats
+                                                      # what])         # a_ll stats
+    
+       if 'xrdmapc' in command :
+          if out :
+             errtext = err
+             config_out = out
+             break
+       if err:
+          #errtext = ''
+          #config_out = 'error'
+          config_out = err.replace(b'\n',b'').decode()
+       else:
+          #config_out=out
+          #if 'xrdmapc' in command :
+          #   break
+          #else : 
+          config_out = out.replace(b'\n',b'').decode()
+          #   # to check if count matters config_out=config_out+'+'+str(count)
+          if out.replace(b'\n',b'') : break
+          time.sleep(1)
+       count += 1
+    #print ( 'DEBUG count = ',count,' config_out ',config_out, ' redirector ',redirector)
+    if not 'xrdmapc' in command :
+       if not config_out : config_out = 'timeout'
+       if 'Auth failed' in config_out : config_out = 'Auth failed'
+    return (errtext,config_out,out)
+
+def run_xrd_commands(cmd,args,timelimit):
     dev_null = open('/dev/null', 'r')
     errtxt = ''
     elapsed = -1.0
-    xrd_args = [ 'perl','-e',"alarm 180; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
-                 "-DIConnectTimeout","30",
-                 "-DITransactionTimeout","60",
-                 "-DIRequestTimeout","60" ] + args
-    err = ''
-    out = ''
+    #xrd_args = [ 'perl','-e',"alarm 180; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
+    #             "-DIConnectTimeout","30",
+    #             "-DITransactionTimeout","60",
+    #             "-DIRequestTimeout","60" ] + args    
+    xrd_args = [ 'perl','-e',"alarm "+str(timelimit)+" ; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
+    #xrd_args = [ 'perl','-e',"alarm 30 ; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
+                 ] + args    
+    #if 'xrdmapc' in cmd :
+    #    xrd_args = [ cmd, ] + args    
     try:
-        ran_try = True
         start = time.time()
         proc = subprocess.Popen(xrd_args,
                                 stdin=dev_null,
@@ -163,22 +184,28 @@ def run_xrd_commands(cmd,args):
         (out, err) = proc.communicate()
         ret = proc.returncode
         elapsed = (time.time() - start)
-        err_redir_index = err.rfind('Received redirection to')
-        err_index3010 = err.rfind('(error code: 3010')  # (permission denied) may be sort-of-OK - we are talking to final storage already - UK
-        err_index3005 = err.rfind('(error code: 3005')  # (no user mapping) - INFN
+        #print ( ' out ',out )
+        #if 'xrdmapc' in cmd : return ('',out,err,elapsed)
+        err_redir_index = err.rfind(b'Received redirection to')
+        err_index3010 = err.rfind(b'(error code: 3010')  # (permission denied) may be sort-of-OK - we are talking to final storage already - UK
+        err_index3005 = err.rfind(b'(error code: 3005')  # (no user mapping) - INFN
         if err_redir_index >= 0 and (err_index3010 >= 0 or err_index3005 >= 0):
             errtxt = ''
         else:    
             if(ret > 0):
-                errtxt = "client-side error - exit code "+str(ret)+"\n"
-            err_index = err.rfind('Last server error')
+               errtxt = "client-side error - exit code "+str(ret)+"\n"
+            err_index = err.rfind(b'Last server error')
             if err_index >= 0:
-                err_end_index=err.find("\n",err_index)
-                errtxt = errtxt + err[err_index:err_end_index]
-    except Exception,e:
+               err_end_index=err.find(b"\n",err_index)
+               errtxt = errtxt + err[err_index:err_end_index]
+    except (Exception,e) :
         errtext = errtxt + "Exception: "+str(e)
+        out = 'Try did not work :O'
+        print(out)
     dev_null.close()
+    
     return (errtxt,out,err,elapsed)
+
 def test_redirector(dicci, servicename, redirector, file_below=None, file_above=None, extra_notes=""):
     servicename=servicename.upper()
     notes_text = "Redirector: "+redirector
@@ -234,14 +261,15 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
     with open(html_dir  + probes_json, 'a') as f:
         json.dump(dicci, f)
         f.write('\n')
+
 def main():
     debug = 0
     atexit.register(clear_lock)
     if len(sys.argv) > 1:
-	if sys.argv[1] == '-d':
-        	debug=1
+       if sys.argv[1] == '-d':
+          debug=1
     if not try_lock():
-        sys.exit(1)
+       sys.exit(1)
     if not os.path.exists(html_dir):
         os.makedirs(html_dir)
     env_setup()
@@ -330,10 +358,10 @@ def main():
                 #os.system('source ~/single_quotes.sh')
         #print(diccionaries)
     except Alarm:
-        print "ERROR: caught overall timeout after "+str(timeout_sec)+"s\n"
+        print ("ERROR: caught overall timeout after "+str(timeout_sec)+"s\n")
         clear_lock()
         sys.exit(2)
-    print "Check ",html_dir+probes_json
+    print ("Check ",html_dir+probes_json)
     signal.alarm(0)
 if __name__ == '__main__':
     for file in os.listdir(html_dir):

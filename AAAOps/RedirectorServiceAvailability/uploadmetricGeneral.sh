@@ -1,4 +1,4 @@
-#bin/sh
+#!/bin/bash
 
 notifytowhom=cms-comp-ops-transfer-team@cernNOSPAMPLEASE.ch
 
