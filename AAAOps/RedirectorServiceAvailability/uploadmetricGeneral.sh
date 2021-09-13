@@ -14,7 +14,7 @@ thelog=$(pwd)/logs/uploadmetricGeneral.log
 # General script
 date
 echo INFO executing XRDFED-kibana-probe_JSON_General.py 
-python XRDFED-kibana-probe_JSON_General.py > $logs/XRDFED_probe_json.log 2>&1
+python3 XRDFED-kibana-probe_JSON_General.py > $logs/XRDFED_probe_json.log 2>&1
 status=$?
 echo INFO $logs/XRDFED_probe_json.log
 cat $logs/XRDFED_probe_json.log
