@@ -27,7 +27,8 @@ import multiprocessing
 html_dir = '/var/www/html/aaa-probe/'   # will create per-service json files here
 #Bockjoo Uncomment and comment a line below 
 LOCKFILE='/var/lock/subsys/xrdfed-kibana-probe'
-#LOCKFILE='/opt/TransferTeam/AAAOps/RedirectorServiceAvailability/var/lock/subsys/xrdfed-kibana-probe-general'
+if 'ufhpc' in socket.gethostname() :
+   LOCKFILE='/opt/TransferTeam/AAAOps/RedirectorServiceAvailability/var/lock/subsys/xrdfed-kibana-probe-general'
 # Bockjoo Uncomment and comment a line below 
 #probes_json='KIBANA_PROBES.json'
 probes_json='KIBANA_PROBES_GENERAL.json'
@@ -48,7 +49,7 @@ def env_setup():
     os.environ['X509_USER_CERT']='/root/.globus/slsprobe-cert.pem'
     os.environ['X509_USER_KEY']='/root/.globus/slsprobe-key.pem'
     os.environ['X509_USER_PROXY']='/root/.globus/slsprobe.proxy'
-    #os.environ['X509_USER_PROXY']=os.environ['HOME']+'/.cmsuser.proxy' # DEBUG
+    if 'ufhpc' in socket.gethostname() : os.environ['X509_USER_PROXY']=os.environ['HOME']+'/.cmsuser.proxy'
     os.environ['KRB5CCNAME']='FILE:/dev/null'
     os.environ['PATH']=os.environ['PATH']+":/opt/globus/bin/"
 def get_proxy():
@@ -264,12 +265,14 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
 
 def main():
     debug = 0
-    atexit.register(clear_lock)
+    if not 'ufhpc' in socket.gethostname():
+       atexit.register(clear_lock)
     if len(sys.argv) > 1:
        if sys.argv[1] == '-d':
           debug=1
-    if not try_lock():
-       sys.exit(1)
+    if not 'ufhpc' in socket.gethostname():
+       if not try_lock():
+          sys.exit(1)
     if not os.path.exists(html_dir):
         os.makedirs(html_dir)
     env_setup()
