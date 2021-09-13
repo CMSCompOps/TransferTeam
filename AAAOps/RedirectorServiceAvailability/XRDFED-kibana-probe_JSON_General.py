@@ -43,7 +43,7 @@ def alarm_handler(signum, frame):
 def clear_lock():
     try:
         os.unlink(LOCKFILE)      
-    except (Exception,e):
+    except Exception as e:
         print ("could not remove lockfile:"+str(e))
 def env_setup():
     os.environ['X509_USER_CERT']='/root/.globus/slsprobe-cert.pem'
@@ -64,7 +64,7 @@ def get_proxy():
 def cleanup_proxy():
     try:
         os.unlink(os.environ['X509_USER_PROXY'])
-    except (Exception,e):
+    except Exception as e:
         print ("could not remove proxy file:"+str(e))
 def try_lock():
     ret =  subprocess.call(['lockfile','-5','-r2',LOCKFILE])
@@ -199,7 +199,7 @@ def run_xrd_commands(cmd,args,timelimit):
             if err_index >= 0:
                err_end_index=err.find(b"\n",err_index)
                errtxt = errtxt + err[err_index:err_end_index]
-    except (Exception,e) :
+    except Exception as e :
         errtext = errtxt + "Exception: "+str(e)
         out = 'Try did not work :O'
         print(out)
