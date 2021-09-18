@@ -118,6 +118,7 @@ def xrdcp_test(redirector,file):
                                                   "-DIRedirCntTimeout","180",
                                                   "root://"+redirector+'/'+file,
                                                   '/dev/null'],180)
+    #print ("DEBUG xrd_test ",redirector," errtext ",errtext, " err ", err )
     return (errtext,err,elapsed)
 def xrd_info(redirector,what):
     theargs = [redirector, "query", "config", what]
@@ -167,13 +168,15 @@ def run_xrd_commands(cmd,args,timelimit):
     dev_null = open('/dev/null', 'r')
     errtxt = ''
     elapsed = -1.0
-    #xrd_args = [ 'perl','-e',"alarm 180; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
-    #             "-DIConnectTimeout","30",
-    #             "-DITransactionTimeout","60",
-    #             "-DIRequestTimeout","60" ] + args    
-    xrd_args = [ 'perl','-e',"alarm "+str(timelimit)+" ; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
-    #xrd_args = [ 'perl','-e',"alarm 30 ; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
-                 ] + args    
+    if 'xrdcp' in cmd :
+       xrd_args = [ 'perl','-e',"alarm "+str(timelimit)+" ; exec @ARGV", cmd,   # one-line wrapper that *actually* kills the command
+                    "-DIConnectTimeout","30",
+                    "-DITransactionTimeout","60",
+                    "-DIRequestTimeout","60" ] + args
+    else :
+       xrd_args = [ 'perl','-e',"alarm "+str(timelimit)+" ; exec @ARGV", cmd ] + args    
+
+
     #if 'xrdmapc' in cmd :
     #    xrd_args = [ cmd, ] + args    
     try:
@@ -191,14 +194,17 @@ def run_xrd_commands(cmd,args,timelimit):
         err_index3010 = err.rfind(b'(error code: 3010')  # (permission denied) may be sort-of-OK - we are talking to final storage already - UK
         err_index3005 = err.rfind(b'(error code: 3005')  # (no user mapping) - INFN
         if err_redir_index >= 0 and (err_index3010 >= 0 or err_index3005 >= 0):
+            #print ("errtxt will be empty because ",err)
             errtxt = ''
         else:    
+            #print ("errtxt will not be empty because ret ",ret," err ",err)
             if(ret > 0):
                errtxt = "client-side error - exit code "+str(ret)+"\n"
             err_index = err.rfind(b'Last server error')
             if err_index >= 0:
                err_end_index=err.find(b"\n",err_index)
                errtxt = errtxt + err[err_index:err_end_index]
+            #print ("errtxt will not be empty because ret ",ret," err_index ", err_index, " err ",err)
     except Exception as e :
         errtext = errtxt + "Exception: "+str(e)
         out = 'Try did not work :O'
@@ -225,11 +231,12 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
         if (file_below):
             notes_text = notes_text + "File below: " + file_below
             (err_below,dump_below,elapsed_below) = xrdcp_test(redirector, file_below)
+            #print ("DEBUG FILE_BELOW Test redirector ",redirector," err_below ",err_below)
             if err_below:
                 availability = 'Degraded'
                 #availinfo=availinfo+" Error below redirector "+err_below
-                dump_sane = re.sub('---*','__',dump_below)
-                c = c+"Error for file BELOW: "+err_below+". Dumpsane: "+dump_sane+ '.'
+                dump_sane = re.sub(b'---*',b'__',dump_below)
+                c = c+"Error for file BELOW: "+err_below+". Dumpsane: "+str(dump_sane.decode())+ '.'
                 dicci['xrdcp_below_time'] = 0
             else:
                 #availinfo=availinfo+" File below: OK "
@@ -240,11 +247,12 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
         if(file_above):
             notes_text = notes_text + "File elsewhere: " + file_above
             (err_above,dump_above,elapsed_above) = xrdcp_test(redirector, file_above)
+            #print ("DEBUG FILE_ABOVE Test redirector ",redirector," err_above ",err_above)
             if err_above :
                 availability = 'Degraded'
                 #availinfo=availinfo+" Error above redirector "+err_above
-                dump_sane = re.sub('---*','__',dump_above)
-                c = c+"Error for file ABOVE: "+err_above+". Dumpsane: "+dump_sane+'.'
+                dump_sane = re.sub(b'---*',b'__',dump_above)
+                c = c+"Error for file ABOVE: "+err_above+". Dumpsane: "+str(dump_sane.decode())+'.'
                 dicci['xrdcp_above_time'] = 0
             else:
                 #availinfo = availinfo+" File above: OK "
@@ -353,7 +361,7 @@ def main():
             argus = services[service]
             argus['dicci'] = dicci
             if debug:
-                test_redirector(** services[xrd])        
+                test_redirector(** argus)        
             else:
                 t = threading.Thread(target=test_redirector, kwargs = argus)  # read: "run a thread with the test function and all the parameters above as arguments"
                 t.start()
