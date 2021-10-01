@@ -263,8 +263,8 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
     #availinfo = availinfo + " " + notes_text
     dicci['status']= str(availability)
     print ("DEBUG redirector ",redirector, " dicci status ",dicci['status'])
-    if c == '':
-        c = 'N/A'
+    #if c == '':
+    #    c = 'N/A'
     c = c.replace("\n", "")
     c = c.replace("\r", "")
     dicci ['Comment'] = c
