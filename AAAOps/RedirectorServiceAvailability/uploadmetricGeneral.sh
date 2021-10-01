@@ -13,6 +13,12 @@ thelog=$(pwd)/logs/uploadmetricGeneral.log
 
 # General script
 date
+echo INFO sending the previous /var/www/html/aaa-probe/KIBANA_PROBES_GENERAL.json so that we can have a regular 15th minute entry for Grafana
+python3 send_metrics.py > $logs/XRDFED_send.log 2>&1
+echo INFO content of logs/XRDFED_send.log
+cat $logs/XRDFED_send.log
+date
+
 echo INFO executing XRDFED-kibana-probe_JSON_General.py 
 python3 XRDFED-kibana-probe_JSON_General.py > $logs/XRDFED_probe_json.log 2>&1
 status=$?
