@@ -262,6 +262,7 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
             dicci['xrdcp_above_time'] = 0
     #availinfo = availinfo + " " + notes_text
     dicci['status']= str(availability)
+    print ("DEBUG redirector ",redirector, " dicci status ",dicci['status'])
     if c == '':
         c = 'N/A'
     c = c.replace("\n", "")
