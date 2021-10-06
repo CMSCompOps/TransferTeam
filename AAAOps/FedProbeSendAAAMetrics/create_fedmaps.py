@@ -275,7 +275,7 @@ def getSites():
         ret[siteName]['xrootd_servers'] = []
         ret[siteName]['xrootd_storage'] = []
         ret[siteName]['federation'] = []
-    #print ('getSites() ret keys  ',ret.keys() )
+    #print ('DEBUG getSites() ret keys  ',ret.keys() )
     #print ('getSites() ret["T0_CH_CERN"] ',ret["T0_CH_CERN"])
     name = ''
     contact = ''
@@ -288,7 +288,7 @@ def getSites():
                 break
         if not siteName: 
             continue
-        #print ('getSites() site ',siteName)
+        #print ('DEBUG getSites() site ',siteName)
         services = site.findall('.//service')
         #ret[siteName]['name'].append(site.attrib['name'])
         if site.attrib['name'] : name = site.attrib['name']
@@ -301,7 +301,7 @@ def getSites():
            contact = siteName
         #if site.attrib['contact'] : contact = site.attrib['contact']
 
-        #print ('getSites() site contact ',)
+        #print ('DEBUG getSites() site contact ',)
         for service in services:
               flavor = service.attrib['flavour']
               try:
@@ -316,7 +316,7 @@ def getSites():
               #  (err_info,xrootd_role,dump_info) = xrd_info(endpoint,"role")
               serviceName = service.attrib['hostname']
             
-              #print ('getSites() services siteName ',siteName)
+              #print ('DEBUG getSites() services siteName ',siteName)
               ret[siteName]['sites'].append(siteName)
               ret[siteName]['hosts'].append(serviceName)
               ret[siteName]['flavors'].append(flavor)
@@ -324,9 +324,9 @@ def getSites():
               ret[siteName]['xrootd_version'].append(xrootd_version)
               ret[siteName]['xrootd_role'].append(xrootd_role)
               ret[siteName]['xrootd_servers'].append('_^_')
-              #print ('getSites() getStorageFromStorageJson siteName ',siteName)
+              #print ('DEBUG getSites() getStorageFromStorageJson siteName ',siteName)
               xrootd_storage = getStorageFromStorageJson ( siteName)
-              #print ('getSites() xrootd_storage ',xrootd_storage)
+              #print ('DEBUG getSites() xrootd_storage ',xrootd_storage)
               #if siteName in SiteStorages : print (' found it ')
               #else : print ('not found ')
               if siteName in SiteStorages :
@@ -336,12 +336,12 @@ def getSites():
                  #print ( 'B ')
                  xrootd_storage = getStorageFromStorageJson ( siteName )
                  updateSiteStorage ( siteName , xrootd_storage )
-              #print ('getSites() done sitestorage ')
+              #print ('DEBUG getSites() done sitestorage ')
               ret[siteName]['xrootd_storage'].append(xrootd_storage)
               ret[siteName]['name'].append(name)
               ret[siteName]['contact'].append(contact)
               ret[siteName]['federation'].append('nowhere')
-              #print ('getSites() done  ')
+              #print ('DEBUG getSites() done  ')
     return ret
 
 
@@ -352,20 +352,42 @@ def getStorageFromStorageJson ( site ):
     with open('/cvmfs/cms.cern.ch/SITECONF/'+site+'/storage.json') as f: storage = f.read()
     storage = json.loads(str(storage))
     xrootd_volume = 'info_missing'
-    for vol in storage :
+    #print ('DEBUG getStorageFromStorageJson ( site ) before for vol in storage = ',storage)
+    #for line in xrdmapc_output_prod.splitlines() :
+    #    line = line.decode() # python3
+    #for vol in storage :
+    for index in range(len(storage)):
+       vol=storage[index]
        volume = str(vol['volume']) # ' '.join([str(elem) for elem in str(vol['volume']).split('_')]) 
+       #print ('DEBUG getStorageFromStorageJson ( site ) volume = ',volume)
        if 'FEDERATION' in volume.upper() : continue 
-       for proto in vol['protocols'] :
-           #print ( 'storage volume ',volume,proto['protocol'] )
-           if 'XRootD' in str(proto['protocol']) : xrootd_volume = volume
+       #print ('DEBUG getStorageFromStorageJson ( site ) FEDERATION not in volume ',volume, ' vol protocols len ',len(vol['protocols']),' vol ',vol['protocols'])
+       #for proto in vol['protocols'] :
+       for index_proto in range(len(vol['protocols'])) :
+           proto=vol['protocols'][index_proto]
+           #print ( 'DEBUG getStorageFromStorageJson ( site ) storage index ', index_proto, ' volume ',volume, ' type ',type(proto) )
+           #print ( 'DEBUG getStorageFromStorageJson ( site ) storage index ', index_proto, ' volume ',volume, proto['protocol'] )
+           try :
+             if 'XRootD' in str(proto['protocol']) : xrootd_volume = volume
+           except :
+             continue
+           
+    #print ('DEBUG getStorageFromStorageJson ( site ) after for vol in storage')
     if 'info_missing' in xrootd_volume :
-     for vol in storage :
+     #for vol in storage :
+     for index in range(len(storage)):
+       vol=storage[index]
        volume = str(vol['volume']) # ' '.join([str(elem) for elem in str(vol['volume']).split('_')]) 
        if 'FEDERATION' in volume.upper() : continue 
-       for proto in vol['protocols'] :
+       #for proto in vol['protocols'] :
+       for index_proto in range(len(vol['protocols'])) :
+           proto=vol['protocols'][index_proto]
            #print ( 'storage volume ',volume,proto['protocol'] )
-           if 'WebDAV' in str(proto['protocol']) : xrootd_volume = volume
-    #print ( site, xrootd_volume )
+           try : 
+             if 'WebDAV' in str(proto['protocol']) : xrootd_volume = volume
+           except :
+             continue
+    #print ('DEBUG getStorageFromStorageJson ( site ) site volume ', site, xrootd_volume )
     #                            3 (
     #print ( 'storage volume ', len(storage), (str(storage[0]['volume'])).split('_')[1:])
     #print ( 'storage volume ', len(storage), storage[1])
