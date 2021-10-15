@@ -1,6 +1,6 @@
 #!/bin/bash
 
-notifytowhom=cms-comp-ops-transfer-team@cernNOSPAMPLEASE.ch
+notifytowhom=cms-comp-ops-transfer-team@cernNOSPAMPLEASE.ch,bockjoo@gmailNOSPAMPLEASE.com
 
 DATE=$(date)
 echo $DATE
@@ -36,7 +36,7 @@ if [ -f $thelog ] ; then
    a=1
    [ $status -eq 0 ] && { grep -q -i "caught overall timeout" $logs/XRDFED_probe_json.log ; [ $(expr $a + $?) -eq $a ] && status=1 ; } ;
    if [ $status -ne 0 ] ; then
-      printf "$(/bin/hostname) $(basename $0)\n$(date)\n$(ls -al $thelog )\n$(cat $thelog)\n" | mail -s "$(/bin/hostname) $(basename $thelog)" $(echo $notifytowhom | sed 's#NOSPAMPLEASE##') -a $thelog
+      printf "$(/bin/hostname) $(basename $0)\n$(date)\n$(ls -al $thelog )\n$(cat $thelog)\n" | mail -s "$(/bin/hostname) $(basename $thelog)" $(echo $notifytowhom | sed 's#NOSPAMPLEASE##g')
    fi
 fi
 
