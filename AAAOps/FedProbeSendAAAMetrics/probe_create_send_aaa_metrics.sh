@@ -20,7 +20,9 @@ notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#')
 [ -d $THEPATH/out ] || mkdir -p $THEPATH/out
 
 python3 $THEPATH/create_fedmaps.py > $THEPATH/create_fedmaps.log 2>&1
-
+if [ $? -ne 0 ] ; then
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 $THEPATH/create_fedmaps.py\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+fi
 if [ ! -r $FED_json ]; then
 	echo "We have a problem creating JSON file.\n"
 	printf "$(/bin/hostname -s) $(basename $0) We have a problem creating JSON file.\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
