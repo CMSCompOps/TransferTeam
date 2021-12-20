@@ -2,7 +2,7 @@ try: import xml.etree.ElementTree as ET
 except ImportError: from elementtree import ElementTree as ET
 try: import json
 except ImportError: import simplejson as json
-#
+
 import sys
 #import urllib2, httplib, sys
 #import httplib, sys
@@ -1010,19 +1010,36 @@ def queryXrdmapc (redirector) :
         (err_info,xrdmapc_output_tran,dump_info) = xrd_info(redirector,'')
         with open(THEPATH+'out/xrdmapc_tran.txt','w' ) as f:
            for line in xrdmapc_output_tran.splitlines() :
-               f.write(str(line.decode()))
+               #f.write(str(line.decode()))
+               if type (line) is str :
+                  #print ( "1 str "+line )
+                  f.write(line)
+               else :
+                  #print ( "1 no str "+str(line.decode()) )
+                  f.write(str(line.decode()))
                f.write('\n')
     elif 'global02' in redirector :
         (err_info,xrdmapc_output_prod_2,dump_info) = xrd_info(redirector,'')
         with open(THEPATH+'out/xrdmapc_prod_2.txt','w' ) as f: 
            for line in xrdmapc_output_prod_2.splitlines() :
-               f.write(str(line.decode()))
+               if type (line) is str :
+                  #print ( "2 str "+line )
+                  f.write(line)
+               else :
+                  #print ( "2 no str "+str(line.decode()) )
+                  f.write(str(line.decode()))
                f.write('\n')
     else :
         (err_info,xrdmapc_output_prod,dump_info) = xrd_info(redirector,'')
         with open(THEPATH+'out/xrdmapc_prod_1.txt','w' ) as f:
            for line in xrdmapc_output_prod.splitlines() :
-               f.write(str(line.decode()))
+               #f.write(str(line.decode()))
+               if type (line) is str :
+                  #print ( "3 str "+line )
+                  f.write(line)
+               else :
+                  #print ( "3 no str "+str(line.decode()) )
+                  f.write(str(line.decode()))
                f.write('\n')
 
 
