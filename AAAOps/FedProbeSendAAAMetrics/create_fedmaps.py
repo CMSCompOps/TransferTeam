@@ -99,7 +99,7 @@ def xrd_info(redirector,what):
     count_limit = 3
     timelimit = 2
     if 'xrdmapc' in command :
-       timelimit = 90
+       timelimit = 180
        count_limit = 1
     while (count < count_limit):
        (errtext,out,err,elapsed) = run_xrd_commands(command, theargs, timelimit) #"xrdfs",
@@ -719,7 +719,7 @@ def getRegionalRedirectors ():
     count = 0 
     #for line in set(Lines) :
     for line in xrdmapc_output_prod.splitlines() :
-        line = line.decode() # python3
+        if type (line) is not str : line = line.decode() # python3
         #print("Line{}: {}".format(count, line.split()))
         entries=line.split()
         #if 'Man' in entries[1] :
@@ -789,7 +789,7 @@ def getXrootdServers () :
     count = 0 
     for line in xrdmapc_output_prod.splitlines() :
         #print("Line{}: {}".format(count, line.split()))
-        line = line.decode()
+        if type (line) is not str : line = line.decode()
         entries=line.split()
         #print ( entries )
         #if entries[0] == 'Srv' :
@@ -916,7 +916,7 @@ def getTransitionalXrootds () :
     #return xrdServers
     #count = 0 
     for line in xrdmapc_output_tran.splitlines() :
-        line = line.decode()
+        if type (line) is not str : line = line.decode()
         #print("Line{}: {}".format(count, line.split()))
         entries=line.split()
         #print ( entries 
