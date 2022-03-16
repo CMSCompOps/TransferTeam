@@ -350,7 +350,10 @@ def getStorageFromStorageJson ( site ):
     from os import path
     if not path.exists('/cvmfs/cms.cern.ch/SITECONF/'+site+'/storage.json') : return 'no_storage_json'
     with open('/cvmfs/cms.cern.ch/SITECONF/'+site+'/storage.json') as f: storage = f.read()
-    storage = json.loads(str(storage))
+    try:
+      storage = json.loads(str(storage))
+    except:
+      return 'storage_json_bad'
     xrootd_volume = 'info_missing'
     #print ('DEBUG getStorageFromStorageJson ( site ) before for vol in storage = ',storage)
     #for line in xrdmapc_output_prod.splitlines() :
