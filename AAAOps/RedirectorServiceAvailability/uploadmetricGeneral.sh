@@ -1,6 +1,7 @@
 #!/bin/bash
 
 notifytowhom=cms-comp-ops-transfer-team@cernNOSPAMPLEASE.ch,bockjoo@gmailNOSPAMPLEASE.com
+GRAFANA_PAGE="https://monit-grafana.cern.ch/d/serviceAvailability/overview-service-availability?orgId=11&var-category=All&from=now-24h&to=now-15m%2Fm"
 
 DATE=$(date)
 echo $DATE

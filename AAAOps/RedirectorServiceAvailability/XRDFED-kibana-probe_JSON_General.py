@@ -94,6 +94,7 @@ def prepare_dictionary(servicename,redirector):
     if is_up == False:
         dic['version'] = 'unavailable'
         dic['status'] = 'unavailable'
+        #dic['role'] = 'unavailable'
         dic['comment'] = "Unpingable host"
         dic["xrdcp_below_time"] = 0
         dic["xrdcp_above_time"] = 0
@@ -110,6 +111,18 @@ def prepare_dictionary(servicename,redirector):
             dic["xrdcp_above_time"] = 0
         else:
             dic['version'] = version
+        #(errtext,role,out) = xrd_info(redirector,'role')
+        #if(errtext):
+        #    dic['role'] = 'unavailable'
+        #    dic['status'] = 'unavailable'
+        #    errtext = errtext.replace("'", "")
+        #    errtext = errtext.replace('"', '')
+        #    dic['comment'] = "Error getting info from redirector: "+errtext
+        #    dic["xrdcp_below_time"] = 0
+        #    dic["xrdcp_above_time"] = 0
+        #else:
+        #    dic['role'] = role
+
     return dic
 def xrdcp_test(redirector,file):
     (errtext,out,err,elapsed) = run_xrd_commands("xrdcp",
@@ -263,7 +276,8 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
             dicci['xrdcp_above_time'] = 0
     #availinfo = availinfo + " " + notes_text
     dicci['status']= str(availability)
-    print ("DEBUG redirector ",redirector, " dicci status ",dicci['status'])
+    #print ("DEBUG redirector ",redirector, " dicci status ",dicci['status'], dicci['role'],dicci['version'])
+    print ("DEBUG redirector ",redirector, " dicci status ",dicci['status'], dicci['version'])
     #01OCT2021 if c == '':
     #01OCT2021     c = 'N/A'
     if c == '':
