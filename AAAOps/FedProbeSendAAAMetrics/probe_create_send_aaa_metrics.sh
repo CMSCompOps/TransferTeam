@@ -39,7 +39,7 @@ fi
 # Server Version List
 #if [ ] ; then
 (
-     timeout=30
+     timeout=10
      echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
      echo "Subject: XRootD Version Role List"
      echo "Content-Type: text/html"
