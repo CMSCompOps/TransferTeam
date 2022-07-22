@@ -39,6 +39,22 @@ fi
 # Server Version List
 #if [ ] ; then
 (
+is_int() {
+  if [ $1 ] ; then
+     theval=$1
+     if [ "x$theval" == "x" ] ; then
+        return 1
+     else
+        if [ "x`echo $theval | egrep -v '^[0-9]+$'`" != "x" ] ; then
+           return 1
+        else
+           return 0
+        fi
+     fi
+  else
+     return 1
+  fi
+}
      timeout=10
      echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
      echo "Subject: XRootD Version Role List"
@@ -63,8 +79,23 @@ fi
            [ "x$role" == "xtimeout" ] && role=$(echo $(perl -e "alarm $timeout ; exec @ARGV" xrdfs $endpoints query config role))
            [ "$role" == "Alarm clock" ] && role="$timeout(sec)TO"
            bgcolor="yellow"
-           [ "x$version" == "xv5.4.3" ] || bgcolor="red"
-           echo "<tr bgcolor='$bgcolor'><td>$site </td><td> $endpoints </td><td> $version </td><td> $role </td></td>"
+           a=$(echo "$version" | grep v | sed "s#[a-z]##g" | sed "s#[A-Z]##g" | cut -d. -f1)
+           [ "x$a" == "x" ] && a=1
+           [ $(is_int $a ; echo $?) -eq 0 ] || a=1
+           a=$(expr 100000 \* $a)
+           b=$(echo "$version" | grep v | sed "s#[a-z]##g" | sed "s#[A-Z]##g" | cut -d. -f2)
+           [ "x$b" == "x" ] && b=1
+           [ $(is_int $b ; echo $?) -eq 0 ] || b=1
+           b=$(expr 1000 \* $b)
+           c=$(echo "$version" | grep v | sed "s#[a-z]##g" | sed "s#[A-Z]##g" | cut -d. -f3)
+           [ "x$c" == "x" ] && c=1
+           [ $(is_int $c ; echo $?) -eq 0 ] || c=1
+           c=$(expr 10 \* $c)
+           expr $a + $b + $c 2>/dev/null 1>/dev/null && \
+           [ $(expr $a + $b + $c) -lt 504000 ] && bgcolor="red"
+           #[ "x$version" == "xv5.4.3" ] || [ "x$version" == "xv5.4.2" ] || bgcolor="red"
+           
+           echo "<tr bgcolor='$bgcolor'><td>$site </td><td> $endpoints </td><td> $version <"'!'"-- a=$a b=$b c=$c status=$? --> </td><td> $role </td></td>"
      done
      echo "</table>"
      echo "</html>"
