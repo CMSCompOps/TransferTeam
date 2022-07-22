@@ -52,6 +52,7 @@ fi
            read version
            read role
            site=$(echo $site | cut -d\" -f4)
+           echo "$site" | grep -q T3 && continue
            endpoints=$(echo $endpoints | cut -d\" -f4)
            version=$(echo $version | cut -d\" -f4)
            role=$(echo $role | cut -d\" -f4)
