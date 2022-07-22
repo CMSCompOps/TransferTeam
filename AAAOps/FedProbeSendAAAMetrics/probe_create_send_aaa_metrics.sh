@@ -36,6 +36,20 @@ if [ $? -ne 0 ] ; then
 fi
 [ -d $(dirname $THELOG) ] || mkdir -p $(dirname $THELOG)
 
+# Server Version List
+(
+     echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
+     echo "Subject: XRootD Version Role List"
+     echo "Content-Type: text/html"
+     echo "<html>"
+     echo "<table>"
+     echo "<tr bgcolor='yellow'><td>Site</td><td>Endpoint</td><td>Version</td><td>Role</td></td>"
+     grep "\"sites\"\|\"endpoints\"\|version\|role" $FED_json | while read site ; do read endpoints ; read version ; read role ; site=$(echo $site | cut -d\" -f4) ; endpoints=$(echo $endpoints | cut -d\" -f4) ; version=$(echo $version | cut -d\" -f4) ; [ "x$version" == "xtimeout" ] && version=$(echo $(xrdfs $endpoints query config version | grep ^v)) ; role=$(echo $role | cut -d\" -f4) ; [ "x$role" == "xtimeout" ] && role=$(echo $(xrdfs $endpoints query config role)) ; echo "<tr bgcolor='yellow'><td>$site </td><td> $endpoints </td><td> $version </td><td> $role </td></td>" ; done
+     echo "</table>"
+     echo "</html>"
+) | /usr/sbin/sendmail -t
+
+
 rm -f $THEPATH/fed.json
 python3 $THEPATH/aaa_federation.py  --amq $THEPATH/credentials.json > $THEPATH/aaa_federation.log 2>&1
 status=$?
