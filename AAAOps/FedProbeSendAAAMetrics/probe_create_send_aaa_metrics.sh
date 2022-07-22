@@ -54,7 +54,7 @@ fi
            site=$(echo $site | cut -d\" -f4)
            endpoints=$(echo $endpoints | cut -d\" -f4)
            version=$(echo $version | cut -d\" -f4)
-           role=$(echo $role | cut -d\" -f4
+           role=$(echo $role | cut -d\" -f4)
            # port 0 is an invalid port
            port=$(echo $endpoints | cut -d: -f2) ; [ $port -eq 0 ] && continue
            [ "x$version" == "xtimeout" ] && version=$(echo $(perl -e "alarm $timeout ; exec @ARGV" xrdfs $endpoints query config version | grep "^v\|Alarm clock"))
