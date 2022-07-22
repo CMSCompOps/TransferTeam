@@ -39,13 +39,30 @@ fi
 # Server Version List
 #if [ ] ; then
 (
+     timeout=30
      echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
      echo "Subject: XRootD Version Role List"
      echo "Content-Type: text/html"
      echo "<html>"
      echo "<table>"
      echo "<tr bgcolor='yellow'><td>Site</td><td>Endpoint</td><td>Version</td><td>Role</td></td>"
-     grep "\"sites\"\|\"endpoints\"\|version\|role" $FED_json | while read site ; do read endpoints ; read version ; read role ; site=$(echo $site | cut -d\" -f4) ; endpoints=$(echo $endpoints | cut -d\" -f4) ; version=$(echo $version | cut -d\" -f4) ; port=$(echo $endpoints | cut -d: -f2) ; [ $port -eq 0 ] && continue ; [ "x$version" == "xtimeout" ] && version=$(echo $(xrdfs $endpoints query config version | grep ^v)) ; role=$(echo $role | cut -d\" -f4) ; [ "x$role" == "xtimeout" ] && role=$(echo $(xrdfs $endpoints query config role)) ; echo "<tr bgcolor='yellow'><td>$site </td><td> $endpoints </td><td> $version </td><td> $role </td></td>" ; done
+     grep "\"sites\"\|\"endpoints\"\|version\|role" $FED_json | \
+     while read site ; do
+           read endpoints
+           read version
+           read role
+           site=$(echo $site | cut -d\" -f4)
+           endpoints=$(echo $endpoints | cut -d\" -f4)
+           version=$(echo $version | cut -d\" -f4)
+           role=$(echo $role | cut -d\" -f4
+           # port 0 is an invalid port
+           port=$(echo $endpoints | cut -d: -f2) ; [ $port -eq 0 ] && continue
+           [ "x$version" == "xtimeout" ] && version=$(echo $(perl -e "alarm $timeout ; exec @ARGV" xrdfs $endpoints query config version | grep "^v\|Alarm clock"))
+           [ "$version" == "Alarm clock" ] && version="$timeout(sec)TO"
+           [ "x$role" == "xtimeout" ] && role=$(echo $(perl -e "alarm $timeout ; exec @ARGV" xrdfs $endpoints query config role))
+           [ "$role" == "Alarm clock" ] && role="$timeout(sec)TO"
+           echo "<tr bgcolor='yellow'><td>$site </td><td> $endpoints </td><td> $version </td><td> $role </td></td>"
+     done
      echo "</table>"
      echo "</html>"
 ) | /usr/sbin/sendmail -t
