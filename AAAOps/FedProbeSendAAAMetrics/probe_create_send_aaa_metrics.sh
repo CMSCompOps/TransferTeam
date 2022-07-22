@@ -37,6 +37,7 @@ fi
 [ -d $(dirname $THELOG) ] || mkdir -p $(dirname $THELOG)
 
 # Server Version List
+if [ ] ; then
 (
      echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
      echo "Subject: XRootD Version Role List"
@@ -48,7 +49,7 @@ fi
      echo "</table>"
      echo "</html>"
 ) | /usr/sbin/sendmail -t
-
+fi # if [ ] ; then
 
 rm -f $THEPATH/fed.json
 python3 $THEPATH/aaa_federation.py  --amq $THEPATH/credentials.json > $THEPATH/aaa_federation.log 2>&1
