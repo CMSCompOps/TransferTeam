@@ -61,7 +61,9 @@ fi
            [ "$version" == "Alarm clock" ] && version="$timeout(sec)TO"
            [ "x$role" == "xtimeout" ] && role=$(echo $(perl -e "alarm $timeout ; exec @ARGV" xrdfs $endpoints query config role))
            [ "$role" == "Alarm clock" ] && role="$timeout(sec)TO"
-           echo "<tr bgcolor='yellow'><td>$site </td><td> $endpoints </td><td> $version </td><td> $role </td></td>"
+           bgcolor="yellow"
+           [ "x$version" == "xv5.4.3" ] || bgcolor="red"
+           echo "<tr bgcolor='$bgcolor'><td>$site </td><td> $endpoints </td><td> $version </td><td> $role </td></td>"
      done
      echo "</table>"
      echo "</html>"
