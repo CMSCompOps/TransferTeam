@@ -39,3 +39,15 @@ git clone https://github.com/dmwm/CMSMonitoring.git
 crontab -l > crontab
 echo '14,29,44,59 * * * * /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/probe_create_send_aaa_metrics.sh > /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/logs/probe_create_send_aaa_metrics.log 2>&1' >> crontab
 # Add the cron to the gitlab
+
+[5] Development
+On cmsio3 as bockjoo
+cd /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/
+git add create_fedmaps.py
+git status
+git commit -m "create_fedmaps.py is updated"
+git push origin master
+
+On vocms036.cern.ch as root
+cd /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/
+git pull origin master
