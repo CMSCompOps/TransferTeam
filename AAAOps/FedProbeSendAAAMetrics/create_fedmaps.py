@@ -791,7 +791,7 @@ def getXrootdServers () :
     #return xrdServers
     count = 0 
     for line in xrdmapc_output_prod.splitlines() :
-        #print("Line{}: {}".format(count, line.split()))
+        print("Line{}: {}".format(count, line.split()))
         if type (line) is not str : line = line.decode()
         entries=line.split()
         #print ( entries )
@@ -808,9 +808,10 @@ def getXrootdServers () :
            if host in HostSitenames :
               site=HostSitenames[host]
            else :
+              if 'localhost' in host : continue # give up
               (site,domain) = findSitename(host)
               updateHostSitename ( host, site )
-           #print ( host, site ) 
+           #print ( " host and site ",host, site ) 
            #print ( "DEBUG xrdServers[site]['endpoints'] ", xrdServers[site]['endpoints'] )
            #if '[::ffff:144.16.111.9]:11001' in endpoint :
            #   site = 'T2_IN_TIFR'
@@ -829,6 +830,14 @@ def getXrootdServers () :
            #if '[::ffff:144.16.111.9]:11001' in endpoint :
            #    xrdServers[site]['endpoints'].append('se01.indiacms.res.in:11001')
            #else :
+           #if 'localhost' in site:
+           #   print (" site has localhost")
+           #   xrdServers[site]={} #'endpoints':'','hosts':'','flavors':'','federation':''}
+           #   xrdServers[site]['endpoints']=['localhost']
+           #   xrdServers[site]['hosts']=[host]
+           #   xrdServers[site]['flavors']=['XROOTD']
+           #   xrdServers[site]['federation']=['prod']
+           #else:
            if not endpoint in xrdServers[site]['endpoints'] :
               xrdServers[site]['endpoints'].append ( endpoint )
               xrdServers[site]['hosts'].append ( host  )
@@ -837,6 +846,7 @@ def getXrootdServers () :
            #print("Line{}: {}".format(count, line.split()), ' idx = ',idx, endpoint,site,xrdServers[site]['federation'])
 
         #count += 1
+    #print ("Returning xrdServers")
     return xrdServers
 
 def getXrootdServersFromFile () :
@@ -1059,6 +1069,7 @@ def updateXrdInfo (thesite) :
        (err_info,xrootd_role,dump_info) = xrd_info(endpoint,"role")
        #xrdInfo['xrootd_role'][xrd_idxes[idx]] = xrootd_role
        sites[thesite]['xrootd_role'][xrd_idxes[idx]] = xrootd_role
+       #print ("DEBUG updateXrdInfo ",thesite, sites[thesite]['endpoints'], " xrootd_role ",xrootd_role, " xrootd_version ",xrootd_version)
        if not 'timeout' in xrootd_role and not 'FATAL' in xrootd_role :
           if not 'timeout' in xrootd_version and not 'FATAL' in xrootd_version :
            updatexrdVersions ( endpoint, xrootd_role, xrootd_version )
