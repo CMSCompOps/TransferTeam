@@ -90,7 +90,7 @@ def check_ping(hostname):
 def prepare_dictionary(servicename,redirector):
     is_up = check_ping(redirector[:redirector.find(':')])
     dic={'service':servicename, 'host': redirector[:redirector.find(':')]}
-    print(servicename," is up ",is_up)
+    print(servicename," redirector= ",redirector," is up ",is_up)
     if is_up == False:
         dic['version'] = 'unavailable'
         dic['status'] = 'unavailable'
@@ -124,6 +124,10 @@ def prepare_dictionary(servicename,redirector):
         #    dic['role'] = role
 
     return dic
+def xrdmapc_test(redirector):
+    (errtext,out,err,elapsed) = run_xrd_commands("xrdmapc", ["--list","all", redirector], 180)
+    #print ("DEBUG xrd_test ",redirector," errtext ",errtext, " err ", err )
+    return (errtext,err,elapsed)
 def xrdcp_test(redirector,file):
     (errtext,out,err,elapsed) = run_xrd_commands("xrdcp",
                                                  ["-d","1",
@@ -285,7 +289,13 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
     c = c.replace("\n", "")
     c = c.replace("\r", "")
     dicci ['Comment'] = c
+
     print ("DEBUG rdir ", redirector," dicci['Comment'] ",dicci['Comment'])
+
+    # xrdmapc test 08SEP2022
+    (err_xrdmapc,dump_xrdmapc,elapsed_xrdmapc) = xrdmapc_test(redirector)
+    print ("DEBUG rdir ", redirector, " xrdmapc err ",err_xrdmapc, " dump ",dump_xrdmapc, " elapsed ",elapsed_xrdmapc)
+
     with open(html_dir  + probes_json, 'a') as f:
         json.dump(dicci, f)
         f.write('\n')
