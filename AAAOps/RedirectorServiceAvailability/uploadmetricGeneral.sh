@@ -1,6 +1,8 @@
 #!/bin/bash
 
-notifytowhom=cms-comp-ops-transfer-team@cernNOSPAMPLEASE.ch,bockjoo@gmailNOSPAMPLEASE.com
+#notifytowhom=cms-comp-ops-transfer-team@cernNOSPAMPLEASE.ch,bockjoo@gmailNOSPAMPLEASE.com
+notifytowhom=bockjoo__AT__gmail__dot__com
+notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#')
 GRAFANA_PAGE="https://monit-grafana.cern.ch/d/serviceAvailability/overview-service-availability?orgId=11&var-category=All&from=now-24h&to=now-15m%2Fm"
 
 DATE=$(date)
@@ -23,6 +25,26 @@ date
 echo INFO executing XRDFED-kibana-probe_JSON_General.py 
 python3 XRDFED-kibana-probe_JSON_General.py > $logs/XRDFED_probe_json.log 2>&1
 status=$?
+if [ $status -ne 0 ] ; then
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 XRDFED-kibana-probe_JSON_General.py\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+fi
+rdirs=$(grep redirector $logs/XRDFED_probe_json.log | awk '{print $3}')
+rdirs_degraded=
+for r in $rdirs ; do
+    grep redirector $logs/XRDFED_probe_json.log | grep "$r" | grep -q Available # Degraded # Available
+    if [ $? -ne 0 ] ; then
+       #grep redirector $logs/XRDFED_probe_json.log | grep "$r" | grep -q Degraded # Available # Degraded
+       #if [ $? -eq 0 ] ; then
+          rdir_degraded=$(grep redirector $logs/XRDFED_probe_json.log | grep "$r" | awk '{print $(NF-1)"+"$NF}')
+          rdirs_degraded="$rdirs_degraded ${r}+$rdir_degraded"
+       #else
+       #3fi
+    fi
+done
+if [ "x$rdirs_degraded" != "x" ] ; then
+   printf "$(/bin/hostname -s) $(basename $0) We have one or more degraded redirectors\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+fi
+
 echo INFO $logs/XRDFED_probe_json.log
 cat $logs/XRDFED_probe_json.log
 date
