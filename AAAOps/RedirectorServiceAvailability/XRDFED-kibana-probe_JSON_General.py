@@ -285,6 +285,7 @@ def test_redirector(dicci, servicename, redirector, file_below=None, file_above=
     c = c.replace("\n", "")
     c = c.replace("\r", "")
     dicci ['Comment'] = c
+    print ("DEBUG rdir ", redirector," dicci['Comment'] ",dicci['Comment'])
     with open(html_dir  + probes_json, 'a') as f:
         json.dump(dicci, f)
         f.write('\n')
