@@ -45,6 +45,13 @@ if [ "x$rdirs_degraded" != "x" ] ; then
    printf "$(/bin/hostname -s) $(basename $0) We have one or more degraded redirectors\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdcp -d 1 -f -DIReadCacheSize 0 -DIRedirCntTimeout 180 -DIConnectTimeout 30 -DITransactionTimeout 60 -DIRequestTimeout 60 root://rdir//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root /dev/null\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
 fi
 
+# check the xrdmapc Operation expired error
+for r in $rdirs ; do
+    grep xrdmapc $logs/XRDFED_probe_json.log | grep "$r" | grep -q "\[ERROR\] Operation expired"
+    if [ $? -eq 0 ] ; then
+       printf "$(/bin/hostname -s) $(basename $0) We have the Operation expired with $r\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdmapc --list all $r\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+    fi
+done
 echo INFO $logs/XRDFED_probe_json.log
 cat $logs/XRDFED_probe_json.log
 date
