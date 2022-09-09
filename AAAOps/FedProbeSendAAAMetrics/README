@@ -1,3 +1,8 @@
+[0] How to Check Things
+   1 To check the hostname the ip from an xrdmapc belongs to, for example, run
+
+xrdfs [2001:e10:4000:122::105]:11001 query config sitename
+
 [1] Essential Files and Directories
 create_fedmaps.py
 aaa_federation.py
