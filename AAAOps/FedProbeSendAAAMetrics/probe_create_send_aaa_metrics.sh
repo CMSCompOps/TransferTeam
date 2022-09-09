@@ -37,7 +37,7 @@ fi
 [ -d $(dirname $THELOG) ] || mkdir -p $(dirname $THELOG)
 
 # Server Version List
-#if [ ] ; then
+if [ ] ; then
 (
 is_int() {
   if [ $1 ] ; then
@@ -100,7 +100,7 @@ is_int() {
      echo "</table>"
      echo "</html>"
 ) | /usr/sbin/sendmail -t
-#fi # if [ ] ; then
+fi # if [ ] ; then
 
 rm -f $THEPATH/fed.json
 python3 $THEPATH/aaa_federation.py  --amq $THEPATH/credentials.json > $THEPATH/aaa_federation.log 2>&1
