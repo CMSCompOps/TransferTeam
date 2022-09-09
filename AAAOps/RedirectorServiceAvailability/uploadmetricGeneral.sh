@@ -28,6 +28,8 @@ status=$?
 if [ $status -ne 0 ] ; then
 	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 XRDFED-kibana-probe_JSON_General.py\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
 fi
+
+if [ ] ; then
 rdirs=$(grep redirector $logs/XRDFED_probe_json.log | awk '{print $3}')
 rdirs_degraded=
 for r in $rdirs ; do
@@ -43,6 +45,7 @@ for r in $rdirs ; do
 done
 if [ "x$rdirs_degraded" != "x" ] ; then
    printf "$(/bin/hostname -s) $(basename $0) We have one or more degraded redirectors\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdcp -d 1 -f -DIReadCacheSize 0 -DIRedirCntTimeout 180 -DIConnectTimeout 30 -DITransactionTimeout 60 -DIRequestTimeout 60 root://rdir//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root /dev/null\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+fi
 fi
 
 # check the xrdmapc Operation expired error
