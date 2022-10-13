@@ -791,7 +791,7 @@ def getXrootdServers () :
     #return xrdServers
     count = 0 
     for line in xrdmapc_output_prod.splitlines() :
-        print("Line{}: {}".format(count, line.split()))
+        #print("Line{}: {}".format(count, line.split()))
         if type (line) is not str : line = line.decode()
         entries=line.split()
         #print ( entries )
@@ -927,10 +927,10 @@ def getTransitionalXrootds () :
         xrdServers[site]['federation'] = []
         xrdServers[site]['flavors'] = []
     #return xrdServers
-    #count = 0 
+    count = 0 
     for line in xrdmapc_output_tran.splitlines() :
         if type (line) is not str : line = line.decode()
-        #print("Line{}: {}".format(count, line.split()))
+         #print("Line{}: {}".format(count, line.split()))
         entries=line.split()
         #print ( entries 
         idx = 0
@@ -961,7 +961,7 @@ def getTransitionalXrootds () :
               xrdServers[site]['federation'].append ( 'trans' )
               #print (' endpoint ',endpoint )
  
-        #count += 1
+        count += 1
     return xrdServers
 
 def getXrootdsFromTransFile () :
@@ -1220,6 +1220,7 @@ def getAllSiteRedirectors () :
       #xrdTranServers = getXrootdsFromTransFile()
       xrdTranServers = getTransitionalXrootds()
       #print ( 'DEBUG xrdTranServers ', xrdTranServers)
+      print ( 'DEBUG Doing sites')
       for site in sites.keys():
         #print ( 'DEBUG Doing site g ',site )
         if 'T0_CH_CERN' in site :
@@ -1308,6 +1309,7 @@ def getAllSiteRedirectors () :
 
               #print ( 'Doing site x ',site, sites[site])
         updateContactInfo()
+      print ("DEBUG return sites for getAllSiteRedirectors")
       return sites
    except Exception as e :
       err={}
