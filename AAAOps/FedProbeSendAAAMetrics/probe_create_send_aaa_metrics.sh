@@ -134,7 +134,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           result=SAM3OK ; [ $status -eq 0 ] || result=SAM3FAIL
           sam3result="$sam3result\n$thesite($result)\n"
       done
-      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
+      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
       #exit 1
    fi
    echo "Sites subscribed to the Production Federation: " $nprod
