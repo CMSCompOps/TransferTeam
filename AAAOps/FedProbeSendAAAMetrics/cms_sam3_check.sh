@@ -123,7 +123,7 @@ sort_search_json=cms_sam3_check_sort_search.json
 sort_search_after_json=cms_sam3_check_sort_search_after.json
 search_details=es.q.match_sitemon_raw_metric_search_details.json
 sort_search_id_json=es.q.match_sitemon_raw_metric_sort_search_id.json
-perl -n -e 'print if /^####### BEGIN token_txt/ .. /^####### ENDIN token_txt/' < $0 | grep -v "token_txt" > $inputs/$token_txt
+[ -f $inputs/$token_txt ] || perl -n -e 'print if /^####### BEGIN token_txt/ .. /^####### ENDIN token_txt/' < $0 | grep -v "token_txt" > $inputs/$token_txt
 perl -n -e 'print if /^####### BEGIN sort_search_json/ .. /^####### ENDIN sort_search_json/' < $0 | grep -v "sort_search_json" > $inputs/${sort_search_json}.in
 perl -n -e 'print if /^####### BEGIN sort_search_after_json/ .. /^####### ENDIN sort_search_after_json/' < $0 | grep -v "sort_search_after_json" > $inputs/${sort_search_after_json}.in
 
