@@ -510,7 +510,7 @@ search_type": "query_then_fetch", "index": ["monit_prod_sam3_enr_metric*"], "ign
 {"query": {"bool": {"filter": [{"range": {"metadata.timestamp": {"gte": "@@gte@@", "lte": "@@lte@@", "format": "epoch_millis"}}}, {"query_string": {"analyze_wildcard": true, "query": "data.dst_experiment_site:@@thesite@@"}}]}}, "from": 0, "size": @@size@@, "search_after": [@@search_after@@], "sort": [{"@@unique_f@@": "desc"},{"@@tie_breakter_id@@": "asc"}]}
 ####### ENDIN sort_search_after_json
 ####### BEGIN token_txt
-eyJrIjoieEZVYUtzcGkyVnVSaUlUOTRnd3RKWEtPdFRYUDdXQnQiLCJuIjoiY21zLWJvb2Nram9vMyIsImlkIjoxMX0=
+
 ####### ENDIN token_txt
 ####### BEGIN Functions 12345
 # Functions
