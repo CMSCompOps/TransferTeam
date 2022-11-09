@@ -371,7 +371,7 @@ for sf in $(printf "$output\n" | grep "\"service_flavour\"" | sort -u | cut -d\"
 done # for sf in $(printf "$output\n" | grep "\"service_flavour\"" | sort -u | cut -d\" -f4) ; do
 if [ "x$error_message" != "x" ] ; then
    #printf "$error_message\n"
-   echo $thesite NOTOK
+   #echo $thesite NOTOK
    exit 1
 fi
 exit 0
