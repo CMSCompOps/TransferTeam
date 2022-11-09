@@ -45,6 +45,7 @@ theprofile=CMS_CRITICAL_FULL
 #theprofile=CMS_CRITICAL
 #theprofile=CMS_FULL
 DBID=9673
+DBID_CMSSST=9475
 EVERY_X_HOUR=1
 #unique_f=data.metric_name # data.CRAB_JobLogURL
 ##tie_breaker_id=metadata.kafka_timestamp # data.CRAB_TaskCreationDate
@@ -123,9 +124,14 @@ sort_search_json=cms_sam3_check_sort_search.json
 sort_search_after_json=cms_sam3_check_sort_search_after.json
 search_details=es.q.match_sitemon_raw_metric_search_details.json
 sort_search_id_json=es.q.match_sitemon_raw_metric_sort_search_id.json
+monit_prod_cmssst_search_json=monit_prod_cmssst_search.json
+
 [ -f $inputs/$token_txt ] || perl -n -e 'print if /^####### BEGIN token_txt/ .. /^####### ENDIN token_txt/' < $0 | grep -v "token_txt" > $inputs/$token_txt
 perl -n -e 'print if /^####### BEGIN sort_search_json/ .. /^####### ENDIN sort_search_json/' < $0 | grep -v "sort_search_json" > $inputs/${sort_search_json}.in
 perl -n -e 'print if /^####### BEGIN sort_search_after_json/ .. /^####### ENDIN sort_search_after_json/' < $0 | grep -v "sort_search_after_json" > $inputs/${sort_search_after_json}.in
+perl -n -e 'print if /^####### BEGIN monit_prod_cmssst_search_json/ .. /^####### ENDIN monit_prod_cmssst_search_json/' < $0 | grep -v "monit_prod_cmssst_search_json" > $inputs/${monit_prod_cmssst_search_json}.in
+startTIS=$(expr $(expr $(date +%s ) / 86400 - 5 ) \* 86400)
+limitTIS=$(expr $(expr $(date +%s) / 900 ) \* 900 + 450)
 
 GTE=$(echo $gte | sed 's#/# #' | awk '{print $1}')
 LTE=$(echo $lte | sed 's#/# #' | awk '{print $1}')
@@ -141,6 +147,11 @@ if [ $# -lt 1 ] ; then
 fi
 
 [ $# -gt 0 ] && thesite="$1"
+
+sed -e "s#@@gte@@#$gte#" -e "s#@@lte@@#$lte#" -e "s#@@thesite@@#$thesite#" -e "s#@@profile@@#$theprofile#" -e "s#@@size@@#$size#" -e "s#@@unique_f@@#$unique_f#" -e "s#@@tie_breakter_id@@#$tie_breaker_id#" -e "s#@@startTIS@@#$startTIS#" -e "s#@@limitTIS@@#$limitTIS#" $inputs/${monit_prod_cmssst_search_json}.in > $inputs/${monit_prod_cmssst_search_json}
+curl -H "Content-Type: application/x-ndjson" -H "Authorization: Bearer $(cat $inputs/$token_txt)" -XGET https://monit-grafana.cern.ch/api/datasources/proxy/${DBID_CMSSST}/_msearch --data-binary "@$inputs/${monit_prod_cmssst_search_json}" 2>/dev/null 1> $inputs/$(basename $0 | sed "s#\.sh##")_monit_prod_cmssst_search.out
+#echo INFO check $inputs/$(basename $0 | sed "s#\.sh##")_monit_prod_cmssst_search.out
+#exit 0
  
 error_message=""
 #error_message_html=""
@@ -501,6 +512,11 @@ rm -f $inputs/${sort_search_after_json}_${now_is}
 rm -f $inputs/$(basename $0 | sed "s#\.sh##").*.out_${now_is}
 
 exit 0
+####### BEGIN monit_prod_cmssst_search_json
+{"search_type":"query_then_fetch","index":["monit_prod_cmssst_*"]}
+{"query":{"bool":{"must":[{"match_phrase":{"metadata.type":"ssbmetric"}},{"match_phrase":{"metadata.type_prefix":"raw"}},{"match_phrase":{"metadata.path":"sts15min"}}],"filter":{"range":{"metadata.timestamp":{"gte":@@startTIS@@,"lt":@@limitTIS@@,"format":"epoch_second"}}}}},"_source":{"includes":["metadata.timestamp","metadata.kafka_timestamp","data.name","data.status"]},"size":4096,"sort":[{"metadata.timestamp":"desc"},{"metadata.kafka_timestamp":"desc"}]}
+####### ENDIN monit_prod_cmssst_search_json
+
 ####### BEGIN sort_search_json
 {"search_type": "query_then_fetch", "index": ["monit_prod_sam3_enr_metric*"], "ignore_unavailable": true}
 {"query": {"bool": {"filter": [{"range": {"metadata.timestamp": {"gte": "now-4h/h", "lte": "now", "format": "epoch_millis"}}}, {"query_string": {"analyze_wildcard": true, "query": "data.dst_experiment_site:@@thesite@@"}}]}}, "from": 0, "size": @@size@@, "sort": [{"@@unique_f@@": "desc"},{"@@tie_breakter_id@@": "asc"}]}
