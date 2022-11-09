@@ -123,9 +123,9 @@ sort_search_json=cms_sam3_check_sort_search.json
 sort_search_after_json=cms_sam3_check_sort_search_after.json
 search_details=es.q.match_sitemon_raw_metric_search_details.json
 sort_search_id_json=es.q.match_sitemon_raw_metric_sort_search_id.json
-perl -n -e 'print if /^####### BEGIN token_txt/ .. /^####### ENDIN token_txt/' < $0 | grep -v "token_txt" > $token_txt
-perl -n -e 'print if /^####### BEGIN sort_search_json/ .. /^####### ENDIN sort_search_json/' < $0 | grep -v "sort_search_json" > ${sort_search_json}.in
-perl -n -e 'print if /^####### BEGIN sort_search_after_json/ .. /^####### ENDIN sort_search_after_json/' < $0 | grep -v "sort_search_after_json" > ${sort_search_after_json}.in
+perl -n -e 'print if /^####### BEGIN token_txt/ .. /^####### ENDIN token_txt/' < $0 | grep -v "token_txt" > $inputs/$token_txt
+perl -n -e 'print if /^####### BEGIN sort_search_json/ .. /^####### ENDIN sort_search_json/' < $0 | grep -v "sort_search_json" > $inputs/${sort_search_json}.in
+perl -n -e 'print if /^####### BEGIN sort_search_after_json/ .. /^####### ENDIN sort_search_after_json/' < $0 | grep -v "sort_search_after_json" > $inputs/${sort_search_after_json}.in
 
 GTE=$(echo $gte | sed 's#/# #' | awk '{print $1}')
 LTE=$(echo $lte | sed 's#/# #' | awk '{print $1}')
@@ -168,11 +168,11 @@ while : ; do
    i=$(expr $i + 1)
    if [ $i -eq 1 ] ; then
       sed -e "s#@@gte@@#$gte#" -e "s#@@lte@@#$lte#" -e "s#@@thesite@@#$thesite#" -e "s#@@profile@@#$theprofile#" -e "s#@@size@@#$size#" -e "s#@@unique_f@@#$unique_f#" -e "s#@@tie_breakter_id@@#$tie_breaker_id#" $inputs/${sort_search_json}.in > $inputs/${sort_search_json}
-      curl -H "Content-Type: application/x-ndjson" -H "Authorization: Bearer $(cat $token_txt)" -XGET https://monit-grafana.cern.ch/api/datasources/proxy/${DBID}/_msearch --data-binary "@$inputs/${sort_search_json}" 2>/dev/null 1> $inputs/$(basename $0 | sed "s#\.sh##").$i.out
+      curl -H "Content-Type: application/x-ndjson" -H "Authorization: Bearer $(cat $inputs/$token_txt)" -XGET https://monit-grafana.cern.ch/api/datasources/proxy/${DBID}/_msearch --data-binary "@$inputs/${sort_search_json}" 2>/dev/null 1> $inputs/$(basename $0 | sed "s#\.sh##").$i.out
       rm -f $inputs/${sort_search_json}
    else
       sed -e "s#@@gte@@#$gte#" -e "s#@@lte@@#$lte#" -e "s#@@thesite@@#$thesite#" -e "s#@@profile@@#$theprofile#" -e "s#@@size@@#$size#" -e "s|@@search_after@@|$search_after|" -e "s#@@unique_f@@#$unique_f#" -e "s#@@tie_breakter_id@@#$tie_breaker_id#" $inputs/${sort_search_after_json}.in > $inputs/${sort_search_after_json}
-      curl -H "Content-Type: application/x-ndjson" -H "Authorization: Bearer $(cat $token_txt)" -XGET https://monit-grafana.cern.ch/api/datasources/proxy/${DBID}/_msearch --data-binary "@$inputs/${sort_search_after_json}" 2>/dev/null 1> $inputs/$(basename $0 | sed "s#\.sh##").$i.out
+      curl -H "Content-Type: application/x-ndjson" -H "Authorization: Bearer $(cat $inputs/$token_txt)" -XGET https://monit-grafana.cern.ch/api/datasources/proxy/${DBID}/_msearch --data-binary "@$inputs/${sort_search_after_json}" 2>/dev/null 1> $inputs/$(basename $0 | sed "s#\.sh##").$i.out
       rm -f $inputs/${sort_search_after_json}
    fi
    #echo DEBUG $inputs/$(basename $0 | sed "s#\.sh##").$i.out_${now_is}
