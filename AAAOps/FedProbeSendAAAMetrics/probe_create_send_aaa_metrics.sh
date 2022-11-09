@@ -127,7 +127,14 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       if [ -f $THEPATH/subscribed_sites_$nprod_exp.txt ] ; then
          thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2)
       fi
-      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$thediff\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
+      sam3result=
+      for thesite in $thediff ; do
+          $THEPATH/cms_sam3_check.sh $thesite > $THEPATH/out/cms_sam3_check.${thesite}.txt 2>&1
+          status=$?
+          result=SAM3OK ; [ $status -eq 0 ] || result=SAM3FAIL
+          sam3result="$sam3result\n$thesite($result)\n"
+      done
+      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
       #exit 1
    fi
    echo "Sites subscribed to the Production Federation: " $nprod
