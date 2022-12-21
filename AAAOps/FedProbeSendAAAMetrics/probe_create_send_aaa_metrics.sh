@@ -110,7 +110,8 @@ xrdmapc_error=$(grep \\[ $THEPATH/out/xrdmapc_prod_1.txt | grep -v "invalid addr
 xrdmapc_port0_error=$(grep ":0$\|:0 " $THEPATH/out/xrdmapc_prod_1.txt | awk '{if ($2 == "Man") print $3 ; else print $2}' | sed 's#:0$##g' | while read h ; do grep -v $h:0 $THEPATH/out/xrdmapc_prod_1.txt | grep -q $h  $THEPATH/out/xrdmapc_prod_1.txt ; [ $? -eq 0 ] || echo ${h}:0 ; done)
 if [ $status -eq 0 ] ; then
       if [ $(date +%M ) -lt 15 ] ; then
-         printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
+         :
+         #printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
       fi
 else
       printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
@@ -135,7 +136,11 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           site_status=$(python3 -m json.tool $THEPATH/cms_sam3_check_monit_prod_cmssst_search.out | grep -A 2 $thesite | grep status | cut -d\" -f4 | head -1)
           sam3result="$sam3result\n$thesite($site_status $result)\n"
       done
-      printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
+      if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
+         echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
+      else
+         printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
+      fi
       #exit 1
    fi
    echo "Sites subscribed to the Production Federation: " $nprod
