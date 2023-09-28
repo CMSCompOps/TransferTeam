@@ -811,6 +811,7 @@ def getXrootdServers () :
               if 'localhost' in host : continue # give up
               (site,domain) = findSitename(host)
               updateHostSitename ( host, site )
+           if site not in xrdServers : continue # skip if site not in vomsfeed
            #print ( " host and site ",host, site ) 
            #print ( "DEBUG xrdServers[site]['endpoints'] ", xrdServers[site]['endpoints'] )
            #if '[::ffff:144.16.111.9]:11001' in endpoint :
