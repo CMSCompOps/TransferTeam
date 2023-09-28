@@ -56,3 +56,4 @@ git push origin master
 On vocms036.cern.ch as root
 cd /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/
 git pull origin master
+# if merge conflicts, git checkout --theirs .
