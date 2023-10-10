@@ -1,5 +1,10 @@
-import requests, json, os
-def siteLifeStatus (site='T2_US_Florida', dbid=9475, gte="now-2h/h",lt="now") :
+#!/usr/bin/env python3
+import sys
+import os
+import requests
+import json
+
+def siteLifeStatus (site='T2_US_Florida', dbid=9475, gte="now-6h/h",lt="now") :
     '''
     gets a site life status during last 2 hours
     '''
@@ -67,11 +72,22 @@ def siteLifeStatus (site='T2_US_Florida', dbid=9475, gte="now-2h/h",lt="now") :
     
 
     #print ( 'Number of Responses ', len ( result["responses"] ) )
-    response = result["responses"] 
-    #print ( 'Total hits ',r['hits']['total']['value'] )
+    response = result["responses"][0] 
+    #print ( 'Total hits ',response['hits']['total']['value'] )
     siteStatus={}
-    for hit in r['hits']['hits'] :
+    #print ( type ( response['hits']['hits'] ) )
+    for hit in response['hits']['hits'] :
         #print ("Site ",hit['_source']['data']['name'], " Status ",hit['_source']['data']['status'])
         siteStatus[hit['_source']['data']['name']] = hit['_source']['data']['status']
     return siteStatus[site]
+
+if __name__ == "__main__":
+   if len(sys.argv) > 1 :
+      site = sys.argv[1]
+      status = siteLifeStatus(site=site)
+      print (status)
+      sys.exit(0)
+   status = siteLifeStatus()
+   print (status)
+
 
