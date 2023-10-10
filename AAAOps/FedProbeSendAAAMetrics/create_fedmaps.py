@@ -42,8 +42,8 @@ import numpy as np
 #              output      : {"prod" : [...], "trans" : [...], "nowhere" : [...]}
 
 THEPATH='/opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/'
-VOFEED='http://dashb-cms-vo-feed.cern.ch/dashboard/request.py/cmssitemapbdii'
-#VOFEED='https://cmssst.web.cern.ch/cmssst/vofeed/vofeed.xml'
+#VOFEED='http://dashb-cms-vo-feed.cern.ch/dashboard/request.py/cmssitemapbdii'
+VOFEED='https://cmssst.web.cern.ch/cmssst/vofeed/vofeed.xml'
 LOCKFILE=THEPATH+'create_fedmaps.lock'
 timeout_sec = 10 * 60
 
@@ -782,7 +782,7 @@ def getXrootdServers () :
     #print ("DEBUG sites ",len ( sites ))
     xrdServers = {}
     for site in sites :
-        # print ( ' site ',site )
+        #print ( ' site ',site )
         xrdServers[site] = {}
         xrdServers[site]['endpoints'] = []
         xrdServers[site]['hosts'] = []
@@ -794,7 +794,7 @@ def getXrootdServers () :
         #print("Line{}: {}".format(count, line.split()))
         if type (line) is not str : line = line.decode()
         entries=line.split()
-        print ( entries )
+        #print ( entries )
         #if entries[0] == 'Srv' :
         idx = 0
         if entries[1] == 'Man' : idx = 2
@@ -811,9 +811,8 @@ def getXrootdServers () :
               if 'localhost' in host : continue # give up
               (site,domain) = findSitename(host)
               updateHostSitename ( host, site )
-           if site not in xrdServers : continue
-           #print ( " host and site ",host, site )
-           #print ( " xrdServers.keys() ", xrdServers.keys() ) 
+           if site not in xrdServers : continue # skip if site not in vomsfeed
+           #print ( " host and site ",host, site ) 
            #print ( "DEBUG xrdServers[site]['endpoints'] ", xrdServers[site]['endpoints'] )
            #if '[::ffff:144.16.111.9]:11001' in endpoint :
            #   site = 'T2_IN_TIFR'
