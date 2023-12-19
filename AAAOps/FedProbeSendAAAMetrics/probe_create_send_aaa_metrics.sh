@@ -8,10 +8,10 @@ GRAFANA_PAGE="https://monit-grafana.cern.ch/d/5njhdTrWk/site-subscription?from=n
 export X509_USER_PROXY=$HOME/.globus/slsprobe.proxy
 if [ -f $X509_USER_PROXY ] ; then
    if [ $(voms-proxy-info -timeleft 2>/dev/null) -lt 3600 ] ; then
-	printf "$(/bin/hostname -s) $(basename $0) We have a problem with $X509_USER_PROXY.\n$(voms-proxy-info -all | sed 's#%#%%#g')" | mail -s "ERROR $(/bin/hostname -s) $(basename $0) proxy issue 1" $notifytowhom
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem with $X509_USER_PROXY.\n$(voms-proxy-info -all | sed 's#%#%%#g')" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0) proxy issue 1" $notifytowhom
    fi
 else   
-   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $X509_USER_PROXY.\nIt does not exist" | mail -s "ERROR $(/bin/hostname -s) $(basename $0) proxy issue 2" $notifytowhom
+   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $X509_USER_PROXY.\nIt does not exist" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0) proxy issue 2" $notifytowhom
 fi
 notifytowhom=bockjoo__AT__gmail__dot__com
 export PYTHONPATH=$PYTHONPATH:$THEPATH/CMSMonitoring/src/python/
@@ -21,17 +21,17 @@ notifytowhom=$(echo $notifytowhom | sed 's#__AT__#@#' | sed 's#__dot__#\.#')
 
 python3 $THEPATH/create_fedmaps.py > $THEPATH/create_fedmaps.log 2>&1
 if [ $? -ne 0 ] ; then
-	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 $THEPATH/create_fedmaps.py\n\n$THEPATH/create_fedmaps.log:\n$(cat $THEPATH/create_fedmaps.log | sed 's#%#%%#g')\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 $THEPATH/create_fedmaps.py\n\n$THEPATH/create_fedmaps.log:\n$(cat $THEPATH/create_fedmaps.log | sed 's#%#%%#g')\n" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
 fi
 if [ ! -r $FED_json ]; then
 	echo "We have a problem creating JSON file.\n"
-	printf "$(/bin/hostname -s) $(basename $0) We have a problem creating JSON file.\n\nn$THEPATH/create_fedmaps.log:\n$(cat $THEPATH/create_fedmaps.log | sed 's#%#%%#g')\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem creating JSON file.\n\nn$THEPATH/create_fedmaps.log:\n$(cat $THEPATH/create_fedmaps.log | sed 's#%#%%#g')\n" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
 	exit 1
 fi
 
 cat $FED_json | python -m json.tool 2>/dev/null 1>/dev/null
 if [ $? -ne 0 ] ; then
-	printf "$(/bin/hostname -s) $(basename $0) We have a problem with $FED_json.\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $FED_json
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem with $FED_json.\n" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $FED_json
 	exit 1
 fi
 [ -d $(dirname $THELOG) ] || mkdir -p $(dirname $THELOG)
@@ -57,6 +57,7 @@ is_int() {
 }
      timeout=10
      echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
+     echo "Reply-To: noreply@cern.ch"
      echo "Subject: XRootD Version Role List"
      echo "Content-Type: text/html"
      echo "<html>"
@@ -111,7 +112,7 @@ xrdmapc_port0_error=$(grep ":0$\|:0 " $THEPATH/out/xrdmapc_prod_1.txt | awk '{if
 if [ $status -eq 0 ] ; then
       if [ $(date +%M ) -lt 15 ] ; then
          :
-         #printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
+         #printf "$(/bin/hostname -s) $(basename $0) AAA metrics sent.\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -r noreply@cern.ch -s "INFO $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
       fi
 else
       printf "$(/bin/hostname -s) $(basename $0) There might have been an issue or more with sending AAA metrics\nSee $KIBANA_PAGE\n$GRAFANA_PAGE\nxrdmapc errors: \n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom -a $THEPATH/logs/probe_create_send_aaa_metrics.log
@@ -139,10 +140,10 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 
       done
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
-      echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
+      echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
       #else
       #   echo $sam3result | grep -q "SAM3 OK" && \
-      #   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
+      #   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
       #fi
       #exit 1
    fi
