@@ -26,7 +26,7 @@ echo INFO executing XRDFED-kibana-probe_JSON_General.py
 python3 XRDFED-kibana-probe_JSON_General.py > $logs/XRDFED_probe_json.log 2>&1
 status=$?
 if [ $status -ne 0 ] ; then
-	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 XRDFED-kibana-probe_JSON_General.py\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+	printf "$(/bin/hostname -s) $(basename $0) We have a problem in running python3 XRDFED-kibana-probe_JSON_General.py\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\n" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
 fi
 
 if [ ] ; then
@@ -44,7 +44,7 @@ for r in $rdirs ; do
     fi
 done
 if [ "x$rdirs_degraded" != "x" ] ; then
-   printf "$(/bin/hostname -s) $(basename $0) We have one or more degraded redirectors\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdcp -d 1 -f -DIReadCacheSize 0 -DIRedirCntTimeout 180 -DIConnectTimeout 30 -DITransactionTimeout 60 -DIRequestTimeout 60 root://rdir//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root /dev/null\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+   printf "$(/bin/hostname -s) $(basename $0) We have one or more degraded redirectors\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdcp -d 1 -f -DIReadCacheSize 0 -DIRedirCntTimeout 180 -DIConnectTimeout 30 -DITransactionTimeout 60 -DIRequestTimeout 60 root://rdir//store/mc/SAM/GenericTTbar/AODSIM/CMSSW_9_2_6_91X_mcRun1_realistic_v2-v1/00000/A64CCCF2-5C76-E711-B359-0CC47A78A3F8.root /dev/null\n" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
 fi
 fi
 
@@ -52,7 +52,7 @@ fi
 for r in $rdirs ; do
     grep xrdmapc $logs/XRDFED_probe_json.log | grep "$r" | grep -q "\[ERROR\] Operation expired"
     if [ $? -eq 0 ] ; then
-       printf "$(/bin/hostname -s) $(basename $0) We have the Operation expired with $r\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdmapc --list all $r\n" | mail -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
+       printf "$(/bin/hostname -s) $(basename $0) We have the Operation expired with $r\n\n$logs/XRDFED_probe_json.log:\n$(cat $logs/XRDFED_probe_json.log | sed 's#%#%%#g')\nTry this:\nperl -e \"alarm 180 ; exec @ARGV\" xrdmapc --list all $r\n" | mail -r noreply@cern.ch -s "ERROR $(/bin/hostname -s) $(basename $0)" $notifytowhom
     fi
 done
 echo INFO $logs/XRDFED_probe_json.log
@@ -69,7 +69,7 @@ if [ -f $thelog ] ; then
    a=1
    [ $status -eq 0 ] && { grep -q -i "caught overall timeout" $logs/XRDFED_probe_json.log ; [ $(expr $a + $?) -eq $a ] && status=1 ; } ;
    if [ $status -ne 0 ] ; then
-      printf "$(/bin/hostname) $(basename $0)\n$(date)\n$(ls -al $thelog )\n$(cat $thelog)\n" | mail -s "$(/bin/hostname) $(basename $thelog)" $(echo $notifytowhom | sed 's#NOSPAMPLEASE##g')
+      printf "$(/bin/hostname) $(basename $0)\n$(date)\n$(ls -al $thelog )\n$(cat $thelog)\n" | mail -r noreply@cern.ch -s "$(/bin/hostname) $(basename $thelog)" $(echo $notifytowhom | sed 's#NOSPAMPLEASE##g')
    fi
 fi
 
