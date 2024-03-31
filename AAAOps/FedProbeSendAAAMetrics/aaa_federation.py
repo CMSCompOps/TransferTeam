@@ -2,7 +2,8 @@
 import re
 import sys
 
-__requires__ = 'stomp.py==4.1.21'
+#RHEL8 default is 7.0.0 __requires__ = 'stomp.py==4.1.21'
+__requires__ = 'stomp.py==7.0.0'
 
 from pkg_resources import load_entry_point
 import stomp
@@ -22,6 +23,12 @@ import hashlib
 from uuid import uuid4
 from urllib.request import urlopen
 import time
+#RHEL8
+# CMSMonitoring modules
+try:
+    from CMSMonitoring.StompAMQ7 import StompAMQ7
+except ImportError:
+    print("ERROR: Could not import StompAMQ7")
 
 print("stomp version", stomp.__version__)
 
@@ -118,6 +125,9 @@ def createFlattenJson(json_file):
                 f.write("%s\n" %my_json)
 
 if __name__ == "__main__":
+    #RHEL8
+    ts = int(time.time()) * 1000
+    #RHEL8
     optmgr = OptionParser()
     opts = optmgr.parser.parse_args()
     payload = parseFederationJson()
@@ -135,15 +145,22 @@ if __name__ == "__main__":
         producer = creds['producer']
         topic = creds['topic']
         hosts = [(host, port)]
-        if creds and StompAMQ:
-            amq = StompAMQ(username, password, producer, topic, key=None,
+        #RHEL8
+        doc_type = creds['type']
+        #RHEL8 if creds and StompAMQ:
+        #RHEL8     amq = StompAMQ(username, password, producer, topic, key=None,
+        #RHEL8                   cert=None, validation_schema=None, host_and_ports=[(host, port)])
+        if creds and StompAMQ7:
+            amq = StompAMQ7(username, password, producer, topic, key=None,
                            cert=None, validation_schema=None, host_and_ports=[(host, port)])
             eod = False
             wait_seconds = 10
             while not eod: 
                 messages = []
                 for d in payload:
-                    notif,_,_ = amq.make_notification(d, "aaa_federations_document", dataSubfield=None)
+                    #RHEL8 notif,_,_ = amq.make_notification(d, "aaa_federations_document", dataSubfield=None)
+                    notif,_,_ = amq.make_notification(payload=d, doc_type=doc_type,
+                                                          producer=producer, ts=ts)
                     messages.append(notif)
                 if messages:
                     print(messages)
