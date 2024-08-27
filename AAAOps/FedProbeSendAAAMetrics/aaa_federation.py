@@ -29,6 +29,7 @@ try:
     from CMSMonitoring.StompAMQ7 import StompAMQ7
 except ImportError:
     print("ERROR: Could not import StompAMQ7")
+    sys.exit(1)
 
 print("stomp version", stomp.__version__)
 
