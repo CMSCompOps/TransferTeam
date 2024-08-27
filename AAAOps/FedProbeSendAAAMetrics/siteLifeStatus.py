@@ -4,13 +4,15 @@ import os
 import requests
 import json
 
-def siteLifeStatus (site='T2_US_Florida', dbid=9475, gte="now-6h/h",lt="now") :
+#def siteLifeStatus (site='T2_US_Florida', dbid=9475, gte="now-6h/h",lt="now") :
+def siteLifeStatus (site='T2_US_Florida', dbid=9980, gte="now-6h/h",lt="now") :
     '''
     gets a site life status during last 2 hours
     '''
     url = "https://monit-grafana.cern.ch/api/datasources/proxy/"+str(dbid)+"/_msearch"
     index_name = "monit_prod_cms_raw_aaa-ng*"       # XRD Collector Monitoring
-    index_name = "monit_prod_cmssst_*"              # Site Status
+    index_name = "monit_prod_cmssst_*"              # 9475 Site Status
+    index_name = "monit_prod_cmssst_raw_ssbmetric-*"              # 9980 Site Status    
     payload_index_props = {
         "search_type": "query_then_fetch",
         "index": [ index_name ],
