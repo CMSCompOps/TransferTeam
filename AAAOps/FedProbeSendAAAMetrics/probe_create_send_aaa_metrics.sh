@@ -143,6 +143,9 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           result="SAM3 OK" ; [ $status -eq 0 ] || result="SAM3 FAIL"
           site_status=$(python3 -m json.tool $THEPATH/cms_sam3_check_monit_prod_cmssst_search.out | grep -A 2 $thesite | grep status | cut -d\" -f4 | head -1)
 	  siteLifeStatus=$(export GRAFANA_VIEWER_TOKEN=$(cat $THEPATH/token.txt) ; python /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/siteLifeStatus.py $thesite)
+          if [ "x$siteLifeStatus" == "x" ] ; then
+	     siteLifeStatus=UNKNOWN
+          fi
           sam3result="$sam3result\n$thesite($site_status $result siteLifeStatus=$siteLifeStatus)\n"
 	  expected=Yes
 	  if [ "$result" == "SAM OK" ] ; then
