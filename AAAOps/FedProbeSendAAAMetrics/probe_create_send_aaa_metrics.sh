@@ -150,7 +150,8 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	  fi
 	  if [ $(grep -q "$thesite" $THEPATH/site_aaa_status.txt ; echo $?) -eq 0 ] ; then
 	      siteline=$(grep "$thesite" $THEPATH/site_aaa_status.txt)
-	      WkCount=$(expr $(echo $siteline | awk '{print $5}') + 1)
+	      WkCount_previous=$(grep "$thesite" $THEPATH/site_aaa_status.txt | awk '{print $5}')
+	      WkCount=$(expr $WkCount_previous + 1)
 	      sed -i "/$(echo $siteline | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.txt
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected >> $THEPATH/site_aaa_status.txt
 	  else
