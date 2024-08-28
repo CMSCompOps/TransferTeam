@@ -157,7 +157,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	  fi
       done
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
-      echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
+      echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
       #else
       #   echo $sam3result | grep -q "SAM3 OK" && \
       #   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
