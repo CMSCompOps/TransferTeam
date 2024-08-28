@@ -129,6 +129,13 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       if [ -f $THEPATH/subscribed_sites_$nprod_exp.txt ] ; then
          thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2)
       fi
+      day_of_week=$(date +%u%H%M%S)
+      if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1000013 ] ; then
+          printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
+      fi
+      if [ ! -f $THEPATH/site_aaa_status.txt  ] ; then
+          printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
+      fi
       sam3result=
       for thesite in $thediff ; do
           $THEPATH/cms_sam3_check.sh $thesite > $THEPATH/out/cms_sam3_check.${thesite}.txt 2>&1
@@ -137,7 +144,17 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           site_status=$(python3 -m json.tool $THEPATH/cms_sam3_check_monit_prod_cmssst_search.out | grep -A 2 $thesite | grep status | cut -d\" -f4 | head -1)
 	  siteLifeStatus=$(export GRAFANA_VIEWER_TOKEN=$(cat $THEPATH/token.txt) ; python /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/siteLifeStatus.py $thesite)
           sam3result="$sam3result\n$thesite($site_status $result siteLifeStatus=$siteLifeStatus)\n"
-
+	  expected=Yes
+	  if [ "$result" == "SAM OK" ] ; then
+	      [ $(echo $siteLifeStatus | grep -q "wait\|morgue" ; echo $?) -eq 0 ] && expected=No
+	  fi
+	  if [ $(grep -q "$thesite" $THEPATH/site_aaa_status.txt ; echo $?) -eq 0 ] ; then
+	      siteline=$(grep "$thesite" $THEPATH/site_aaa_status.txt)
+	      WkCount=$(expr $(echo $siteline | awk '{print $5}') + 1)
+              printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected >> $THEPATH/site_aaa_status.txt
+	  else
+              printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" 1 $expected >> $THEPATH/site_aaa_status.txt
+	  fi
       done
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
       echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
