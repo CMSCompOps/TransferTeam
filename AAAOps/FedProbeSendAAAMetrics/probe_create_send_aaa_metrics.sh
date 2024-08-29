@@ -131,9 +131,15 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       fi
       day_of_week=$(date +%u%H%M%S)
       if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1000013 ] ; then
+	  echo "<html>" > $THEPATH/site_aaa_status.html
+	  echo "<table>" >> $THEPATH/site_aaa_status.html
+	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
       fi
       if [ ! -f $THEPATH/site_aaa_status.txt  ] ; then
+	  echo "<html>" > $THEPATH/site_aaa_status.html
+	  echo "<table>" >> $THEPATH/site_aaa_status.html
+	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
       fi
       sam3result=
@@ -157,12 +163,19 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	      WkCount=$(expr $WkCount_previous + 1)
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.txt
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected >> $THEPATH/site_aaa_status.txt
+	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
+	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$WkCount</td> <td>$expected</td> </tr>" >> $THEPATH/site_aaa_status.html
 	  else
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" 1 $expected >> $THEPATH/site_aaa_status.txt
+	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td> 1 </td> <td>$expected</td> </tr>" >> $THEPATH/site_aaa_status.html
 	  fi
       done
+      if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1000013 ] ; then
+	  echo "</table>" >> $THEPATH/site_aaa_status.html
+	  echo "</html>" >> $THEPATH/site_aaa_status.html
+      fi
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
-      echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
+      echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.html)\n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
       #else
       #   echo $sam3result | grep -q "SAM3 OK" && \
       #   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
