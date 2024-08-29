@@ -130,7 +130,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
          thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2)
       fi
       day_of_week=$(date +%u%H%M%S)
-      if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1000013 ] ; then
+      if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1002800 ] ; then
 	  echo "<html>" > $THEPATH/site_aaa_status.html
 	  echo "<table>" >> $THEPATH/site_aaa_status.html
 	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> </tr>" >> $THEPATH/site_aaa_status.html
