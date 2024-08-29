@@ -170,10 +170,8 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td> 1 </td> <td>$expected</td> </tr>" >> $THEPATH/site_aaa_status.html
 	  fi
       done
-      if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1000013 ] ; then
-	  echo "</table>" >> $THEPATH/site_aaa_status.html
-	  echo "</html>" >> $THEPATH/site_aaa_status.html
-      fi
+      grep -q "</table>" $THEPATH/site__aaa_status.html || echo "</table>" >> $THEPATH/site_aaa_status.html
+      grep -q "</html>" $THEPATH/site__aaa_status.html || echo "</html>" >> $THEPATH/site_aaa_status.html
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
       echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.html)\n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
       #else
