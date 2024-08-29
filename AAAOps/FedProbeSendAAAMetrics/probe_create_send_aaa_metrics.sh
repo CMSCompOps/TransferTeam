@@ -136,9 +136,11 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
       fi
-      if [ ! -f $THEPATH/site_aaa_status.txt  ] ; then
+      if [ ! -f $THEPATH/site_aaa_status.html  ] ; then
 	  echo "<html>" > $THEPATH/site_aaa_status.html
 	  echo "<table>" >> $THEPATH/site_aaa_status.html
+      fi
+      if [ ! -f $THEPATH/site_aaa_status.txt  ] ; then
 	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
       fi
