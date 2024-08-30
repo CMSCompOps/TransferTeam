@@ -127,7 +127,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
    if [ $nprod_exp -gt $nprod ] ; then
       thediff=
       if [ -f $THEPATH/subscribed_sites_$nprod_exp.txt ] ; then
-         thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2)
+         thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2 | sort -u)
       fi
       day_of_week=$(date +%u%H%M%S)
       if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1002800 ] ; then
