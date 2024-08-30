@@ -167,11 +167,11 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.txt
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected >> $THEPATH/site_aaa_status.txt
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
-	      echo DEUBG "thesite = $thesite siteLifeStatus = $siteLifeStatus result = $result WkCount = $WkCount expected = $expected sam_critical_host_test = $sam_critical_host_tests" >> $THEPATH/site_aaa_status.html
-	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$WkCount</td> <td>$expected</td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
+	      #echo DEUBG "thesite = $thesite siteLifeStatus = $siteLifeStatus result = $result WkCount = $WkCount expected = $expected sam_critical_host_test = $sam_critical_host_tests" >> $THEPATH/site_aaa_status.html
+	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$WkCount</td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
 	  else
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" 1 $expected >> $THEPATH/site_aaa_status.txt
-	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td> 1 </td> <td>$expected</td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
+	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td> 1 </td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
 	  fi
       done
       if [ -f $THEPATH/site_aaa_status.html ] ; then
