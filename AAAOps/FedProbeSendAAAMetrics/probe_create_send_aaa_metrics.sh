@@ -157,7 +157,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           sam3result="$sam3result\n$thesite($site_status $result siteLifeStatus=$siteLifeStatus)\n"
 	  expected=Yes
 	  if [ "$result" == "SAM OK" ] ; then
-	      [ $(echo "$siteLifeStatus" | grep -q "wait\|morgue" ; echo $?) -eq 0 ] && expected=No
+	      [ $(echo "$siteLifeStatus" | grep -q "enabled" ; echo $?) -eq 0 ] && expected=No
 	  fi
 	  if [ $(grep -q "$thesite" $THEPATH/site_aaa_status.txt ; echo $?) -eq 0 ] ; then
 	      siteline=$(grep "$thesite" $THEPATH/site_aaa_status.txt)
