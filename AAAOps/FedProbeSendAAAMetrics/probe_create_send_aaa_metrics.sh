@@ -185,7 +185,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       if [ $(echo $sam3result | grep -q "SAM3 OK" ; echo $?) -eq 0 ] ; then
        (
          echo "To: $notifytowhom"
-         echo "Subject: echo $(basename $0) on $(/bin/hostname -s)"
+         echo "Subject: $(basename $0) on $(/bin/hostname -s)"
 	 echo "Reply-to: noreply@cern.ch"
          echo "Content-Type: text/html"
 	 cat $THEPATH/site_aaa_status.html	 
