@@ -182,6 +182,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           echo "</table>" >> $THEPATH/site_aaa_status.html
           echo "</html>" >> $THEPATH/site_aaa_status.html
       fi
+      grep -q "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
       if [ $? -ne 0 ] ; then
 	  echo DEBUG updating with "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
           sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=6>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
