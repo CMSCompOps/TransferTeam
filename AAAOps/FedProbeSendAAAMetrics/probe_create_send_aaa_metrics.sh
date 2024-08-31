@@ -183,6 +183,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           echo "</html>" >> $THEPATH/site_aaa_status.html
       fi
       if [ $? -ne 0 ] ; then
+	  echo DEBUG updating with "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
           sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=6>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
       fi
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
