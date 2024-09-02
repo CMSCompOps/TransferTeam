@@ -123,6 +123,22 @@ nprod_exp=54
 if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
    subscribed_sites=$($THEPATH/check_subscribed_sites.sh)
    nprod=$(printf "$subscribed_sites\n" | tail -1 | awk '{print $2}')
+   if [ $nprod -lt 10 ] ; then
+       echo Warning something is wrong
+       (
+         echo "To: "$(echo $notifytowhom | sed "s#__AT__#@#" | sed "s#__dot__#\.#g")
+         echo "Reply-To: noreply@cern.ch"
+         echo "Subject: XRootD Version Role List"
+         echo "Content-Type: text/html"
+         echo "<pre>"
+	 echo $THEPATH/create_fedmaps.log
+	 cat $THEPATH/create_fedmaps.log
+	 echo ; echo ; echo
+	 echo $THEPATH/fed.json
+	 cat $THEPATH/fed.json
+	 echo "</pre>"
+       ) | /usr/sbin/sendmail -t
+   fi
    printf "$subscribed_sites\n" > $THEPATH/subscribed_sites_$nprod.txt
    if [ $nprod_exp -gt $nprod ] ; then
       thediff=
