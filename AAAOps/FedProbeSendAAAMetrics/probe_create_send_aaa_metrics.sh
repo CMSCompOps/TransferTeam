@@ -155,7 +155,18 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       if [ ! -f $THEPATH/site_aaa_status.html  ] ; then
 	  echo "<html>" > $THEPATH/site_aaa_status.html
 	  echo "<table>" >> $THEPATH/site_aaa_status.html
+	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
       fi
+      thestring="<td>Site</td>"
+      sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
+      thestring="<table>"
+      sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
+      thestring="<html>"
+      sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
+      sed -i "1s|^|<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>\n|" $THEPATH/site_aaa_status.html
+      sed -i "1s/^/<table>\n/" $THEPATH/site_aaa_status.html
+      sed -i "1s/^/<html>\n/" $THEPATH/site_aaa_status.html
+      
       if [ ! -f $THEPATH/site_aaa_status.txt  ] ; then
 	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
