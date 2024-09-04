@@ -5,7 +5,7 @@ import requests
 import json
 
 #def siteLifeStatus (site='T2_US_Florida', dbid=9475, gte="now-6h/h",lt="now") :
-def siteLifeStatus (site='T2_US_Florida', dbid=9980, gte="now-6h/h",lt="now") :
+def siteLifeStatus (site='T2_US_Florida', what='sts15min', dbid=9980, gte="now-23h/h",lte="now") :
     '''
     gets a site life status during last 2 hours
     '''
@@ -63,7 +63,9 @@ def siteLifeStatus (site='T2_US_Florida', dbid=9980, gte="now-6h/h",lt="now") :
       ]
     }
     payload_query["query"]["bool"]["filter"]["range"]["metadata.timestamp"]["gte"] = gte
-    payload_query["query"]["bool"]["filter"]["range"]["metadata.timestamp"]["lt"] = lt
+    payload_query["query"]["bool"]["filter"]["range"]["metadata.timestamp"]["lt"] = lte
+    # down15min or sts15min
+    payload_query["query"]["bool"]["must"][2]["match_phrase"]["metadata.monit_hdfs_path"] = what
     #print(payload_query)
     payload = json.dumps(payload_index_props) + " \n" + json.dumps(payload_query) + "\n"
     headers = {
@@ -84,6 +86,12 @@ def siteLifeStatus (site='T2_US_Florida', dbid=9980, gte="now-6h/h",lt="now") :
     return siteStatus[site]
 
 if __name__ == "__main__":
+   if len(sys.argv) > 2 :
+      site = sys.argv[1]
+      what = sys.argv[2]
+      status = siteLifeStatus(site=site, what=what)
+      print (status)
+      sys.exit(0)
    if len(sys.argv) > 1 :
       site = sys.argv[1]
       status = siteLifeStatus(site=site)
