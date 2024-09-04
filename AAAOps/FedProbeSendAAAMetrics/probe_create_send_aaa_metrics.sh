@@ -146,10 +146,10 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
          thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2 | sort -u)
       fi
       day_of_week=$(date +%u%H%M%S)
-      if [ $day_of_week -gt 1000000 -a $day_of_week -lt 1002800 ] ; then
+      if [ $day_of_week -gt 1014000 -a $day_of_week -lt 1002800 ] ; then
 	  echo "<html>" > $THEPATH/site_aaa_status.html
 	  echo "<table>" >> $THEPATH/site_aaa_status.html
-	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
+	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
       fi
       if [ ! -f $THEPATH/site_aaa_status.html  ] ; then
@@ -157,7 +157,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	  echo "<table>" >> $THEPATH/site_aaa_status.html
       fi
       if [ ! -f $THEPATH/site_aaa_status.txt  ] ; then
-	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
+	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
           printf "%20s %20s %20s %7s %7s\n" Site "Life Status" "SAM Status" WkCount Expected > $THEPATH/site_aaa_status.txt
       fi
       sam3result=
@@ -167,9 +167,8 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           result="SAM3 OK" ; [ $status -eq 0 ] || result="SAM3 FAIL"
           site_status=$(python3 -m json.tool $THEPATH/cms_sam3_check_monit_prod_cmssst_search.out | grep -A 2 $thesite | grep status | cut -d\" -f4 | head -1)
 	  siteLifeStatus=$(export GRAFANA_VIEWER_TOKEN=$(cat $THEPATH/token.txt) ; python /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/siteLifeStatus.py $thesite)
-          if [ "x$siteLifeStatus" == "x" ] ; then
-	     siteLifeStatus=UNKNOWN
-          fi
+	  siteDownStatus=$(export GRAFANA_VIEWER_TOKEN=$(cat $THEPATH/token.txt) ; python /opt/TransferTeam/AAAOps/FedProbeSendAAAMetrics/siteLifeStatus.py $thesite "down15min")
+
           sam3result="$sam3result\n$thesite($site_status $result siteLifeStatus=$siteLifeStatus)\n"
 	  expected=Yes
 	  if [ "$result" == "SAM OK" ] ; then
@@ -184,10 +183,10 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected >> $THEPATH/site_aaa_status.txt
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
 	      #echo DEUBG "thesite = $thesite siteLifeStatus = $siteLifeStatus result = $result WkCount = $WkCount expected = $expected sam_critical_host_test = $sam_critical_host_tests" >> $THEPATH/site_aaa_status.html
-	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$WkCount</td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
+	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$siteDownStatus</td> <td>$WkCount</td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
 	  else
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" 1 $expected >> $THEPATH/site_aaa_status.txt
-	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td> 1 </td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
+	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$siteDownStatus</td> <td> 1 </td> <td>$expected</td> <td>$sam_critical_host_tests </td> </tr>" >> $THEPATH/site_aaa_status.html
 	  fi
       done
       if [ -f $THEPATH/site_aaa_status.html ] ; then
@@ -201,7 +200,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       grep -q "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
       if [ $? -ne 0 ] ; then
 	  echo DEBUG updating with "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
-          sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=6>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
+          sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=7>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
       fi
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
       #echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.html)\n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
