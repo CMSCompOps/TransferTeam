@@ -187,7 +187,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 
           sam3result="$sam3result\n$thesite($site_status $result siteLifeStatus=$siteLifeStatus)\n"
 	  expected=Yes
-	  if [ "$result" == "SAM OK" ] ; then
+	  if [ "$result" == "SAM3 OK" ] ; then
 	      if [ $(echo "$siteLifeStatus" | grep -q "enabled" ; echo $?) -eq 0 ] ; then
                  [ "x$siteDownStatus" == "xdowntime" ] || expected=No
               fi
