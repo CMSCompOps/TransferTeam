@@ -160,15 +160,15 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       
       thestring="Sites with Frequent Subscription Failure"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
-      thestring="<td>Site</td>"
+      thestring="<td><b>Site</b></td>"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
       thestring="<table>"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
       thestring="<html>"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
       
-      sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=7>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
-      sed -i "1s|^|<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>\n|" $THEPATH/site_aaa_status.html
+      sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=7><FONT size=2><b>Sites with Frequent Subscription Failure</b></FONT></td> </tr>\n|" $THEPATH/site_aaa_status.html
+      sed -i "1s|^|<tr bgcolor='yellow'> <td><b>Site</b></td> <td><b>Life Status</b></td> <td><b>SAM Status</b></td> <td><b>Down Status</b></td> <td><b>WkCount</b></td> <td><b>Expected</b></td> <td><b>SAM Critical</b></td> </tr>\n|" $THEPATH/site_aaa_status.html
       sed -i "1s/^/<table>\n/" $THEPATH/site_aaa_status.html
       sed -i "1s/^/<html>\n/" $THEPATH/site_aaa_status.html
       
@@ -188,7 +188,9 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           sam3result="$sam3result\n$thesite($site_status $result siteLifeStatus=$siteLifeStatus)\n"
 	  expected=Yes
 	  if [ "$result" == "SAM OK" ] ; then
-	      [ $(echo "$siteLifeStatus" | grep -q "enabled" ; echo $?) -eq 0 ] && expected=No
+	      if [ $(echo "$siteLifeStatus" | grep -q "enabled" ; echo $?) -eq 0 ] ; then
+                 [ "x$siteDownStatus" == "xdowntime" ] || expected=No
+              fi
 	  fi
 	  sam_critical_host_tests=$(grep CRITICAL  $THEPATH/out/cms_sam3_check.${thesite}.txt  | awk '{print $2" "$4"<br/>"}')
 	  if [ $(grep -q "$thesite" $THEPATH/site_aaa_status.txt ; echo $?) -eq 0 ] ; then
