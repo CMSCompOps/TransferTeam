@@ -1342,7 +1342,8 @@ def getDNSARecords ( h ):
     isAlias = False
     aRecords = []
     try :
-      result = dns.resolver.query(h, 'A')
+      #result = dns.resolver.query(h, 'A')
+      result = dns.resolver.resolve(h, 'A')
       for ipval in result:
         ip = ipval.to_text()
         (host, alias, ipl) = socket.gethostbyaddr(ip)
