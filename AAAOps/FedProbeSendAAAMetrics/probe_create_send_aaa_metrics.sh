@@ -157,12 +157,17 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	  echo "<table>" >> $THEPATH/site_aaa_status.html
 	  echo "<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>" >> $THEPATH/site_aaa_status.html
       fi
+      
+      thestring="Sites with Frequent Subscription Failure"
+      sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
       thestring="<td>Site</td>"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
       thestring="<table>"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
       thestring="<html>"
       sed -i "/$(echo $thestring | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
+      
+      sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=7>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
       sed -i "1s|^|<tr bgcolor='yellow'> <td>Site</td> <td>Life Status</td> <td>SAM Status</td> <td>Down Status</td> <td>WkCount</td> <td>Expected</td> <td>SAM Critical</td> </tr>\n|" $THEPATH/site_aaa_status.html
       sed -i "1s/^/<table>\n/" $THEPATH/site_aaa_status.html
       sed -i "1s/^/<html>\n/" $THEPATH/site_aaa_status.html
@@ -208,11 +213,11 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
           echo "</table>" >> $THEPATH/site_aaa_status.html
           echo "</html>" >> $THEPATH/site_aaa_status.html
       fi
-      grep -q "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
-      if [ $? -ne 0 ] ; then
-	  echo DEBUG updating with "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
-          sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=7>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
-      fi
+      #grep -q "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
+      #if [ $? -ne 0 ] ; then
+      #	  echo DEBUG updating with "Sites with Frequent Subscription Failure" $THEPATH/site_aaa_status.html
+      #    sed -i "1s|^|<tr bgcolor='green'> <td bgcolor='white' colspan=7>Sites with Frequent Subscription Failure</td> </tr>\n|" $THEPATH/site_aaa_status.html
+      #fi
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
       #echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.html)\n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
       if [ $(echo $sam3result | grep -q "SAM3 OK" ; echo $?) -eq 0 ] ; then
