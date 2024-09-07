@@ -1,10 +1,29 @@
-1 EU_Alias xrootd-cms.infn.it Daniele Spiga
-1.1 EU xrootd-cms-redir-int.cr.cnaf.infn.it Daniele Spiga
-1.2 EU xrootd-redic.pi.infn.it Daniele Spiga
-1.3 EU llrxrd-redir.in2p3.fr Michael Mellin
+1 EU_Alias xrootd-cms.infn.it Daniele Spiga T1_IT_CNAF
+1.1 EU xrootd-cms-redir-int.cr.cnaf.infn.it Daniele Spiga T1_IT_CNAF
+1.2 EU xrootd-redic.pi.infn.it Daniele Spiga* T2_IT_Pisa
+1.3 EU llrxrd-redir.in2p3.fr Michael Mellin T1_FR_IN2P3
+       2 DE_Srv cmsxrootd-1.gridka.de Artur Il Darovic Gottmann* T1_DE_KIT
+       2 DE_Srv cmsxrootd-2.gridka.de Artur Il Darovic Gottmann* T1_DE_KIT
+       2 ES xrootd-es-pic.pic.es:1096 Antonio Perez-Calero Yzquierdo* T1_ES_PIC
+       2 RU_Srv se-xrd01.jinr-t1.ru:1095 ? T1_RU_JINR
+       2 UK cms-aaa-manager01.gridpp.rl.ac.uk Katy Ellis* T1_UK_RAL
+       2 UK xrootd-cms-uk.gridpp.rl.ac.uk Katy Ellis* T1_UK_RAL
+       2 UK xrootd-cms-uk.gridpp.rl.ac.uk Katy Ellis* T1_UK_RAL
+       2 UK_Alias xrootd.grid.hep.ph.ic.ac.uk Katy Ellis* T2_UK_London_IC
+         2.1 UK xrootd01.grid.hep.ph.ic.ac.uk Katy Ellis* T2_UK_London_IC
+         2.2 UK xrootd02.grid.hep.ph.ic.ac.uk Katy Ellis* T2_UK_London_IC
+       2 UK_Alias cms-xrootd.gridpp.ac.uk Katy Ellis* T1_UK_London_IC
+         2.1 UK xrootd01.grid.hep.ph.ic.ac.uk Katy Ellis* T2_UK_London_IC
+         2.2 UK xrootd-cms-uk.gridpp.rl.ac.uk Katy Ellis* T1_UK_RAL
+         2.3 UK xrootd02.grid.hep.ph.ic.ac.uk Katy Ellis* T2_UK_London_IC
 
-1 US_Alias cmsxrootd.fnal.gov Yujun Wu
-1.1 US xrootd.unl.edu John Thiltges
-1.2 US cmsxrootd2.fnal.gov Yujun Wu
+1 US_Alias cmsxrootd.fnal.gov Yujun Wu T1_US_FNAL
+1.1 US xrootd.unl.edu John Thiltges T2_US_Nebraska
+1.2 US cmsxrootd2.fnal.gov Yujun Wu T1_US_FNAL
+
+? UK_Alias mover.pp.rl.ac.uk* Katy Ellis* T1_UK_RAL*
+  ?.1 UK heplnx230.pp.rl.ac.uk* Katy Ellis* T1_UK_RAL*
+  ?.2 UK heplnx231.pp.rl.ac.uk* Katy Ellis* T1_UK_RAL*
+
 
 
