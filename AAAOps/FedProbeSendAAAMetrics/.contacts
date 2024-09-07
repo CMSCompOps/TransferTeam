@@ -1,6 +1,10 @@
-xrootd-cms-redir-int.cr.cnaf.infn.it Daniel Spiga
-xrootd-redic.pi.infn.it Daniel Spiga
-llrxrd-redir.in2p3.fr Michael Mellin
+1 EU_Alias xrootd-cms.infn.it Daniele Spiga
+1.1 EU xrootd-cms-redir-int.cr.cnaf.infn.it Daniele Spiga
+1.2 EU xrootd-redic.pi.infn.it Daniele Spiga
+1.3 EU llrxrd-redir.in2p3.fr Michael Mellin
 
-xrootd.unl.edu John Thiltges
-cmsxrootd2.fnal.gov Yujun Wu
+1 US_Alias cmsxrootd.fnal.gov Yujun Wu
+1.1 US xrootd.unl.edu John Thiltges
+1.2 US cmsxrootd2.fnal.gov Yujun Wu
+
+
