@@ -46,8 +46,8 @@ def clear_lock():
     except Exception as e:
         print ("could not remove lockfile:"+str(e))
 def env_setup():
-    os.environ['X509_USER_CERT']='/root/.globus/slsprobe-cert.pem'
-    os.environ['X509_USER_KEY']='/root/.globus/slsprobe-key.pem'
+    #os.environ['X509_USER_CERT']='/root/.globus/slsprobe-cert.pem'
+    #os.environ['X509_USER_KEY']='/root/.globus/slsprobe-key.pem'
     os.environ['X509_USER_PROXY']='/root/.globus/slsprobe.proxy'
     #os.environ['X509_USER_PROXY']='/root/.globus/.proxy'
     if 'ufhpc' in socket.gethostname() : os.environ['X509_USER_PROXY']=os.environ['HOME']+'/.cmsuser.proxy'
