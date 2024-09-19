@@ -196,11 +196,11 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
 	      siteline=$(grep "$thesite" $THEPATH/site_aaa_status.txt)
 	      WkCount_previous=$(grep "$thesite" $THEPATH/site_aaa_status.txt | awk '{print $5}')
 	      WkCount=$(expr $WkCount_previous + 1)
+              other_comments=$(echo $(grep "|" $THEPATH/site_aaa_status.txt | grep $thesite | cut -d\| -f2-))
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.txt
-              printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected >> $THEPATH/site_aaa_status.txt
+              printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected "|" $other_comments >> $THEPATH/site_aaa_status.txt
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
 	      #echo DEUBG "thesite = $thesite siteLifeStatus = $siteLifeStatus result = $result WkCount = $WkCount expected = $expected sam_critical_host_test = $sam_critical_host_tests" >> $THEPATH/site_aaa_status.html
-              other_comments=$(echo $(grep "|" $THEPATH/site_aaa_status.txt | cut -d\| -f2-))
 	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$siteDownStatus</td> <td>$WkCount</td> <td>$expected</td> <td>$sam_critical_host_tests $other_comments </td> </tr>" >> $THEPATH/site_aaa_status.html
 	  else
               printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" 1 $expected >> $THEPATH/site_aaa_status.txt
