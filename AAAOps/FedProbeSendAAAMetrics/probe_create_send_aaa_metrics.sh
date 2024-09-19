@@ -192,6 +192,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
               fi
 	  fi
 	  sam_critical_host_tests=$(grep CRITICAL  $THEPATH/out/cms_sam3_check.${thesite}.txt  | awk '{print $2" "$4"<br/>"}')
+          other_comments=
 	  if [ $(grep -q "$thesite" $THEPATH/site_aaa_status.txt ; echo $?) -eq 0 ] ; then
 	      siteline=$(grep "$thesite" $THEPATH/site_aaa_status.txt)
 	      WkCount_previous=$(grep "$thesite" $THEPATH/site_aaa_status.txt | awk '{print $5}')
