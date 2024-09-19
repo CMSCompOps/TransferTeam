@@ -239,7 +239,16 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
    fi
    echo "Sites subscribed to the Production Federation: " $nprod
 fi
-
+ip_no_host=$(echo $(grep [0-9]: $THEPATH/out/xrdmapc_prod_* | awk '{print $NF}' | sort -u))
+if [ "x$ip_no_host" != "x" ] ; then
+       (
+         echo "To: $notifytowhom"
+         echo "Subject: $(basename $0) on $(/bin/hostname -s) IPs without Hostnames"
+	 echo "Reply-to: noreply@cern.ch"
+         echo "Content-Type: text/html"
+	 for ip in $ip_no_host ; do echo $ip"<br/>" ; done
+       )  | /usr/sbin/sendmail -t
+fi
 printf "$(/bin/hostname -s) $(basename $0) \nxrdmapc errors:\n$xrdmapc_error\nPort 0 Errors: ${xrdmapc_port0_error}\n"
 
 [ -f ${THELOG}_$(date +%Y%m%d) ] || touch  ${THELOG}_$(date +%Y%m%d)
