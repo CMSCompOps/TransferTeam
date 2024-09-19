@@ -200,7 +200,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
               other_comments=$(echo $(grep "$thesite" $THEPATH/site_aaa_status.txt | grep "|" | cut -d\| -f2-))
 	      [ "x$other_comments" == "x" ] || other_comments=" | $other_comments"
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.txt
-              printf "%20s %20s %20s %7s %7s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected $other_comments >> $THEPATH/site_aaa_status.txt
+              printf "%20s %20s %20s %7s %7s %80s\n" "$thesite" "$siteLifeStatus" "$result" $WkCount $expected "$other_comments" >> $THEPATH/site_aaa_status.txt
 	      sed -i "/$(echo $thesite | sed 's^/^\\\/^g')/ d" $THEPATH/site_aaa_status.html
 	      #echo DEUBG "thesite = $thesite siteLifeStatus = $siteLifeStatus result = $result WkCount = $WkCount expected = $expected sam_critical_host_test = $sam_critical_host_tests" >> $THEPATH/site_aaa_status.html
 	      echo "<tr bgcolor='yellow'> <td>$thesite</td> <td>$siteLifeStatus</td> <td>$result</td> <td>$siteDownStatus</td> <td>$WkCount</td> <td>$expected</td> <td>$sam_critical_host_tests $other_comments </td> </tr>" >> $THEPATH/site_aaa_status.html
