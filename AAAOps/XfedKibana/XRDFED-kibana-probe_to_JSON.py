@@ -22,8 +22,9 @@ import socket
 import atexit
 import threading
 import tempfile
+import json
 
-html_dir = '/root/ogarzonm/'   # will create per-service xml files here
+html_dir = '/var/www/html/aaa-probe/'   # will create per-service xml files here
 
 #CERN_eosfile_rucio='/atlas/rucio/user/ivukotic:user.ivukotic.xrootd.cern-prod-1M'
 
@@ -88,6 +89,8 @@ def try_lock():
         return False
     return True
 
+"""
+
 def prepare_xml(servicename):
     doc = xml.dom.minidom.Document()
     serviceUpdate = doc.createElementNS("http://sls.cern.ch/SLS/XML/update","serviceupdate")
@@ -105,6 +108,21 @@ def prepare_xml(servicename):
     serviceUpdate.appendChild(tValue)
     return (doc,data, serviceUpdate)
 
+"""
+
+def prepare_dictionary(servicename):
+    timeStampTmp = time.strftime("%Y-%m-%dT%H:%M:%S%z")
+    timeStamp=timeStampTmp[0:-2]+':'+timeStampTmp[-2:] 
+    dic={'serviceupdate':{
+        'xmlns': "http://sls.cern.ch/SLS/XML/update"
+        'data': '',
+        'id':servicename,
+        'timestamp': timeStamp
+    }
+        
+        
+        }
+    return dic
 def dnsalias_to_nodes(redirector):
     (host,port) = redirector.split(':')
     all_hosts = []
@@ -132,11 +150,9 @@ def xrd_info(redirector):
                                                       [redirector,
                                                        "query","1", # 1:kXR_QStats
                                                        "a"])         # a_ll stats
-    if not out:
-        out = "<root><a>1</a></root>" 
-    if not errtext: 
+    if not errtext:
         try:
-            dom = xml.dom.minidom.parseString(out) 
+            dom = xml.dom.minidom.parseString(out)
             root_node = dom.documentElement
             if root_node.tagName == 'statistics':
                 v_attr = root_node.getAttributeNode('ver')
@@ -153,8 +169,6 @@ def run_xrd_commands(cmd,args):
                  "-DIConnectTimeout","30",
                  "-DITransactionTimeout","60",
                  "-DIRequestTimeout","60" ] + args
-    if not out:
-        out = "<root><a>1</a></root>"
     try:
         start = time.time()
         proc = subprocess.Popen(xrd_args,
@@ -171,11 +185,11 @@ def run_xrd_commands(cmd,args):
             errtxt = ''
         else:    
             if(ret > 0):
-               errtxt = "client-side error - exit code "+str(ret)+"\n"
+                errtxt = "client-side error - exit code "+str(ret)+"\n"
             err_index = err.rfind('Last server error')
             if err_index >= 0:
-               err_end_index=err.find("\n",err_index)
-               errtxt = errtxt + err[err_index:err_end_index]
+                err_end_index=err.find("\n",err_index)
+                errtxt = errtxt + err[err_index:err_end_index]
     except Exception,e:
         errtext = errtxt + "Exception: "+str(e)
     dev_null.close()
@@ -191,8 +205,9 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     availinfo = ''
     need_xml_link=0
 
-    # prepare the XML
-    (doc, data, serviceUpdate) = prepare_xml(servicename)
+    # prepare the dictionary.
+    dicci = prepare_dictionary(servicename)
+    #(doc, data, serviceUpdate) = prepare_xml(servicename)
     notes_text = "Redirector:"+redirector+"<br />" 
 
     # run the functional tests - first some simple check to get the version, if OK look for files
@@ -201,15 +216,22 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
         #availability = 0.0
         availability = 'unavailable'
         availinfo=availinfo+"<br />Error getting info from redirector<br />"+err_info
-        c=doc.createComment("Detailed output for INFO for "+redirector+"\n"+
+        c="Detailed output for INFO for "+redirector+"\n"+
                                   err_info+"\n"
-                                  +dump_info)
-        serviceUpdate.appendChild(c)
-        nValue = doc.createElement("numericvalue")
-        nValue.setAttribute("name", "xrdcp_below_time")
-        nValue.setAttribute("desc", "Time to copy a file below redirector")
-        nValue.appendChild(doc.createTextNode("0.000"))
-        data.appendChild(nValue)
+                                  +dump_info
+        #serviceUpdate.appendChild(c)
+        dicci = {**dicci, **{'comment': c}}
+        numericvalue = {
+         
+            'name': "xrdcp_below_time",
+            'desc' : "Time to copy a file below redirector",
+            'value': '0.000'
+        }
+        #nValue.setAttribute("name", "xrdcp_below_time")
+        #nValue.setAttribute("desc", "Time to copy a file below redirector")
+        #nValue.appendChild(doc.createTextNode("0.000"))
+        dicci['serviceupdate']['data'] = numericvalue
+        #data.appendChild(nValue)
 
     else:
         availinfo="Version check: "+version+"\n"
@@ -222,18 +244,24 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
                 availinfo=availinfo+"<br />Error below redirector<br />\n"+err_below
                 # sanitize the raw output in order to not trigger XML errors..
                 dump_sane = re.sub('---*','__',dump_below)
-                c = doc.createComment("Detailed output for file BELOW "+redirector+":"+file_below+"\n"+
+                c = "Detailed output for file BELOW "+redirector+":"+file_below+"\n"+
                                   err_below+"\n"
-                                  +dump_sane)
-                serviceUpdate.appendChild(c)
+                                  +dump_sane
+                dicci = {**dicci, **{'comment': c}}
                 need_xml_link=1
             else:
                 availinfo=availinfo+"<br />File below: OK <br />"
-            nValue = doc.createElement("numericvalue")
-            nValue.setAttribute("name", "xrdcp_below_time")
-            nValue.setAttribute("desc", "Time to copy a file below redirector")
-            nValue.appendChild(doc.createTextNode(str(elapsed_below)))
-            data.appendChild(nValue)
+            numericvalue = {
+                    'name': "xrdcp_below_time",
+                    "desc": "Time to copy a file below redirector",
+                    "elapsed_below": str(elapsed_below)
+            }
+            #nValue = doc.createElement("numericvalue")
+            #nValue.setAttribute("name", "xrdcp_below_time")
+            #nValue.setAttribute("desc", "Time to copy a file below redirector")
+            #nValue.appendChild(doc.createTextNode(str(elapsed_below)))
+            dicci['serviceupdate']['data'] = numericvalue
+            #data.appendChild(nValue)
         else:
             availinfo=availinfo+"<br />File below: not tested." 
         if(file_above):
@@ -245,18 +273,25 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
                 availinfo=availinfo+"<br />Error above redirector<br />"+err_above
                 # sanitize the raw output in order to not trigger XML errors.. in a comment.
                 dump_sane = re.sub('---*','__',dump_above)
-                c = doc.createComment("Detailed output for file ABOVE "+redirector+":"+file_above+"\n"+
+                c = "Detailed output for file ABOVE "+redirector+":"+file_above+"\n"+
                                   err_above+"\n"
-                                  +dump_sane)
-                serviceUpdate.appendChild(c)
+                                  +dump_sane
+                dicci = {**dicci, **{'comment': c}}
+                #serviceUpdate.appendChild(c)
                 need_xml_link=1
             else:
                 availinfo=availinfo+"<br />File above: OK <br />"
-            nValue = doc.createElement("numericvalue")
-            nValue.setAttribute("name", "xrdcp_above_time")
-            nValue.setAttribute("desc", "Time to copy a file elsewhere in the federation")
-            nValue.appendChild(doc.createTextNode(str(elapsed_above)))
-            data.appendChild(nValue)
+            numericvalue = {
+                    'name': "xrdcp_below_time",
+                    "desc": "Time to copy a file below redirector",
+                    "elapsed_below": str(elapsed_below)
+            }
+            #nValue = doc.createElement("numericvalue")
+            #nValue.setAttribute("name", "xrdcp_above_time")
+            #nValue.setAttribute("desc", "Time to copy a file elsewhere in the federation")
+            #nValue.appendChild(doc.createTextNode(str(elapsed_above)))
+            dicci['serviceupdate']['data'] = numericvalue
+            #data.appendChild(nValue)
         else:
             availinfo=availinfo+"<br />File above: not tested."
 
@@ -264,13 +299,15 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     if need_xml_link:
         myhostname = socket.gethostname()
         notes_text = notes_text + "Details for failed test: http://" + myhostname + "/aaa-probe/" + servicename + ".xml <br />\n" + "Details for recently failed test : http://vocms039.cern.ch/aaa-probe/err/ <br />\n" 
-	availinfo = availinfo + "<br />" + notes_text 
-    availabilityF = doc.createElement("status")
-    availabilityF.appendChild(doc.createTextNode(str(availability)))
-    serviceUpdate.appendChild(availabilityF)
-    availabilityInfo = doc.createElement("availabilityinfo")
-    availabilityInfo.appendChild(doc.createTextNode(availinfo))
-    serviceUpdate.appendChild(availabilityInfo)
+	availinfo = availinfo + "<br />" + notes_text
+    dicci = {**dicci, **{'status': str(availability)}}
+    dicci = {**dicci, **{'status': availinfo}}
+    #availabilityF = doc.createElement("status")
+    #availabilityF.appendChild(doc.createTextNode(str(availability)))
+    #serviceUpdate.appendChild(availabilityF)
+    #availabilityInfo = doc.createElement("availabilityinfo")
+    #availabilityInfo.appendChild(doc.createTextNode(availinfo))
+    #serviceUpdate.appendChild(availabilityInfo)
     
     # commented out by Engin 
     #notes = doc.createElement("notes")
@@ -283,26 +320,28 @@ def test_redirector(servicename, redirector, file_below=None, file_above=None, e
     #collect_lemon(redirector=redirector,doc=doc,data=data)
 
     # try to get some "readable XML" that still is accepted by SLS:
-    uglyXml = doc.toprettyxml(indent="  ",encoding="utf-8")
-    text_re = re.compile('>\n\s+([^<>\s].*?)\n\s+</', re.DOTALL)    
-    prettyXml = text_re.sub('>\g<1></', uglyXml)
+    #uglyXml = doc.toprettyxml(indent="  ",encoding="utf-8")
+    #text_re = re.compile('>\n\s+([^<>\s].*?)\n\s+</', re.DOTALL)    
+    #prettyXml = text_re.sub('>\g<1></', uglyXml)
 
     # write XML to file
-    xmlFile = html_dir + '/' + servicename +'.xml'
-    try:
-        xmlFileH = open(xmlFile, 'w')
-        xmlFileH.write(prettyXml);
-        xmlFileH.close()
-    except Exception, e:
-        print "cannot write new availability file "+xmlFile+":",e
-
+    #try:
+        #xmlFileH = open(xmlFile, 'w')
+        #xmlFileH.write(prettyXml);
+        #xmlFileH.close()
+    #except Exception, e:
+        #print "cannot write new availability file "+xmlFile+":",e
+    jsonFile = html_dir + '/' + servicename +'.json'
+    with open(jsonFile, 'w') as fp:
+        json.dump(dicci, fp)
+    
 
 def main():
     debug = 0
     atexit.register(clear_lock)
     if len(sys.argv) > 1:
 	if sys.argv[1] == '-d':
-	   debug=1
+        debug=1
     if not try_lock():
         sys.exit(1)
     if not os.path.exists(html_dir):
