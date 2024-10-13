@@ -131,7 +131,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
          echo "Subject: XRootD Version Role List"
          echo "Content-Type: text/html"
 	 echo "AAA Subscription: https://monit-grafana.cern.ch/d/5njhdTrWk/site-subscription?orgId=11 <br/>"
-  	 echo ""
+  	 echo "Redirector Availability: https://monit-grafana.cern.ch/d/serviceAvailability/overview-service-availability?orgId=11&var-category=All&from=now-24h&to=now-15m%2Fm <br/>"
          echo "<pre>"
 	 echo $THEPATH/create_fedmaps.log
 	 cat $THEPATH/create_fedmaps.log
