@@ -85,6 +85,7 @@ def siteLifeStatus (site='T2_US_Florida', what='sts15min', dbid=9980, gte="now-2
         siteStatus[hit['_source']['data']['name']] = hit['_source']['data']['status']
     if len(siteStatus.keys()) == 0 :
         return 'UNKNOWN'
+    if not site in siteStatus.keys() : return 'NoKey'
     return siteStatus[site]
 
 if __name__ == "__main__":
