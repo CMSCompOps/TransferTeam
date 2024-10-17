@@ -240,6 +240,15 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       #   printf "$(/bin/hostname -s) $(basename $0) We have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom 
       #fi
       #exit 1
+   else
+      echo INFO not "($nprod_exp -gt $nprod)"
+      (
+         echo "To: $notifytowhom"
+         echo "Subject: $(basename $0) on $(/bin/hostname -s) $nprod_exp is not gt $nprod "
+	 echo "Reply-to: noreply@cern.ch"
+         echo "Content-Type: text/html"
+	 $nprod_exp is not greater than $nprod	 
+       )  | /usr/sbin/sendmail -t
    fi
    echo "Sites subscribed to the Production Federation: " $nprod
 fi
