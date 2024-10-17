@@ -143,6 +143,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
    fi
    printf "$subscribed_sites\n" > $THEPATH/subscribed_sites_$nprod.txt
    if [ $nprod_exp -gt $nprod ] ; then
+      echo DEBUG nprod_exp -gt $nprod : $nprod_exp -gt $nprod
       thediff=
       if [ -f $THEPATH/subscribed_sites_$nprod_exp.txt ] ; then
          thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2 | sort -u)
