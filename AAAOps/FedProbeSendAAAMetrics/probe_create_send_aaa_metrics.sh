@@ -143,7 +143,7 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
    fi
    printf "$subscribed_sites\n" > $THEPATH/subscribed_sites_$nprod.txt
    if [ $nprod_exp -gt $nprod ] ; then
-      echo DEBUG nprod_exp -gt $nprod : $nprod_exp -gt $nprod
+      echo DEBUG nprod_exp -gt nprod : $nprod_exp -gt $nprod
       thediff=
       if [ -f $THEPATH/subscribed_sites_$nprod_exp.txt ] ; then
          thediff=$(diff $THEPATH/subscribed_sites_$nprod.txt $THEPATH/subscribed_sites_$nprod_exp.txt | sed 's#%#%%#g' | grep T | cut -d\" -f2 | sort -u)
@@ -227,6 +227,8 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
       #fi
       #if [ "x$thediff" == "xT2_UA_KIPT" ] ; then
       #echo $sam3result | grep -q "SAM3 OK" && printf "$(/bin/hostname -s) $(basename $0)  \n$(cat $THEPATH/site_aaa_status.html)\n$(cat $THEPATH/site_aaa_status.txt)\nWe have a problem with $nprod\n$sam3result\n\n$(for thesite in $thediff ; do cat $THEPATH/out/cms_sam3_check.${thesite}.txt ; done)\n" | mail -r noreply@cern.ch -s "Warn $(/bin/hostname -s) $(basename $0)" $notifytowhom
+      echo DEBUG sam3result
+      printf "$sam3result\n"
       if [ $(echo $sam3result | grep -q "SAM3 OK" ; echo $?) -eq 0 ] ; then
        (
          echo "To: $notifytowhom"
