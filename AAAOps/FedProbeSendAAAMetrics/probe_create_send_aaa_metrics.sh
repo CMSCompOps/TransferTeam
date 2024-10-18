@@ -237,6 +237,9 @@ if [ -f $THEPATH/check_subscribed_sites.sh ] ; then
          echo "Content-Type: text/html"
 	 cat $THEPATH/site_aaa_status.html	 
        )  | /usr/sbin/sendmail -t
+       echo DEBUG sam3result OK mail sent
+      else
+       echo DEBUG sam3result not OK
       fi
       #else
       #   echo $sam3result | grep -q "SAM3 OK" && \
