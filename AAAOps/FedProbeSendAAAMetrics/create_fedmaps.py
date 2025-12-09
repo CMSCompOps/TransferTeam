@@ -97,7 +97,7 @@ def xrd_info(redirector,what):
     config_out = "unknown"
     count = 0
     count_limit = 3
-    timelimit = 2
+    timelimit = 180 # 2
     if 'xrdmapc' in command :
        timelimit = 180
        count_limit = 1
